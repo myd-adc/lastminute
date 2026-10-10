@@ -1,6 +1,6 @@
 import { Check, ChevronRight } from 'lucide-react-native';
-import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, Switch, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { useEffect, useState, type ReactNode } from 'react';
+import { Animated, Platform, Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { onest, type, useTheme } from '@/theme';
 
@@ -41,19 +41,30 @@ export function Segmented<K extends string>({
   );
 }
 
-// Accent switch from the Figma settings rows.
+// Figma switch (52×32): accent track with a dark knob on the right when on; surface2 track, muted knob when off.
 export function Toggle({ value, onChange, accessibilityLabel }: { value: boolean; onChange: (v: boolean) => void; accessibilityLabel?: string }) {
   const { c } = useTheme();
+  const [x] = useState(() => new Animated.Value(value ? 1 : 0));
+  useEffect(() => {
+    Animated.timing(x, { toValue: value ? 1 : 0, duration: 160, useNativeDriver: Platform.OS !== 'web' }).start();
+  }, [value, x]);
   return (
-    <Switch
+    <Pressable
+      accessibilityRole="switch"
       accessibilityLabel={accessibilityLabel}
-      value={value}
-      onValueChange={onChange}
-      trackColor={{ false: c.surface2, true: c.accent }}
-      thumbColor={value ? c.onAccent : c.muted}
-      ios_backgroundColor={c.surface2}
-      {...({ activeThumbColor: c.onAccent } as object)}
-    />
+      accessibilityState={{ checked: value }}
+      onPress={() => onChange(!value)}
+      hitSlop={8}
+      style={[styles.switchTrack, { backgroundColor: value ? c.accent : c.surface2 }]}
+    >
+      <Animated.View
+        style={[
+          styles.switchKnob,
+          { backgroundColor: value ? c.onAccent : c.muted },
+          { transform: [{ translateX: x.interpolate({ inputRange: [0, 1], outputRange: [0, 20] }) }] },
+        ]}
+      />
+    </Pressable>
   );
 }
 
@@ -133,10 +144,12 @@ export function ListRow({
 const styles = StyleSheet.create({
   track: { flexDirection: 'row', height: 44, padding: 4, gap: 4, borderRadius: 14 },
   segment: { flex: 1, flexDirection: 'row', gap: 6, alignItems: 'center', justifyContent: 'center', borderRadius: 10 },
+  switchTrack: { width: 52, height: 32, borderRadius: 16, padding: 4, justifyContent: 'center' },
+  switchKnob: { width: 24, height: 24, borderRadius: 12 },
   checkRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   box: { width: 24, height: 24, borderRadius: 7, alignItems: 'center', justifyContent: 'center' },
   radio: { width: 22, height: 22, borderRadius: 11, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
   radioDot: { width: 12, height: 12, borderRadius: 6 },
   list: { borderRadius: 20, overflow: 'hidden' },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 52, paddingHorizontal: 16, paddingVertical: 12 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 46, paddingHorizontal: 16, paddingVertical: 11 },
 });

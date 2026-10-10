@@ -12,6 +12,8 @@ export type Palette = {
   danger: string;
   dangerSoft: string;
   accentSoft: string;
+  // Accent used as text/icon colour: lime on dark, deep olive on light (lime text is unreadable on light).
+  accentInk: string;
   scrim: string;
 };
 
@@ -27,6 +29,7 @@ export const dark: Palette = {
   danger: '#FF3D8B',
   dangerSoft: 'rgba(255,61,139,0.14)',
   accentSoft: 'rgba(215,255,59,0.14)',
+  accentInk: '#D7FF3B',
   scrim: 'rgba(11,11,16,0.6)',
 };
 
@@ -42,6 +45,7 @@ export const light: Palette = {
   danger: '#E5306F',
   dangerSoft: 'rgba(229,48,111,0.1)',
   accentSoft: 'rgba(215,255,59,0.35)',
+  accentInk: '#5A7A00',
   scrim: 'rgba(11,11,16,0.35)',
 };
 

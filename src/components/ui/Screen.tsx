@@ -4,7 +4,8 @@ import type { ReactNode } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { tabBarClearance, useIsWide } from '@/lib/layout';
+import { footerBottom, tabBarClearance, useIsWide } from '@/lib/layout';
+import { t } from '@/i18n/translate';
 import { type, useTheme } from '@/theme';
 
 type Props = {
@@ -23,7 +24,7 @@ export function Screen({ children, scroll = true, withTabBar, keyboard, footer, 
   const insets = useSafeAreaInsets();
   const wide = useIsWide();
   const top = wide ? 32 : insets.top + 8;
-  const bottom = withTabBar && !wide ? tabBarClearance(insets.bottom) : footer ? 16 : insets.bottom + 24;
+  const bottom = withTabBar && !wide ? tabBarClearance(insets.bottom) : footer ? 16 : footerBottom(insets.bottom);
   const pad = padded ? { paddingHorizontal: wide ? 40 : 20 } : null;
 
   const body = scroll ? (
@@ -41,7 +42,7 @@ export function Screen({ children, scroll = true, withTabBar, keyboard, footer, 
   const content = (
     <View style={[styles.flex, { backgroundColor: c.bg }]}>
       {body}
-      {footer && <View style={[pad, { paddingTop: 12, paddingBottom: wide ? 32 : insets.bottom + 12, gap: 12 }]}>{footer}</View>}
+      {footer && <View style={[pad, { paddingTop: 12, paddingBottom: wide ? 32 : footerBottom(insets.bottom), gap: 12 }]}>{footer}</View>}
     </View>
   );
 
@@ -76,7 +77,7 @@ export function Header({
   return (
     <View style={styles.header}>
       {onBack && (
-        <Pressable accessibilityRole="button" accessibilityLabel="Назад" hitSlop={12} onPress={onBack}>
+        <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12} onPress={onBack}>
           <ChevronLeft size={26} color={c.text} strokeWidth={2} />
         </Pressable>
       )}

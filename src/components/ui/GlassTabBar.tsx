@@ -4,24 +4,29 @@ import { Compass, MessageSquare, User, Users, type LucideIcon } from 'lucide-rea
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { t, useT, type TKey } from '@/i18n';
+import { tabBarBottom } from '@/lib/layout';
 import { useTheme } from '@/theme';
 
 export type TabKey = 'events' | 'scene' | 'chats' | 'me';
 
-export const tabs: { key: TabKey; label: string; icon: LucideIcon; href: '/' | '/scene' | '/chats' | '/me' }[] = [
-  { key: 'events', label: 'Події', icon: Compass, href: '/' },
-  { key: 'scene', label: 'Сцена', icon: Users, href: '/scene' },
-  { key: 'chats', label: 'Чати', icon: MessageSquare, href: '/chats' },
-  { key: 'me', label: 'Профіль', icon: User, href: '/me' },
+export const tabs: { key: TabKey; labelKey: TKey; icon: LucideIcon; href: '/' | '/scene' | '/chats' | '/me' }[] = [
+  { key: 'events', labelKey: 'common.tabs.events', icon: Compass, href: '/' },
+  { key: 'scene', labelKey: 'common.tabs.scene', icon: Users, href: '/scene' },
+  { key: 'chats', labelKey: 'common.tabs.chats', icon: MessageSquare, href: '/chats' },
+  { key: 'me', labelKey: 'common.tabs.profile', icon: User, href: '/me' },
 ];
+
+export const tabLabel = (tab: (typeof tabs)[number]) => t(tab.labelKey);
 
 // Figma «TabBar · Glass»: floating liquid-glass pill, icons only, centred 24 pt above the home indicator.
 export function GlassTabBar({ active, unread }: { active: TabKey; unread?: boolean }) {
   const { c, scheme } = useTheme();
+  useT(); // re-render on language change
   const insets = useSafeAreaInsets();
   const lightMode = scheme === 'light';
   return (
-    <View style={[styles.wrap, { bottom: Math.max(insets.bottom, 12) + 12 }]}>
+    <View style={[styles.wrap, { bottom: tabBarBottom(insets.bottom) }]}>
       <View style={[styles.shadow, { boxShadow: lightMode ? '0px 12px 16px rgba(10,10,15,0.16)' : '0px 12px 16px rgba(10,10,15,0.45)' }]}>
         <BlurView
           intensity={30}
@@ -42,7 +47,7 @@ export function GlassTabBar({ active, unread }: { active: TabKey; unread?: boole
               <Pressable
                 key={t.key}
                 accessibilityRole="tab"
-                accessibilityLabel={t.label}
+                accessibilityLabel={tabLabel(t)}
                 accessibilityState={{ selected: on }}
                 onPress={() => router.navigate(t.href)}
                 style={[

@@ -5,11 +5,12 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { getInterest, getScene } from '@/data/mock';
 import { unreadCount } from '@/lib/selectors';
+import { useT } from '@/i18n';
 import { useNow, useStore } from '@/store/AppStore';
 import { onest, type, useTheme } from '@/theme';
 
 import { Gradient } from './Gradient';
-import { tabs, type TabKey } from './GlassTabBar';
+import { tabLabel, tabs, type TabKey } from './GlassTabBar';
 
 export const SIDEBAR_WIDTH = 248;
 
@@ -24,6 +25,7 @@ export function activeTabFor(pathname: string): TabKey {
 export function WebShell({ children }: { children: ReactNode }) {
   const { c } = useTheme();
   const { state } = useStore();
+  const { t } = useT();
   const now = useNow();
   const pathname = usePathname();
   const active = activeTabFor(pathname);
@@ -36,14 +38,14 @@ export function WebShell({ children }: { children: ReactNode }) {
       <View style={[styles.sidebar, { borderRightColor: c.line, backgroundColor: c.bg }]}>
         <Pressable onPress={() => router.navigate('/')} style={styles.logo}>
           <View style={[styles.logoDot, { backgroundColor: c.accent }]} />
-          <Text style={[onest('bold', 18), { color: c.text }]}>lastminute</Text>
+          <Text style={[onest('bold', 18), { color: c.text }]}>{t('common.appName')}</Text>
         </Pressable>
 
         {scene && (
           <Pressable onPress={() => router.push('/preferences')} style={[styles.scene, { backgroundColor: c.surface }]}>
             <Gradient id={scene.gradient} style={styles.sceneDot} />
             <View style={{ flex: 1 }}>
-              <Text style={[type.caption, { color: c.muted }]}>Моя сцена</Text>
+              <Text style={[type.caption, { color: c.muted }]}>{t('common.myScene')}</Text>
               <Text style={[type.subheadStrong, { color: c.text }]} numberOfLines={1}>
                 {scene.name}
               </Text>
@@ -53,18 +55,18 @@ export function WebShell({ children }: { children: ReactNode }) {
         )}
 
         <View style={{ gap: 4 }}>
-          {tabs.map((t) => {
-            const on = t.key === active;
-            const Icon = t.icon;
+          {tabs.map((tab) => {
+            const on = tab.key === active;
+            const Icon = tab.icon;
             return (
               <Pressable
-                key={t.key}
-                onPress={() => router.navigate(t.href)}
+                key={tab.key}
+                onPress={() => router.navigate(tab.href)}
                 style={({ hovered }: { hovered?: boolean }) => [styles.nav, (on || hovered) && { backgroundColor: c.surface }]}
               >
-                <Icon size={20} color={on ? c.accent : c.muted} strokeWidth={2} />
-                <Text style={[onest(on ? 'semibold' : 'medium', 15), { color: on ? c.text : c.muted, flex: 1 }]}>{t.label}</Text>
-                {t.key === 'chats' && unread > 0 && (
+                <Icon size={20} color={on ? c.accentInk : c.muted} strokeWidth={2} />
+                <Text style={[onest(on ? 'semibold' : 'medium', 15), { color: on ? c.text : c.muted, flex: 1 }]}>{tabLabel(tab)}</Text>
+                {tab.key === 'chats' && unread > 0 && (
                   <View style={[styles.badge, { backgroundColor: c.accent }]}>
                     <Text style={[onest('bold', 12), { color: c.onAccent }]}>{unread}</Text>
                   </View>
@@ -78,7 +80,7 @@ export function WebShell({ children }: { children: ReactNode }) {
 
         {myInterests.length > 0 && (
           <View style={[styles.prefs, { borderColor: c.line, backgroundColor: c.bg }]}>
-            <Text style={[type.caption, { color: c.muted }]}>Твої вподобання</Text>
+            <Text style={[type.caption, { color: c.muted }]}>{t('common.yourPreferences')}</Text>
             <View style={styles.prefChips}>
               {myInterests.slice(0, 4).map((i) => (
                 <View key={i.id} style={[styles.prefChip, { backgroundColor: c.surface2 }]}>
@@ -94,7 +96,7 @@ export function WebShell({ children }: { children: ReactNode }) {
               )}
             </View>
             <Pressable onPress={() => router.push('/preferences')}>
-              <Text style={[onest('semibold', 13), { color: c.accent }]}>Змінити →</Text>
+              <Text style={[onest('semibold', 13), { color: c.accentInk }]}>{t('common.change')}</Text>
             </Pressable>
           </View>
         )}
