@@ -1,13 +1,11 @@
-// Ukrainian date/time formatting, hand-rolled: Intl locale data is not guaranteed under Hermes.
+// Dates, countdowns and counters in the current UI language (see src/i18n). Hand-rolled: Intl locale data is not
+// guaranteed under Hermes. Function names are historical — they are no longer Ukrainian-only.
+import { t } from '@/i18n/translate';
 
 export const HOUR = 60 * 60 * 1000;
 export const DAY = 24 * HOUR;
 
-const WEEKDAY_SHORT = ['НД', 'ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ'];
-const WEEKDAY_TITLE = ['Нд', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
-const WEEKDAY_LONG = ['Неділя', 'Понеділок', 'Вівторок', 'Середа', 'Четвер', 'Пʼятниця', 'Субота'];
-const MONTHS = ['січня', 'лютого', 'березня', 'квітня', 'травня', 'червня', 'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня'];
-
+const list = (key: 'weekdayShort' | 'weekdayTitle' | 'weekdayLong' | 'months') => t(`common.time.${key}`).split(',');
 const pad = (n: number) => String(n).padStart(2, '0');
 
 // Local date `dayOffset` days from `base`, at hh:mm.
@@ -18,8 +16,8 @@ export function at(base: number, dayOffset: number, hh: number, mm = 0): string 
   return d.toISOString();
 }
 
-const startOfDay = (t: number) => {
-  const d = new Date(t);
+const startOfDay = (ms: number) => {
+  const d = new Date(ms);
   d.setHours(0, 0, 0, 0);
   return d.getTime();
 };
@@ -31,20 +29,21 @@ export const time = (iso: string) => {
   return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 };
 
-export const weekdayShort = (iso: string) => WEEKDAY_SHORT[new Date(iso).getDay()];
-export const weekdayTitle = (iso: string) => WEEKDAY_TITLE[new Date(iso).getDay()];
+export const weekdayShort = (iso: string) => list('weekdayShort')[new Date(iso).getDay()];
+export const weekdayTitle = (iso: string) => list('weekdayTitle')[new Date(iso).getDay()];
 export const dayOfMonth = (iso: string) => pad(new Date(iso).getDate());
+// «Субота, 10 жовтня» / «Saturday, 10 October»
 export const longDate = (iso: string) => {
   const d = new Date(iso);
-  return `${WEEKDAY_LONG[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]}`;
+  return `${list('weekdayLong')[d.getDay()]}, ${d.getDate()} ${list('months')[d.getMonth()]}`;
 };
 
 // «Сьогодні» / «Завтра» / «Вчора» / «Пт»
 export function dayLabel(iso: string, now: number) {
   const diff = dayDiff(iso, now);
-  if (diff === 0) return 'Сьогодні';
-  if (diff === 1) return 'Завтра';
-  if (diff === -1) return 'Вчора';
+  if (diff === 0) return t('common.time.today');
+  if (diff === 1) return t('common.time.tomorrow');
+  if (diff === -1) return t('common.time.yesterday');
   return weekdayTitle(iso);
 }
 
@@ -60,21 +59,21 @@ export function shortStamp(iso: string, now: number) {
   return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}`;
 }
 
-// «27 год», «40 хв» — compact countdown used on chat timers.
+// «27 год» / «27 h», «40 хв» / «40 min» — compact countdown used on chat timers.
 export function countdown(ms: number) {
   const min = Math.max(0, Math.ceil(ms / 60000));
-  if (min >= 60) return `${Math.floor(min / 60)} год`;
-  return `${min} хв`;
+  if (min >= 60) return t('common.time.hoursShort', { n: Math.floor(min / 60) });
+  return t('common.time.minutesShort', { n: min });
 }
 
-// «23 год 40 хв»
+// «23 год 40 хв» / «23 h 40 min»
 export function countdownLong(ms: number) {
   const min = Math.max(0, Math.floor(ms / 60000));
   const h = Math.floor(min / 60);
-  return h > 0 ? `${h} год ${min % 60} хв` : `${min % 60} хв`;
+  return h > 0 ? t('common.time.hoursMinutes', { h, m: min % 60 }) : t('common.time.minutesShort', { n: min % 60 });
 }
 
-// Picks the Ukrainian plural form: one (1, 21), few (2–4, 22–24), many (0, 5–20…).
+// Ukrainian plural picker kept for existing callers; prefer plural entries in the dictionaries.
 export function plural(n: number, one: string, few: string, many: string) {
   const m10 = n % 10;
   const m100 = n % 100;
@@ -83,6 +82,6 @@ export function plural(n: number, one: string, few: string, many: string) {
   return many;
 }
 
-export const going = (n: number) => `${n} ${plural(n, 'йде', 'йдуть', 'йдуть')}`;
-export const people = (n: number) => `${n} ${plural(n, 'людина', 'людини', 'людей')}`;
-export const eventsCount = (n: number) => `${n} ${plural(n, 'подія', 'події', 'подій')}`;
+export const going = (n: number) => t('common.count.going', { count: n });
+export const people = (n: number) => t('common.count.people', { count: n });
+export const eventsCount = (n: number) => t('common.count.events', { count: n });

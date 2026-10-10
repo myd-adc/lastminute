@@ -12,5 +12,5 @@ paths:
 - `src/store/AppStore.tsx` — provider (AsyncStorage persistence, hydration), `useStore()` → `{ state, dispatch, sendMessage }`.
 - `useNow()` is the demo-aware clock: always use it instead of `Date.now()` in UI.
 - `src/lib/selectors.ts` — all derived data (feed, room queue, matches, chat list/status, album, pending surveys, stats). New derived logic goes here, not in screens.
-- `src/lib/time.ts` — Ukrainian dates, countdowns, plurals, hand-rolled (no `Intl` locale data under Hermes).
-- `src/data/types.ts` — domain model; `src/data/mock.ts` — demo data, dates relative to app start.
+- `src/lib/time.ts` — dates, countdowns, counters in the current language, hand-rolled (no `Intl` locale data under Hermes).
+- `src/data/types.ts` — domain model; `src/data/mock.ts` — bilingual demo data (live bindings switched by language), dates relative to app start.

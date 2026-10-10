@@ -1,9 +1,10 @@
 import { pastChats, PAST_EVENT_IDS } from '@/data/mock';
 import type { GoesWith, InterestId, Message, Photo, ReportReason, SceneId, Survey, Vibe } from '@/data/types';
+import { deviceLang, type Lang } from '@/i18n/core';
 import type { ThemeMode } from '@/theme';
 import type { GradientId } from '@/theme/palette';
 
-export const STATE_VERSION = 4;
+export const STATE_VERSION = 5;
 
 export type Me = {
   name: string;
@@ -25,6 +26,7 @@ export type Report = { userId: string; eventId?: string; reason: ReportReason; a
 
 export type State = {
   version: number;
+  language: Lang;
   // M01–M02: phone + SMS code (demo: any 6 digits).
   phone: string | null;
   phoneVerified: boolean;
@@ -70,6 +72,7 @@ export const groupChatId = (eventId: string) => `group:${eventId}`;
 
 export const initialState: State = {
   version: STATE_VERSION,
+  language: deviceLang(),
   phone: null,
   phoneVerified: false,
   me: null,
@@ -110,6 +113,7 @@ export type Action =
   | { type: 'setScene'; sceneId: SceneId; studentEmail?: string | null }
   | { type: 'completeOnboarding'; notify: boolean }
   | { type: 'setTheme'; theme: ThemeMode }
+  | { type: 'setLanguage'; language: Lang }
   | { type: 'setNotify'; key: keyof State['settings']['notify']; value: boolean }
   | { type: 'setPrivacy'; key: 'showSolo' | 'showSharedEvents'; value: boolean }
   | { type: 'setFeedTab'; tab: FeedTab }
@@ -138,7 +142,6 @@ export type Action =
 function seedHistory(state: State): State {
   const going = { ...state.going };
   const decisions = { ...state.decisions };
-  const messages = { ...state.messages };
   const myContacts = { ...state.myContacts };
   const surveys = { ...state.surveys };
   for (const eventId of PAST_EVENT_IDS) {
@@ -147,10 +150,9 @@ function seedHistory(state: State): State {
   }
   for (const chat of pastChats) {
     decisions[pairKey(chat.eventId, chat.userId)] = { choice: 'go', at: chat.messages[0].at };
-    messages[dmChatId(chat.eventId, chat.userId)] = chat.messages;
     if (chat.myContact) myContacts[pairKey(chat.eventId, chat.userId)] = chat.myContact;
   }
-  return { ...state, going, decisions, messages, myContacts, surveys };
+  return { ...state, going, decisions, myContacts, surveys };
 }
 
 const omit = <T extends Record<string, unknown>>(obj: T, key: string): T => {
@@ -178,6 +180,8 @@ export function reducer(state: State, action: Action): State {
       };
       return seedHistory(next);
     }
+    case 'setLanguage':
+      return { ...state, language: action.language };
     case 'setTheme':
       return { ...state, settings: { ...state.settings, theme: action.theme } };
     case 'setNotify':
@@ -257,6 +261,6 @@ export function reducer(state: State, action: Action): State {
     case 'hydrate':
       return action.state;
     case 'logout':
-      return { ...initialState, settings: { ...initialState.settings, theme: state.settings.theme } };
+      return { ...initialState, language: state.language, settings: { ...initialState.settings, theme: state.settings.theme } };
   }
 }

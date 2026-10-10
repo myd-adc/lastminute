@@ -1,5 +1,5 @@
 // Pure derived data over store state + mock data. Every function takes `now` (demo clock) explicitly.
-import { albumPhotos, attendanceOf, attendeesOf, events, getEvent, getUser, PAST_EVENT_IDS, soloGroups } from '@/data/mock';
+import { albumPhotos, attendanceOf, attendeesOf, events, getEvent, getUser, PAST_EVENT_IDS, pastChats, soloGroups } from '@/data/mock';
 import type { Attendance, Event, Message, Photo, User } from '@/data/types';
 import { dmChatId, groupChatId, pairKey, type State } from '@/store/state';
 
@@ -93,10 +93,13 @@ export function chatState(state: State, event: Event, userId: string | null, now
   return 'open';
 }
 
+// Thread = seeded demo messages (localized, from mock data) + messages written in this session (stored in state).
 export function messagesOf(state: State, chatId: string): Message[] {
   const own = state.messages[chatId] ?? [];
-  if (!chatId.startsWith('group:')) return own;
-  const seeded = soloGroups[chatId.slice('group:'.length)]?.messages ?? [];
+  const seeded = chatId.startsWith('group:')
+    ? (soloGroups[chatId.slice('group:'.length)]?.messages ?? [])
+    : (pastChats.find((c) => dmChatId(c.eventId, c.userId) === chatId)?.messages ?? []);
+  if (!seeded.length) return own;
   return [...seeded, ...own].sort((a, b) => a.at.localeCompare(b.at));
 }
 

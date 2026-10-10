@@ -1,7 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState, type ReactNode } from 'react';
 
-import { attendanceOf } from '@/data/mock';
+import { attendanceOf, setDataLanguage } from '@/data/mock';
+import { setLang } from '@/i18n/core';
 import type { Message } from '@/data/types';
 
 import { initialState, reducer, STATE_VERSION, type Action, type State } from './state';
@@ -64,6 +65,10 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       dispatch({ type: 'addMessage', chatId, message: { id: newId(), from: userId, text: reply, at } });
     }, 1400);
   }, []);
+
+  // Plain functions (formatters, mock data getters) read the language from module state; sync it before children render.
+  setLang(state.language);
+  setDataLanguage(state.language);
 
   const value = useMemo(() => ({ state, dispatch, hydrated, sendMessage }), [state, hydrated, sendMessage]);
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

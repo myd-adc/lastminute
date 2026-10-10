@@ -2,7 +2,7 @@
 
 # LastMinute
 
-Event-first social app for students in Lviv: swipe through events of your scene → mark «Я йду» → only then see who else is going, swipe people in the event room, and go together after a mutual «Піти разом». Not a dating feed, not a ticket shop. UI copy is Ukrainian.
+Event-first social app for students in Lviv: swipe through events of your scene → mark «Я йду» → only then see who else is going, swipe people in the event room, and go together after a mutual «Піти разом». Not a dating feed, not a ticket shop. UI in Ukrainian and English (see `.claude/rules/i18n.md`).
 
 One Expo Router codebase ships iOS, Android and web. The web build is also the demo people open from a QR code.
 
@@ -37,6 +37,7 @@ npx expo export --platform web   # production web build into dist/
 - `src/data/` — domain types and mock data.
 - `src/components/ui/` — shared kit (import from `@/components/ui`); feature components in `src/components/<feature>/`.
 - `src/theme/` — colours, fonts, gradients. Styling rules: `.claude/rules/styling.md`.
+- `src/i18n/` — `t()` / `useT()` and the uk/en dictionaries. No hard-coded UI copy: `.claude/rules/i18n.md`.
 
 ## Code style
 
