@@ -42,3 +42,6 @@ yarn-error.*
 
 # Playwright MCP screenshots/snapshots
 .playwright-mcp/
+
+# Design reference screenshots exported from Figma
+design/
