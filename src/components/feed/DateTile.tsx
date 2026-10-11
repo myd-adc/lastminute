@@ -3,17 +3,17 @@ import { StyleSheet, Text, View } from 'react-native';
 import { time, weekdayShort } from '@/lib/time';
 import { onest, useTheme } from '@/theme';
 
-// «FRI / 21:00» tile from W03 «Next in your scene» and the Scene tab lists.
+// «FRI / 21:00» tile from W03 «Next in your scene» (64×48, 12 radius) and the Scene tab lists.
 export function DateTile({ iso }: { iso: string }) {
-  const { c, scheme } = useTheme();
+  const { c } = useTheme();
   return (
     <View style={[styles.tile, { backgroundColor: c.surface2 }]}>
-      <Text style={[onest('bold', 12), { color: scheme === 'light' ? '#5A7A00' : c.accent }]}>{weekdayShort(iso)}</Text>
-      <Text style={[onest('medium', 12), { color: c.muted }]}>{time(iso)}</Text>
+      <Text style={[onest('bold', 13, 16), { color: c.accentInk }]}>{weekdayShort(iso)}</Text>
+      <Text style={[onest('regular', 12, 15), { color: c.muted }]}>{time(iso)}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  tile: { width: 56, height: 50, borderRadius: 12, alignItems: 'center', justifyContent: 'center', gap: 2 },
+  tile: { width: 64, height: 48, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
 });

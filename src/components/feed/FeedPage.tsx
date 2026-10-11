@@ -6,10 +6,11 @@ import { AvatarStack, Button, IconButton, Pill } from '@/components/ui';
 import type { Event } from '@/data/types';
 import { useT } from '@/i18n';
 import { going as goingLabel } from '@/lib/time';
-import { display, onest, useTheme, type GradientId } from '@/theme';
+import { display, onest, useStyles, type Palette, type GradientId, type Scheme } from '@/theme';
 
 import { priceLabel } from './format';
 import { PosterArt } from './PosterArt';
+import { RailButton } from './RailButton';
 
 export type PeoplePreview = { people: { name: string; gradient: GradientId }[] };
 
@@ -25,7 +26,7 @@ type Props = FeedHandlers & {
   event: Event;
   width: number;
   height: number;
-  posterTop: number;
+  shift: number; // insets.top - 50: the safe area replaces the 50 pt Figma status bar
   bottomClearance: number;
   when: string;
   saved: boolean;
@@ -35,58 +36,53 @@ type Props = FeedHandlers & {
   preview: PeoplePreview;
 };
 
-const WHITE = '#F6F5F2';
+// Translucent venue/price pills over the poster (M06/W03: text colour at 16 %).
+export const posterPillBg = (scheme: Scheme) => (scheme === 'light' ? 'rgba(11,11,16,0.16)' : 'rgba(246,245,242,0.16)');
 
 // One full-screen page of the M06 swipe feed. Memoised: only re-renders when its own data changes.
+// Everything below the poster is bottom-anchored above the tab bar, as in the frame (actions end 16 pt above the bar).
 export const FeedPage = memo(function FeedPage(p: Props) {
   const { event: e } = p;
-  const { c, scheme } = useTheme();
+  const s = useStyles(makeStyles);
   const { t } = useT();
-  const light = scheme === 'light';
-  const fg = light ? c.text : WHITE;
   const extra = Math.max(0, p.goingN - p.preview.people.length);
   const open = () => p.onOpen(e.id);
   return (
     <View style={{ width: p.width, height: p.height }}>
       <Pressable accessibilityRole="button" accessibilityLabel={t('feed.openDetails', { title: e.title })} onPress={open} style={StyleSheet.absoluteFill}>
-        <PosterArt event={e} width={p.width} height={p.height} top={p.posterTop} scrimFrom={0.38} />
+        <PosterArt event={e} width={p.width} height={p.height} variant="feed" shift={p.shift} />
       </Pressable>
 
       <View style={[styles.content, { paddingBottom: p.bottomClearance }]}>
         <View style={styles.mid}>
-          <Pressable onPress={open} style={styles.info}>
-            <View style={styles.pills}>
-              <Pill label={p.when} tone="accent" />
-              <Pill label={e.venue} tone="glass" />
-              <Pill label={priceLabel(e)} tone="glass" />
-            </View>
-            <Text style={[display(30, 34), { color: fg }]} numberOfLines={3}>
-              {e.title}
-            </Text>
-          </Pressable>
+          <View style={styles.info}>
+            <Pressable onPress={open} style={styles.infoTop}>
+              <View style={styles.pills}>
+                <Pill label={p.when} tone="accent" />
+                <Pill label={e.venue} tone="surface2" weight="medium" style={s.glassPill} />
+                <Pill label={priceLabel(e)} tone="surface2" weight="medium" style={s.glassPill} />
+              </View>
+              <Text style={[display(28, 31), s.text]} numberOfLines={3}>
+                {e.title}
+              </Text>
+            </Pressable>
+            <Pressable onPress={open} style={s.who}>
+              <AvatarStack people={p.preview.people} size={36} extra={extra} />
+              <View style={styles.whoText}>
+                <Text style={[onest('bold', 15, 19), s.text]}>{t('feed.card.goingFrom', { count: p.goingN, scene: p.scene })}</Text>
+                {p.soloN > 0 && <Text style={[onest('medium', 13, 17), s.accent]}>{t('feed.card.soloHint', { count: p.soloN })}</Text>}
+              </View>
+            </Pressable>
+          </View>
           <View style={styles.rail}>
-            <IconButton icon={Bookmark} size={44} variant={light ? 'surface' : 'glass'} active={p.saved} label={p.saved ? t('common.saved') : t('common.save')} onPress={() => p.onSave(e.id)} />
-            <IconButton icon={Send} size={44} variant={light ? 'surface' : 'glass'} label={t('feed.share')} onPress={() => p.onShare(e)} />
-            <IconButton icon={Users} size={44} variant={light ? 'surface' : 'glass'} label={String(p.goingN)} accessibilityLabel={goingLabel(p.goingN)} onPress={open} />
+            <RailButton tone="poster" icon={Bookmark} active={p.saved} label={p.saved ? t('common.saved') : t('common.save')} onPress={() => p.onSave(e.id)} />
+            <RailButton tone="poster" icon={Send} label={t('feed.share')} onPress={() => p.onShare(e)} />
+            <RailButton tone="poster" icon={Users} label={String(p.goingN)} accessibilityLabel={goingLabel(p.goingN)} onPress={open} />
           </View>
         </View>
 
-        <Pressable onPress={open} style={[styles.who, light && styles.whoLight]}>
-          <AvatarStack people={p.preview.people} size={30} extra={extra} />
-          <View style={styles.flex}>
-            <Text style={[onest('bold', 14, 18), { color: fg }]}>
-              {t('feed.card.goingFrom', { count: p.goingN, scene: p.scene })}
-            </Text>
-            {p.soloN > 0 && (
-              <Text style={[onest('medium', 13, 17), { color: light ? '#5A7A00' : c.accent }]}>
-                {t('feed.card.soloHint', { count: p.soloN })}
-              </Text>
-            )}
-          </View>
-        </Pressable>
-
         <View style={styles.actions}>
-          <IconButton icon={X} size={60} variant={light ? 'surface' : 'glass'} accessibilityLabel={t('common.skip')} onPress={() => p.onSkip(e.id)} />
+          <IconButton icon={X} size={56} accessibilityLabel={t('common.skip')} onPress={() => p.onSkip(e.id)} />
           <Button label={t('common.imGoing')} onPress={() => p.onGo(e.id)} style={styles.go} />
         </View>
       </View>
@@ -94,25 +90,34 @@ export const FeedPage = memo(function FeedPage(p: Props) {
   );
 });
 
+const makeStyles = (c: Palette, scheme: Scheme) =>
+  StyleSheet.create({
+    text: { color: c.text },
+    accent: { color: c.accentInk },
+    glassPill: { backgroundColor: posterPillBg(scheme) },
+    who: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      paddingLeft: 12,
+      paddingRight: 14,
+      paddingVertical: 10,
+      borderRadius: 18,
+      backgroundColor: c.surface,
+      borderWidth: 1,
+      borderColor: c.line,
+    },
+  });
+
 const styles = StyleSheet.create({
-  flex: { flex: 1 },
-  content: { position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 20, gap: 14, pointerEvents: 'box-none' },
-  mid: { flexDirection: 'row', alignItems: 'flex-end', gap: 12 },
-  info: { flex: 1, gap: 14 },
-  pills: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  rail: { width: 64, alignItems: 'center', gap: 14, paddingBottom: 2 },
-  who: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    padding: 12,
-    marginRight: 64,
-    borderRadius: 18,
-    backgroundColor: 'rgba(11,11,16,0.55)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
-  },
-  whoLight: { backgroundColor: 'rgba(255,255,255,0.75)', borderColor: 'rgba(255,255,255,0.9)' },
+  content: { position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 20, gap: 18, pointerEvents: 'box-none' },
+  // Info column (292 pt) + 52 pt rail at x = 318; the rail ends 57 pt above the info block.
+  mid: { flexDirection: 'row', alignItems: 'flex-end', gap: 6 },
+  info: { flex: 1, gap: 12 },
+  infoTop: { gap: 12 },
+  pills: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
+  whoText: { flex: 1, gap: 2 },
+  rail: { width: 52, alignItems: 'center', gap: 18, marginBottom: 57 },
   actions: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  go: { flex: 1, height: 60, borderRadius: 30 },
+  go: { flex: 1 },
 });

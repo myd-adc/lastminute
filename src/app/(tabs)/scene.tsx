@@ -14,7 +14,7 @@ import { display, onest, type, useTheme } from '@/theme';
 
 // «Scene» tab (not in Figma): the user's scene, this week's events on it and the people (faces hidden until «I’m going»).
 export default function SceneScreen() {
-  const { c, scheme } = useTheme();
+  const { c } = useTheme();
   const { state } = useStore();
   const { t } = useT();
   const now = useNow();
@@ -23,7 +23,7 @@ export default function SceneScreen() {
   const list = sceneEvents(state, now);
   const mine = list.filter((e) => state.going[e.id]).length;
   const faces = users.filter((u) => u.sceneId === state.sceneId && !state.blocked[u.id]).slice(0, 6);
-  const accentText = scheme === 'light' ? '#5A7A00' : c.accent;
+  const accentText = c.accentInk;
 
   return (
     <Screen withTabBar contentStyle={wide && styles.wide}>

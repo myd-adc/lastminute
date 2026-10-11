@@ -105,7 +105,7 @@ export function MobileFeed() {
       event={item}
       width={size.w}
       height={size.h}
-      posterTop={insets.top + 70}
+      shift={insets.top - 50}
       bottomClearance={clearance}
       when={whenLabel(item.startsAt, now)}
       saved={!!state.saved[item.id]}
@@ -120,7 +120,7 @@ export function MobileFeed() {
   return (
     <View style={[styles.root, { backgroundColor: c.bg }]} onLayout={onLayout}>
       {feed.length === 0 ? (
-        <EndOfFeed header={header(false)} contentStyle={{ paddingTop: insets.top + 12, paddingBottom: clearance }} />
+        <EndOfFeed header={header(false)} contentStyle={{ paddingTop: insets.top + 8, paddingBottom: clearance }} />
       ) : (
         size.h > 0 && (
           <>
@@ -140,7 +140,7 @@ export function MobileFeed() {
               initialNumToRender={2}
               maxToRenderPerBatch={2}
             />
-            <View style={[styles.header, { top: insets.top + 12 }]}>{header(true)}</View>
+            <View style={[styles.header, { top: insets.top + 8 }]}>{header(true)}</View>
           </>
         )
       )}
