@@ -18,6 +18,7 @@ type Props = {
   keyboard?: boolean; // web: ← skip, → go, Space toggles the profile details
   maxWidth?: number;
   maxHeight?: number;
+  wide?: boolean; // W05 geometry (card 380×520) instead of M09 (350×500)
   ref?: Ref<DeckHandle>;
 };
 
@@ -25,19 +26,30 @@ const ND = Platform.OS !== 'web'; // native driver for transforms on iOS/Android
 const SWIPE_DISTANCE = 110;
 const SWIPE_VELOCITY = 0.7;
 const BASE_TILT = 1.5;
-const PEEK = 12;
+// Figma places the tilted card ~7 pt left of the column centre while the sheets behind stay centred.
+const CARD_SHIFT = -7;
+// «Card behind» sheets relative to the top card: width inset, top offset, height inset (M09 / W05).
+const SHEETS = {
+  mobile: [
+    { dw: 24, top: 3.5, dh: 20 },
+    { dw: 48, top: 13.5, dh: 30 },
+  ],
+  wide: [
+    { dw: 32, top: 15, dh: 12 },
+    { dw: 60, top: 27, dh: 20 },
+  ],
+};
 // Pan values whose card is already flying out (guards double swipes/taps).
 const flying = new WeakSet<Animated.ValueXY>();
 
 // Stack of tilted person cards (M09/W05). Drag the top card left/right; the next card scales up underneath.
-export function CardDeck({ people, onDecide, onMore, showShared, keyboard, maxWidth = 350, maxHeight = 500, ref }: Props) {
+export function CardDeck({ people, onDecide, onMore, showShared, keyboard, maxWidth = 350, maxHeight = 500, wide, ref }: Props) {
   const { c } = useTheme();
   const { t } = useT();
   const [box, setBox] = useState({ w: 0, h: 0 });
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const top = people[0];
   const next = people[1];
-  const third = people[2];
   const topId = top?.user.id;
 
   // A fresh value per top card: the leaving card keeps its own until it unmounts, so nothing has to be reset.
@@ -102,8 +114,12 @@ export function CardDeck({ people, onDecide, onMore, showShared, keyboard, maxWi
   };
 
   const cardW = Math.min(maxWidth, box.w);
-  const cardH = Math.min(maxHeight, box.h - PEEK * 2 - 8);
+  const cardH = Math.min(maxHeight, box.h);
   const ready = cardW > 200 && cardH > 300;
+  const cardLeft = (box.w - cardW) / 2 + CARD_SHIFT;
+  const cardTop = (box.h - cardH) / 2;
+  // One sheet per waiting person behind the top card, at most two.
+  const sheets = (wide ? SHEETS.wide : SHEETS.mobile).slice(0, Math.max(0, people.length - 1));
 
   const topStyle = {
     transform: [
@@ -113,11 +129,15 @@ export function CardDeck({ people, onDecide, onMore, showShared, keyboard, maxWi
     ],
   };
   const progress = pan.x.interpolate({ inputRange: [-SWIPE_DISTANCE, 0, SWIPE_DISTANCE], outputRange: [1, 0, 1], extrapolate: 'clamp' });
+  // At rest the next card is hidden behind the top one (the Figma sheets show instead); it grows in while dragging.
+  const first = (wide ? SHEETS.wide : SHEETS.mobile)[0];
   const nextStyle = {
+    opacity: progress,
     transform: [
-      { translateY: progress.interpolate({ inputRange: [0, 1], outputRange: [PEEK * 2.4, 0] }) },
-      { scale: progress.interpolate({ inputRange: [0, 1], outputRange: [0.93, 1] }) },
-      { rotate: progress.interpolate({ inputRange: [0, 1], outputRange: ['-2deg', `${BASE_TILT}deg`] }) },
+      { translateX: progress.interpolate({ inputRange: [0, 1], outputRange: [-CARD_SHIFT, 0] }) },
+      { translateY: progress.interpolate({ inputRange: [0, 1], outputRange: [first.top - first.dh / 2 + 4, 0] }) },
+      { scale: progress.interpolate({ inputRange: [0, 1], outputRange: [(cardW - first.dw) / Math.max(cardW, 1), 1] }) },
+      { rotate: progress.interpolate({ inputRange: [0, 1], outputRange: ['0deg', `${BASE_TILT}deg`] }) },
     ],
   };
   const goOpacity = pan.x.interpolate({ inputRange: [20, 100], outputRange: [0, 1], extrapolate: 'clamp' });
@@ -129,24 +149,31 @@ export function CardDeck({ people, onDecide, onMore, showShared, keyboard, maxWi
   return (
     <View style={styles.flex} onLayout={onLayout}>
       {ready && top && (
-        <View style={[styles.stage, { width: cardW, height: cardH }]}>
-          {third && (
-            <View style={[styles.abs, styles.noTouch, { left: 24, top: PEEK * 2, transform: [{ rotate: '-4deg' }] }]}>
-              <CardShadowSheet width={cardW - 48} height={cardH - 10} />
-            </View>
-          )}
+        <>
+          {sheets
+            .slice()
+            .reverse()
+            .map((sh) => (
+              <View
+                key={sh.dw}
+                style={[styles.abs, styles.noTouch, { left: (box.w - (cardW - sh.dw)) / 2, top: cardTop + sh.top }]}
+              >
+                <CardShadowSheet width={cardW - sh.dw} height={cardH - sh.dh} />
+              </View>
+            ))}
           {cards.map((a) => {
             const isTop = a === top;
             return (
               <Animated.View
                 key={a.user.id}
-                style={[styles.abs, isTop ? topStyle : [nextStyle, styles.noTouch]]}
+                style={[styles.abs, { left: cardLeft, top: cardTop }, isTop ? topStyle : [nextStyle, styles.noTouch]]}
                 {...(isTop ? responder.panHandlers : null)}
               >
                 <PersonCard
                   attendee={a}
                   width={cardW}
                   height={cardH}
+                  wide={wide}
                   showShared={showShared}
                   expanded={isTop && expandedId === a.user.id}
                   onPress={isTop ? toggleExpanded : undefined}
@@ -165,15 +192,14 @@ export function CardDeck({ people, onDecide, onMore, showShared, keyboard, maxWi
               </Animated.View>
             );
           })}
-        </View>
+        </>
       )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  stage: { marginBottom: PEEK * 2 },
+  flex: { flex: 1 },
   abs: { position: 'absolute', top: 0, left: 0 },
   noTouch: { pointerEvents: 'none' },
   stamp: { position: 'absolute', top: 64, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 14, pointerEvents: 'none' },

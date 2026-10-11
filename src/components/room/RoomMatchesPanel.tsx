@@ -1,14 +1,14 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { ChatThread } from '@/components/chat/ChatThread';
-import { Avatar } from '@/components/ui';
 import type { Event } from '@/data/types';
 import { useT } from '@/i18n';
 import { expiresAt, matchesAt } from '@/lib/selectors';
 import { time } from '@/lib/time';
 import { dmChatId, pairKey, useStore } from '@/store/AppStore';
-import { onest, type, useTheme } from '@/theme';
+import { fonts, onest, type, useTheme } from '@/theme';
 
+import { Face } from './Face';
 import { TimerPill } from './TimerPill';
 
 export const MATCH_PANEL_WIDTH = 440;
@@ -33,12 +33,12 @@ export function RoomMatchesPanel({
   const left = expiresAt(event) - now;
 
   return (
-    <View style={[styles.panel, { borderLeftColor: c.line }]}>
+    <View style={[styles.panel, { borderLeftColor: c.line, backgroundColor: c.surface }]}>
       <View style={styles.head}>
-        <Text style={[onest('bold', 17), { color: c.text, flex: 1 }]}>{t('room.matches.title')}</Text>
+        <Text style={[styles.title, { color: c.text }]}>{t('room.matches.title')}</Text>
         {matches.length > 0 && (
           <View style={[styles.count, { backgroundColor: c.accent }]}>
-            <Text style={[onest('bold', 13), { color: c.onAccent }]}>{matches.length}</Text>
+            <Text style={[onest('bold', 13, 16), { color: c.onAccent }]}>{matches.length}</Text>
           </View>
         )}
       </View>
@@ -63,14 +63,14 @@ export function RoomMatchesPanel({
                   accessibilityRole="button"
                   accessibilityState={{ selected: on }}
                   onPress={() => onSelect(u.id)}
-                  style={({ hovered }: { hovered?: boolean }) => [styles.row, (on || hovered) && { backgroundColor: c.surface }]}
+                  style={({ hovered }: { hovered?: boolean }) => [styles.row, (on || hovered) && { backgroundColor: c.surface2 }]}
                 >
-                  <Avatar name={u.name} gradient={u.gradient} size={40} />
-                  <View style={{ flex: 1, gap: 2 }}>
-                    <Text style={[type.bodyStrong, { color: c.text }]} numberOfLines={1}>
+                  <Face name={u.name} gradient={u.gradient} size={44} fontSize={16} font="display" />
+                  <View style={{ flex: 1, gap: 1 }}>
+                    <Text style={[onest('bold', 16, 20), { color: c.text }]} numberOfLines={1}>
                       {u.name}
                     </Text>
-                    <Text style={[type.footnote, { color: c.muted }]} numberOfLines={1}>
+                    <Text style={[onest('regular', 13, 17), { color: c.muted }]} numberOfLines={1}>
                       {t('room.matches.bothTapped')}
                       {at ? ` · ${time(at)}` : ''}
                     </Text>
@@ -81,7 +81,7 @@ export function RoomMatchesPanel({
             })}
           </View>
           {selected && (
-            <View style={[styles.thread, { borderTopColor: c.line }]}>
+            <View style={styles.thread}>
               <ChatThread key={selected.id} variant="panel" chatId={dmChatId(event.id, selected.id)} eventId={event.id} userId={selected.id} />
             </View>
           )}
@@ -93,9 +93,10 @@ export function RoomMatchesPanel({
 
 const styles = StyleSheet.create({
   panel: { width: MATCH_PANEL_WIDTH, borderLeftWidth: 1 },
-  head: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 24, paddingTop: 32, paddingBottom: 16, gap: 12 },
-  count: { minWidth: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 8 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 24, paddingVertical: 12 },
-  thread: { flex: 1, borderTopWidth: 1 },
+  head: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 24, paddingTop: 28, paddingBottom: 16, gap: 8 },
+  title: { flex: 1, fontFamily: fonts.displaySemibold, fontSize: 16, lineHeight: 20 },
+  count: { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 14 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 24, paddingVertical: 14 },
+  thread: { flex: 1 },
   empty: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10, paddingHorizontal: 48 },
 });

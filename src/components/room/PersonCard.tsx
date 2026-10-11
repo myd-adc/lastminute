@@ -18,17 +18,20 @@ type Props = {
   expanded?: boolean; // «Space · профіль»: smaller photo, extra details
   onMore?: () => void;
   onPress?: () => void;
+  wide?: boolean; // W05 card (380×520): taller photo, bigger initial and name
 };
 
 export const sharedLabel = (n: number) => translate('room.card.shared', { count: n });
 
 // M09 person card: gradient photo with a huge initial, pills, name, scene · affiliation, tags, «Говори зі мною про».
-export function PersonCard({ attendee, width, height, showShared, expanded, onMore, onPress }: Props) {
+// Figma M09: photo 240 / initial 150 / pills inset 14 / body 16·19; W05: 250 / 160 / 16 / 18·20.
+export function PersonCard({ attendee, width, height, showShared, expanded, onMore, onPress, wide }: Props) {
   const { c } = useTheme();
   const { t } = useT();
   const { user, attendance } = attendee;
-  const photoH = Math.max(110, Math.min(expanded ? 130 : 240, height - 260));
-  const initialSize = Math.min(150, Math.round(photoH * 0.66));
+  const m = wide ? WIDE : MOBILE;
+  const photoH = Math.max(110, Math.min(expanded ? 130 : m.photo, height - 260));
+  const initialSize = Math.round((photoH * m.initial) / m.photo);
   const tags = user.tags.map(getInterest).filter((i) => !!i);
   const shared = showShared && user.sharedEvents > 0;
 
@@ -40,11 +43,21 @@ export function PersonCard({ attendee, width, height, showShared, expanded, onMo
       style={[styles.card, { width, height, backgroundColor: c.surface, borderColor: c.line }]}
     >
       <Gradient id={user.gradient} style={[styles.photo, { height: photoH }]}>
-        <Text style={[styles.initial, { fontSize: initialSize, lineHeight: Math.round(initialSize * 1.1) }]}>
+        <Text
+          style={[
+            styles.initial,
+            {
+              color: c.text,
+              fontSize: initialSize,
+              lineHeight: Math.round(initialSize * 1.24),
+              transform: [{ translateY: -Math.round((photoH * m.lift) / m.photo) }],
+            },
+          ]}
+        >
           {user.name.charAt(0).toUpperCase()}
         </Text>
-        {attendance.solo && <Pill label={soloLabel(user)} tone="bg" style={styles.solo} />}
-        {shared && <Pill label={sharedLabel(user.sharedEvents)} tone="accent" style={styles.shared} />}
+        {attendance.solo && <Pill label={soloLabel(user)} tone="bg" style={[styles.abs, { top: m.inset, left: m.inset }]} />}
+        {shared && <Pill label={sharedLabel(user.sharedEvents)} tone="accent" style={[styles.abs, { bottom: m.inset, left: m.inset }]} />}
         {onMore && (
           <Pressable accessibilityRole="button" accessibilityLabel={t('room.card.report')} hitSlop={8} onPress={onMore} style={styles.more}>
             <MoreHorizontal size={20} color="#F6F5F2" strokeWidth={2} />
@@ -52,15 +65,13 @@ export function PersonCard({ attendee, width, height, showShared, expanded, onMo
         )}
       </Gradient>
 
-      <View style={styles.body}>
-        <View style={{ gap: 4 }}>
-          <Text style={[display(22, 28), { letterSpacing: -0.44, color: c.text }]} numberOfLines={1}>
-            {user.name}, {user.age}
-          </Text>
-          <Text style={[onest('regular', 14, 19), { color: c.muted }]} numberOfLines={1}>
-            {getScene(user.sceneId).name} · {user.affiliation}
-          </Text>
-        </View>
+      <View style={[styles.body, { paddingTop: m.bodyTop, paddingHorizontal: m.bodyX }]}>
+        <Text style={[display(m.name, Math.round(m.name * 1.24)), { color: c.text }]} numberOfLines={1}>
+          {user.name}, {user.age}
+        </Text>
+        <Text style={[onest('regular', 14, 18), { color: c.muted }]} numberOfLines={1}>
+          {getScene(user.sceneId).name} · {user.affiliation}
+        </Text>
         {tags.length > 0 && (
           <View style={styles.tags}>
             {tags.map((tag) => (
@@ -69,7 +80,7 @@ export function PersonCard({ attendee, width, height, showShared, expanded, onMo
           </View>
         )}
         <View style={[styles.talk, { backgroundColor: c.bg }]}>
-          <Text style={[onest('medium', 12, 16), { color: c.muted }]}>{t('room.card.talkAbout')}</Text>
+          <Text style={[onest('medium', 12, 15), { color: c.muted }]}>{t('room.card.talkAbout')}</Text>
           <Text style={[onest('semibold', 15, 20), { color: c.text }]} numberOfLines={expanded ? undefined : 3}>
             {user.talkAbout}
           </Text>
@@ -91,18 +102,21 @@ export function PersonCard({ attendee, width, height, showShared, expanded, onMo
   );
 }
 
-// Plain sheet peeking out behind the top card (Figma: surface2, radius 28).
+// Plain sheet peeking out behind the top card (Figma «Card behind»: surface2, radius 28, no border).
 export function CardShadowSheet({ width, height }: { width: number; height: number }) {
   const { c } = useTheme();
-  return <View style={{ width, height, borderRadius: 28, backgroundColor: c.surface2, borderWidth: 1, borderColor: c.line }} />;
+  return <View style={{ width, height, borderRadius: 28, backgroundColor: c.surface2 }} />;
 }
+
+// `lift` = how far the Figma initial sits above the vertical centre of the photo.
+const MOBILE = { photo: 240, initial: 150, lift: 7, inset: 14, bodyTop: 16, bodyX: 19, name: 22 };
+const WIDE = { photo: 250, initial: 160, lift: 10, inset: 16, bodyTop: 18, bodyX: 20, name: 24 };
 
 const styles = StyleSheet.create({
   card: { borderRadius: 28, borderWidth: 1, overflow: 'hidden' },
   photo: { alignItems: 'center', justifyContent: 'center' },
-  initial: { fontFamily: fonts.display, color: '#F6F5F2', opacity: 0.92 },
-  solo: { position: 'absolute', top: 14, left: 14 },
-  shared: { position: 'absolute', bottom: 14, left: 14 },
+  initial: { fontFamily: fonts.display },
+  abs: { position: 'absolute' },
   more: {
     position: 'absolute',
     top: 12,
@@ -116,7 +130,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.18)',
   },
-  body: { padding: 16, gap: 12 },
-  tags: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  body: { paddingBottom: 16, gap: 10 },
+  tags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   talk: { borderRadius: 16, paddingHorizontal: 14, paddingVertical: 12, gap: 4 },
 });

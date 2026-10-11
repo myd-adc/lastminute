@@ -3,21 +3,19 @@ import { Check, MapPin, MoreHorizontal } from 'lucide-react-native';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { Avatar, AvatarStack, Button } from '@/components/ui';
+import { Button } from '@/components/ui';
 import { attendanceOf, soloGroups } from '@/data/mock';
 import type { Event, User } from '@/data/types';
 import { useT } from '@/i18n';
 import { t as translate } from '@/i18n/translate';
 import { decisionOf, isMatch, soloGroupMembers } from '@/lib/selectors';
 import { useStore } from '@/store/AppStore';
-import { display, onest, type, useTheme } from '@/theme';
+import { display, fonts, onest, type, useTheme } from '@/theme';
 
+import { Face, Faces } from './Face';
 import { byGender, writeTo } from './text';
 
-export const useAccentText = () => {
-  const { c, scheme } = useTheme();
-  return scheme === 'light' ? '#5A7A00' : c.accent;
-};
+export const useAccentText = () => useTheme().c.accentInk;
 
 export const membersLabel = (n: number) => translate('common.count.participants', { count: n });
 
@@ -50,7 +48,7 @@ export function useSoloGroup(event: Event) {
 
 type Group = ReturnType<typeof useSoloGroup>;
 
-// «Точка зустрічі» card with the «Я буду ✓» toggle.
+// «Точка зустрічі» card with the «Я буду ✓» toggle (Figma «Pinned meeting point»).
 export function MeetCard({ g, showMenu = true }: { g: Group; showMenu?: boolean }) {
   const { c } = useTheme();
   const { t } = useT();
@@ -60,25 +58,25 @@ export function MeetCard({ g, showMenu = true }: { g: Group; showMenu?: boolean 
   const me = g.state.me;
   const people = [
     ...g.confirmedUsers.map((u) => ({ name: u.name, gradient: u.gradient })),
-    ...(g.meConfirmed && me ? [{ name: me.name, gradient: me.gradient }] : []),
+    ...(g.meConfirmed && me ? [{ name: me.name, gradient: me.gradient, photoUri: me.photoUri }] : []),
   ];
   return (
     <View style={[styles.meet, { borderColor: c.accent, backgroundColor: c.surface }]}>
       <View style={styles.rowCenter}>
-        <MapPin size={18} color={accentText} strokeWidth={2} />
-        <Text style={[type.footnote, { color: c.muted, flex: 1 }]}>{t('room.group.meetingPoint')}</Text>
+        <MapPin size={16} color={accentText} strokeWidth={2} />
+        <Text style={[onest('semibold', 12, 15), { color: c.muted, flex: 1 }]}>{t('room.group.meetingPoint')}</Text>
         {showMenu && (
           <Pressable accessibilityRole="button" accessibilityLabel={t('room.group.menu')} hitSlop={10} onPress={() => setMenu((m) => !m)}>
-            <MoreHorizontal size={20} color={c.muted} />
+            <MoreHorizontal size={16} color={c.muted} strokeWidth={2} />
           </Pressable>
         )}
       </View>
-      <Text style={[display(24, 30), { color: c.text }]}>
+      <Text style={[display(20, 25), { color: c.text }]}>
         {t('room.group.meetAt', { place: g.group.meetPlace, time: g.group.meetTime })}
       </Text>
-      <View style={styles.rowCenter}>
-        {people.length > 0 && <AvatarStack people={people.slice(0, 5)} size={24} />}
-        <Text style={[type.subhead, { color: c.muted, flex: 1 }]}>
+      <View style={[styles.rowCenter, { gap: 10 }]}>
+        {people.length > 0 && <Faces people={people.slice(0, 5)} size={24} fontSize={10} />}
+        <Text style={[onest('medium', 13, 17), { color: c.muted, flex: 1 }]}>
           {t('room.group.confirmed', { count: g.confirmedCount, total: g.total })}
         </Text>
         <Pressable
@@ -87,12 +85,13 @@ export function MeetCard({ g, showMenu = true }: { g: Group; showMenu?: boolean 
           onPress={g.toggleMeet}
           style={({ pressed }) => [
             styles.meetPill,
-            g.meConfirmed ? { backgroundColor: c.accent } : { borderWidth: 1.5, borderColor: c.accent },
+            g.meConfirmed ? { backgroundColor: c.accent } : [styles.meetPillOff, { borderColor: c.accent }],
             pressed && { opacity: 0.85 },
           ]}
         >
-          <Text style={[onest('semibold', 13), { color: g.meConfirmed ? c.onAccent : accentText }]}>{t('room.group.imThere')}</Text>
-          {g.meConfirmed && <Check size={14} color={c.onAccent} strokeWidth={2.6} />}
+          <Text style={[onest('bold', 12, 15), { color: g.meConfirmed ? c.onAccent : accentText }]}>
+            {t(g.meConfirmed ? 'room.group.imThereOn' : 'room.group.imThere')}
+          </Text>
         </Pressable>
       </View>
       {menu && (
@@ -163,10 +162,10 @@ function MemberRow({ event, user, confirmed }: { event: Event; user: User; confi
   };
   return (
     <View style={styles.member}>
-      <Avatar name={user.name} gradient={user.gradient} size={40} />
+      <Face name={user.name} gradient={user.gradient} size={40} fontSize={16} />
       <View style={{ flex: 1, gap: 2 }}>
-        <Text style={[type.bodyStrong, { color: c.text }]}>{user.name}</Text>
-        <Text style={[type.footnote, { color: confirmed ? accentText : c.muted }]} numberOfLines={1}>
+        <Text style={[onest('semibold', 15, 19), { color: c.text }]}>{user.name}</Text>
+        <Text style={[onest('regular', 12, 15), { color: confirmed ? accentText : c.muted }]} numberOfLines={1}>
           {user.affiliation} · {confirmed ? t('room.group.memberConfirmed') : t(byGender(user, 'room.group.noReplyF', 'room.group.noReplyM'))}
         </Text>
       </View>
@@ -177,7 +176,7 @@ function MemberRow({ event, user, confirmed }: { event: Event; user: User; confi
         onPress={wave}
         style={[styles.waveBtn, { backgroundColor: decided ? c.accent : c.surface2 }]}
       >
-        <Text style={{ fontSize: 18 }}>{matched ? '💬' : '👋'}</Text>
+        <Text style={{ fontSize: 16 }}>{matched ? '💬' : '👋'}</Text>
       </Pressable>
     </View>
   );
@@ -191,15 +190,15 @@ export function GroupMembersPanel({ event, g }: { event: Event; g: Group }) {
   const me = g.state.me;
   const rules = [t('room.group.rule1'), t('room.group.rule2'), t('room.group.rule3'), t('room.group.rule4')];
   return (
-    <View style={[styles.panel, { borderLeftColor: c.line }]}>
-      <Text style={[display(20, 26), { color: c.text }]}>{t('room.group.members', { count: g.total })}</Text>
-      <View style={{ gap: 4 }}>
+    <View style={[styles.panel, { borderLeftColor: c.line, backgroundColor: c.surface }]}>
+      <Text style={[styles.panelTitle, { color: c.text }]}>{t('room.group.members', { count: g.total })}</Text>
+      <View style={{ gap: 2 }}>
         {me && (
           <View style={styles.member}>
-            <Avatar name={me.name} gradient={me.gradient} photoUri={me.photoUri} size={40} />
+            <Face name={me.name} gradient={me.gradient} photoUri={me.photoUri} size={40} fontSize={16} />
             <View style={{ flex: 1, gap: 2 }}>
-              <Text style={[type.bodyStrong, { color: c.text }]}>{t('room.group.you', { name: me.name })}</Text>
-              <Text style={[type.footnote, { color: g.meConfirmed ? accentText : c.muted }]} numberOfLines={1}>
+              <Text style={[onest('semibold', 15, 19), { color: c.text }]}>{t('room.group.you', { name: me.name })}</Text>
+              <Text style={[onest('regular', 12, 15), { color: g.meConfirmed ? accentText : c.muted }]} numberOfLines={1}>
                 {[me.affiliation, g.meConfirmed ? t('room.group.meConfirmed') : t('room.group.meNotYet')].filter(Boolean).join(' · ')}
               </Text>
             </View>
@@ -209,18 +208,18 @@ export function GroupMembersPanel({ event, g }: { event: Event; g: Group }) {
           <MemberRow key={u.id} event={event} user={u} confirmed={!!g.group?.confirmed.includes(u.id)} />
         ))}
       </View>
-      <View style={[styles.rules, { backgroundColor: c.surface }]}>
-        <Text style={[type.bodyStrong, { color: c.text }]}>{t('room.group.howItWorks')}</Text>
+      <View style={[styles.rules, { backgroundColor: c.bg }]}>
+        <Text style={[onest('semibold', 14, 18), { color: c.text }]}>{t('room.group.howItWorks')}</Text>
         {rules.map((r) => (
-          <View key={r} style={styles.rowCenter}>
+          <View key={r} style={styles.rule}>
             <Check size={16} color={accentText} strokeWidth={2.6} />
-            <Text style={[type.subhead, { color: c.muted, flex: 1 }]}>{r}</Text>
+            <Text style={[onest('regular', 13, 18), { color: c.muted, flex: 1 }]}>{r}</Text>
           </View>
         ))}
       </View>
       <View style={{ flex: 1 }} />
       <Pressable onPress={g.leave} style={({ pressed }) => [styles.leave, { borderColor: c.line }, pressed && { opacity: 0.8 }]}>
-        <Text style={[type.callout, { color: c.text }]}>{t('room.group.leave')}</Text>
+        <Text style={[onest('semibold', 14, 18), { color: c.text }]}>{t('room.group.leave')}</Text>
       </Pressable>
     </View>
   );
@@ -228,15 +227,18 @@ export function GroupMembersPanel({ event, g }: { event: Event; g: Group }) {
 
 const styles = StyleSheet.create({
   rowCenter: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  meet: { borderWidth: 1.5, borderRadius: 20, padding: 16, gap: 10 },
-  meetPill: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 12, paddingVertical: 7, borderRadius: 14 },
+  meet: { borderWidth: 1.5, borderRadius: 18, paddingHorizontal: 14, paddingVertical: 12, gap: 8 },
+  meetPill: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 14 },
+  meetPillOff: { borderWidth: 1, paddingHorizontal: 9, paddingVertical: 5 },
   menu: { borderTopWidth: 1, marginTop: 4, paddingTop: 4 },
   menuItem: { paddingVertical: 10 },
   gate: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 14, paddingHorizontal: 20, maxWidth: 440, width: '100%', alignSelf: 'center' },
   gateBtn: { alignSelf: 'stretch', marginTop: 8 },
-  member: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8 },
-  waveBtn: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
-  panel: { width: 400, borderLeftWidth: 1, paddingHorizontal: 24, paddingTop: 32, paddingBottom: 24, gap: 20 },
-  rules: { borderRadius: 20, padding: 16, gap: 10 },
-  leave: { height: 48, borderRadius: 24, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
+  member: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
+  waveBtn: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
+  panel: { width: 400, borderLeftWidth: 1, paddingHorizontal: 24, paddingTop: 28, paddingBottom: 24, gap: 14 },
+  panelTitle: { fontFamily: fonts.displaySemibold, fontSize: 16, lineHeight: 20 },
+  rules: { borderRadius: 16, padding: 16, gap: 10 },
+  rule: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
+  leave: { paddingVertical: 12, borderRadius: 22, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
 });

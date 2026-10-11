@@ -1,6 +1,5 @@
 import { router } from 'expo-router';
-import { ArrowLeft, ArrowRight, Lock, X } from 'lucide-react-native';
-import type { ReactNode } from 'react';
+import { Lock, X } from 'lucide-react-native';
 import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { Button, IconButton, Segmented } from '@/components/ui';
@@ -30,20 +29,20 @@ export function RoomTabs({ event, now, compact, style }: { event: Event; now: nu
           : {
               key: 'album',
               label: t(compact ? 'room.tabs.albumAt' : 'room.tabs.albumFrom', { time: time(event.startsAt) }),
-              icon: <Lock size={15} color={c.muted} strokeWidth={2} />,
+              icon: <Lock size={14} color={c.muted} strokeWidth={2} />,
             },
       ]}
     />
   );
 }
 
-// ✕ and «👋 Піти разом» (60 pt action row).
-export function RoomActions({ onSkip, onGo, style }: { onSkip: () => void; onGo: () => void; style?: StyleProp<ViewStyle> }) {
+// ✕ and «👋 Піти разом» (60 pt action row, 14 pt gap). `goWidth` fixes the CTA width (W05: 260).
+export function RoomActions({ onSkip, onGo, goWidth, style }: { onSkip: () => void; onGo: () => void; goWidth?: number; style?: StyleProp<ViewStyle> }) {
   const { t } = useT();
   return (
     <View style={[styles.actions, style]}>
       <IconButton icon={X} size={60} onPress={onSkip} accessibilityLabel={t('common.skip')} />
-      <Button label={t('common.goTogether')} onPress={onGo} style={styles.go} />
+      <Button label={t('common.goTogether')} onPress={onGo} style={[styles.go, goWidth ? { width: goWidth } : styles.goFlex]} />
     </View>
   );
 }
@@ -52,7 +51,7 @@ export function RoomFootnote({ name }: { name: string }) {
   const { c } = useTheme();
   const { t } = useT();
   return (
-    <Text style={[type.footnote, { color: c.muted, textAlign: 'center' }]} numberOfLines={2}>
+    <Text style={[onest('regular', 13, 17), { color: c.muted, textAlign: 'center' }]} numberOfLines={2}>
       {t('room.footnote', { name })}
     </Text>
   );
@@ -110,45 +109,38 @@ export function RoomDone({ event, matches, waiting }: { event: Event; matches: n
   );
 }
 
-function Key({ label, icon }: { label?: string; icon?: 'left' | 'right' }) {
-  const { c } = useTheme();
-  const Icon = icon === 'left' ? ArrowLeft : ArrowRight;
-  return (
-    <View style={[styles.key, { borderColor: c.line, backgroundColor: c.surface }]}>
-      {icon ? <Icon size={12} color={c.text} strokeWidth={2.4} /> : <Text style={[onest('semibold', 11), { color: c.text }]}>{label}</Text>}
-    </View>
-  );
-}
-
-// W05 keyboard hints under the deck.
-export function KeyboardHints() {
+// W05 keyboard hints under the deck: outlined key caps (12 semibold) + 13 pt muted labels.
+export function KeyboardHints({ style }: { style?: StyleProp<ViewStyle> }) {
   const { c } = useTheme();
   const { t } = useT();
-  const hint = (k: ReactNode, text: string) => (
+  const hint = (key: string, text: string) => (
     <View style={styles.hint}>
-      {k}
-      <Text style={[onest('regular', 12), { color: c.muted }]}>{text}</Text>
+      <View style={[styles.key, { borderColor: c.line }]}>
+        <Text style={[onest('semibold', 12, 15), { color: c.text }]}>{key}</Text>
+      </View>
+      <Text style={[onest('regular', 13, 17), { color: c.muted }]}>{text}</Text>
     </View>
   );
   return (
-    <View style={styles.hints}>
-      {hint(<Key icon="right" />, t('room.keys.go'))}
-      {hint(<Key icon="left" />, t('room.keys.skip'))}
-      {hint(<Key label={t('room.keys.space')} />, t('room.keys.profile'))}
+    <View style={[styles.hints, style]}>
+      {hint(t('room.keys.right'), t('room.keys.go'))}
+      {hint(t('room.keys.left'), t('room.keys.skip'))}
+      {hint(t('room.keys.space'), t('room.keys.profile'))}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  actions: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  go: { flex: 1, height: 60, borderRadius: 30 },
+  actions: { flexDirection: 'row', alignItems: 'center', gap: 14 },
+  go: { height: 60, borderRadius: 28 },
+  goFlex: { flex: 1 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 14, paddingHorizontal: 12, maxWidth: 420, alignSelf: 'center', width: '100%' },
   emoji: { fontSize: 56 },
   cta: { alignSelf: 'stretch', marginTop: 8 },
   summary: { flexDirection: 'row', gap: 12, alignSelf: 'stretch' },
   stat: { flex: 1, borderRadius: 20, padding: 16, alignItems: 'center', gap: 2 },
   buttons: { alignSelf: 'stretch', gap: 12, marginTop: 8 },
-  hints: { flexDirection: 'row', justifyContent: 'center', gap: 24 },
-  hint: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  key: { minWidth: 22, height: 22, paddingHorizontal: 6, borderRadius: 6, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  hints: { flexDirection: 'row', justifyContent: 'center', gap: 16 },
+  hint: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  key: { paddingHorizontal: 7, paddingVertical: 2, borderRadius: 6, borderWidth: 1 },
 });

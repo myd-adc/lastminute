@@ -1,7 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
 import { useCallback, useRef, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { CardDeck, type Choice, type DeckHandle } from '@/components/room/CardDeck';
@@ -16,7 +16,7 @@ import { useIsWide, footerBottom } from '@/lib/layout';
 import { attendeesFor, isWaiting, matchesAt, roomQueue, type Attendee } from '@/lib/selectors';
 import { whenLabel } from '@/lib/time';
 import { useNow, useStore } from '@/store/AppStore';
-import { type, useTheme } from '@/theme';
+import { onest, type, useTheme } from '@/theme';
 
 export default function RoomScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -81,22 +81,34 @@ function useRoom(event: Event, onMatch?: (userId: string) => void) {
 }
 
 // ── M09 ────────────────────────────────────────────────────────────────
+// Figma rhythm (390×844, 50 pt status bar): header 44 at +6 · segmented 44 at +12 · card 350×500 at +20 ·
+// actions 60 at +22 · footnote at +18 · 51 pt to the screen bottom (34 home indicator + 17).
 
 function RoomMobile({ event }: { event: Event }) {
   const { c } = useTheme();
+  const { t } = useT();
   const insets = useSafeAreaInsets();
   const r = useRoom(event);
   const deck = useRef<DeckHandle>(null);
   const top = r.queue.pending[0];
 
   return (
-    <View style={[styles.flex, { backgroundColor: c.bg, paddingTop: insets.top + 8, paddingBottom: footerBottom(insets.bottom) - 14 }]}>
+    <View style={[styles.flex, { backgroundColor: c.bg, paddingTop: insets.top + 6, paddingBottom: footerBottom(insets.bottom) + 13 }]}>
       <View style={styles.mobileHead}>
-        <Header
-          title={event.title}
-          subtitle={`${whenLabel(event.startsAt, r.now, ' ')} · ${event.venue}`}
-          right={r.going ? <Pill label={r.counter} /> : undefined}
-        />
+        <View style={styles.headerRow}>
+          <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12} onPress={() => goBack()}>
+            <ChevronLeft size={26} color={c.text} strokeWidth={2} />
+          </Pressable>
+          <View style={[styles.flex, { gap: 2 }]}>
+            <Text style={[onest('bold', 15, 19), { color: c.text }]} numberOfLines={1}>
+              {event.title}
+            </Text>
+            <Text style={[onest('regular', 13, 17), { color: c.muted }]} numberOfLines={1}>
+              {whenLabel(event.startsAt, r.now, ' ')} · {event.venue}
+            </Text>
+          </View>
+          {r.going && <Pill label={r.counter} />}
+        </View>
         <RoomTabs event={event} now={r.now} />
       </View>
 
@@ -110,7 +122,7 @@ function RoomMobile({ event }: { event: Event }) {
         </View>
       ) : (
         <>
-          <View style={[styles.flex, { paddingHorizontal: 20, paddingTop: 16 }]}>
+          <View style={styles.mobileDeck}>
             <CardDeck
               ref={deck}
               people={r.queue.pending}
@@ -131,6 +143,7 @@ function RoomMobile({ event }: { event: Event }) {
 }
 
 // ── W05 ────────────────────────────────────────────────────────────────
+// Figma (1440×900): header 52 at y 30 · card 380×520 35 below · actions 60 49 below · footnote +20 · hints +53 · 44 bottom.
 
 function RoomWide({ event }: { event: Event }) {
   const { c } = useTheme();
@@ -147,16 +160,15 @@ function RoomWide({ event }: { event: Event }) {
           <IconButton icon={ChevronLeft} size={40} onPress={() => goBack()} accessibilityLabel={t('common.back')} />
           <Gradient id={event.poster.gradient} style={styles.thumb} />
           <View style={[styles.flex, { gap: 2 }]}>
-            <Text style={[type.bodyStrong, { color: c.text }]} numberOfLines={1}>
+            <Text style={[onest('bold', 16, 20), { color: c.text }]} numberOfLines={1}>
               {event.title}
             </Text>
-            <Text style={[type.footnote, { color: c.muted }]} numberOfLines={1}>
+            <Text style={[onest('regular', 13, 17), { color: c.muted }]} numberOfLines={1}>
               {whenLabel(event.startsAt, r.now, ' ')} · {venueShort(event.venue)}
               {r.going ? ` · ${t('room.youreGoing')}` : ''}
             </Text>
           </View>
-          {r.going && <Pill label={r.counter} />}
-          <RoomTabs event={event} now={r.now} compact style={{ width: 280 }} />
+          <RoomTabs event={event} now={r.now} compact style={{ width: 270 }} />
         </View>
 
         {!r.going ? (
@@ -165,26 +177,25 @@ function RoomWide({ event }: { event: Event }) {
           <RoomDone event={event} matches={r.matches} waiting={r.waiting} />
         ) : (
           <>
-            <View style={[styles.flex, { paddingTop: 24 }]}>
+            <View style={styles.wideDeck}>
               <CardDeck
                 ref={deck}
                 people={r.queue.pending}
                 onDecide={r.decide}
                 onMore={r.report}
                 showShared={r.state.settings.showSharedEvents}
-                maxWidth={360}
-                maxHeight={500}
+                maxWidth={380}
+                maxHeight={520}
+                wide
                 keyboard
               />
             </View>
             <View style={styles.wideFoot}>
-              <RoomActions
-                style={{ width: 340 }}
-                onSkip={() => deck.current?.swipe('skip')}
-                onGo={() => deck.current?.swipe('go')}
-              />
-              <RoomFootnote name={top.user.name} />
-              <KeyboardHints />
+              <RoomActions goWidth={260} onSkip={() => deck.current?.swipe('skip')} onGo={() => deck.current?.swipe('go')} />
+              <View style={{ marginTop: 20 }}>
+                <RoomFootnote name={top.user.name} />
+              </View>
+              <KeyboardHints style={{ marginTop: 53 }} />
             </View>
           </>
         )}
@@ -199,9 +210,12 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row' },
   pad: { flex: 1, paddingHorizontal: 20 },
   mobileHead: { paddingHorizontal: 20, gap: 12 },
-  mobileFoot: { paddingHorizontal: 20, paddingTop: 8, gap: 14 },
-  wideMain: { paddingHorizontal: 40, paddingTop: 28, paddingBottom: 28 },
-  wideHead: { flexDirection: 'row', alignItems: 'center', gap: 14 },
-  thumb: { width: 48, height: 48, borderRadius: 12 },
-  wideFoot: { alignItems: 'center', gap: 16, paddingTop: 8 },
+  headerRow: { flexDirection: 'row', alignItems: 'center', gap: 10, height: 44 },
+  mobileDeck: { flex: 1, paddingHorizontal: 20, paddingTop: 20, paddingBottom: 22 },
+  mobileFoot: { paddingHorizontal: 20, gap: 18 },
+  wideMain: { paddingHorizontal: 40, paddingTop: 30, paddingBottom: 44 },
+  wideHead: { flexDirection: 'row', alignItems: 'center', gap: 14, height: 52 },
+  thumb: { width: 52, height: 52, borderRadius: 14 },
+  wideDeck: { flex: 1, paddingTop: 35, paddingBottom: 49 },
+  wideFoot: { alignItems: 'center' },
 });
