@@ -60,7 +60,7 @@ export function GlassTabBar({ active, unread }: { active: TabKey; unread?: boole
                 ]}
               >
                 <Icon size={24} color={iconColor} strokeWidth={2} />
-                {t.key === 'chats' && unread && <View style={[styles.dot, { backgroundColor: lightMode ? '#5A7A00' : c.accent }]} />}
+                {t.key === 'chats' && unread && <View style={[styles.dot, { backgroundColor: c.accentInk }]} />}
               </Pressable>
             );
           })}

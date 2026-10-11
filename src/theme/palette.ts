@@ -45,7 +45,7 @@ export const light: Palette = {
   danger: '#E5306F',
   dangerSoft: 'rgba(229,48,111,0.1)',
   accentSoft: 'rgba(215,255,59,0.35)',
-  accentInk: '#5A7A00',
+  accentInk: '#4F6B00', // Figma color/accent-text
   scrim: 'rgba(11,11,16,0.35)',
 };
 

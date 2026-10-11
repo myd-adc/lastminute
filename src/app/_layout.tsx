@@ -56,8 +56,9 @@ function Navigator() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="event/[id]/index" options={overlay} />
         <Stack.Screen name="report/[userId]" options={overlay} />
+        <Stack.Screen name="language" options={overlay} />
         <Stack.Screen name="match/[eventId]/[userId]" options={{ presentation: 'fullScreenModal', animation: 'fade' }} />
-        <Stack.Screen name="event/[id]/after" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="event/[id]/after" options={{ presentation: 'fullScreenModal' }} />
       </Stack.Protected>
     </Stack>
   );

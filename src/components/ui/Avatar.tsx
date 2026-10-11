@@ -15,14 +15,14 @@ type Props = {
 
 // Initial on a gradient circle — the Figma default when there is no photo.
 export function Avatar({ name, gradient, size, photoUri, ring }: Props) {
-  const { c } = useTheme();
+  const { c, scheme } = useTheme();
   const ringStyle = ring && { borderWidth: 2, borderColor: c.bg };
   const shape = { width: size, height: size, borderRadius: size / 2 };
   if (photoUri) return <Image source={{ uri: photoUri }} style={[shape, ringStyle]} />;
   return (
     <View style={[shape, styles.clip, ringStyle]}>
       <Gradient id={gradient} style={[StyleSheet.absoluteFill, styles.center]}>
-        <Text style={{ fontFamily: fonts.display, fontSize: Math.round(size * 0.42), color: '#F6F5F2' }}>
+        <Text style={{ fontFamily: fonts.display, fontSize: Math.round(size * 0.37), color: scheme === 'light' ? c.text : '#F6F5F2' }}>
           {name.trim().charAt(0).toUpperCase() || '?'}
         </Text>
       </Gradient>
