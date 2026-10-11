@@ -5,7 +5,7 @@ import { Gradient, Pill } from '@/components/ui';
 import { getInterest, getScene } from '@/data/mock';
 import { useT } from '@/i18n';
 import { t as translate } from '@/i18n/translate';
-import type { Attendee } from '@/lib/selectors';
+import { nameAge, type Attendee } from '@/lib/selectors';
 import { display, fonts, onest, useTheme } from '@/theme';
 
 import { byGender, soloLabel } from './text';
@@ -39,7 +39,7 @@ export function PersonCard({ attendee, width, height, showShared, expanded, onMo
     <Pressable
       onPress={onPress}
       disabled={!onPress}
-      accessibilityLabel={`${user.name}, ${user.age}`}
+      accessibilityLabel={nameAge(user)}
       style={[styles.card, { width, height, backgroundColor: c.surface, borderColor: c.line }]}
     >
       <Gradient id={user.gradient} style={[styles.photo, { height: photoH }]}>
@@ -67,7 +67,7 @@ export function PersonCard({ attendee, width, height, showShared, expanded, onMo
 
       <View style={[styles.body, { paddingTop: m.bodyTop, paddingHorizontal: m.bodyX }]}>
         <Text style={[display(m.name, Math.round(m.name * 1.24)), { color: c.text }]} numberOfLines={1}>
-          {user.name}, {user.age}
+          {nameAge(user)}
         </Text>
         <Text style={[onest('regular', 14, 18), { color: c.muted }]} numberOfLines={1}>
           {getScene(user.sceneId).name} · {user.affiliation}

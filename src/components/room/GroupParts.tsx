@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Button } from '@/components/ui';
-import { attendanceOf, soloGroups } from '@/data/mock';
+import { soloGroups } from '@/data/mock';
 import type { Event, User } from '@/data/types';
 import { useT } from '@/i18n';
 import { t as translate } from '@/i18n/translate';
@@ -147,7 +147,7 @@ function MemberRow({ event, user, confirmed }: { event: Event; user: User; confi
   const { c } = useTheme();
   const { t } = useT();
   const accentText = useAccentText();
-  const { state, dispatch } = useStore();
+  const { state, decide } = useStore();
   const decided = decisionOf(state, event.id, user.id) === 'go';
   const matched = isMatch(state, event.id, user.id);
   const wave = () => {
@@ -155,10 +155,7 @@ function MemberRow({ event, user, confirmed }: { event: Event; user: User; confi
       router.push({ pathname: '/chat/[eventId]/[userId]', params: { eventId: event.id, userId: user.id } });
       return;
     }
-    dispatch({ type: 'decide', eventId: event.id, userId: user.id, choice: 'go' });
-    if (attendanceOf(event.id, user.id)?.likesYou) {
-      router.push({ pathname: '/match/[eventId]/[userId]', params: { eventId: event.id, userId: user.id } });
-    }
+    decide(event.id, user.id, 'go').then((m) => m && router.push({ pathname: '/match/[eventId]/[userId]', params: { eventId: event.id, userId: user.id } }));
   };
   return (
     <View style={styles.member}>

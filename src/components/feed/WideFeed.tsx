@@ -6,7 +6,7 @@ import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } fr
 import { Avatar, AvatarStack, Button, IconButton, Pill } from '@/components/ui';
 import type { Event } from '@/data/types';
 import { useT } from '@/i18n';
-import { acquaintances, attendeesFor, goingCount, nextOnScene, soloCount } from '@/lib/selectors';
+import { acquaintances, attendeesFor, goingCount, nameAge, nextOnScene, soloCount } from '@/lib/selectors';
 import { going as goingLabel, whenLabel } from '@/lib/time';
 import { display, fonts, onest, useTheme } from '@/theme';
 
@@ -194,7 +194,7 @@ export function WideFeed() {
               <Avatar name={a.user.name} gradient={a.user.gradient} size={36} ring />
               <View style={styles.textCol}>
                 <Text style={[onest('semibold', 15, 19), { color: c.text }]}>
-                  {a.user.name}, {a.user.age}
+                  {nameAge(a.user)}
                 </Text>
                 <Text style={[onest('regular', 13, 17), { color: c.muted }]}>{a.user.affiliation}</Text>
               </View>

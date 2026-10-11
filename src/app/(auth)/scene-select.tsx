@@ -1,27 +1,36 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { OnboardingFrame } from '@/components/onboarding/OnboardingFrame';
 import { emptyProfile } from '@/components/onboarding/ProfileForm';
 import { NotifyCard, SceneForm, sceneValid, type SceneDraft } from '@/components/onboarding/SceneForm';
 import { scenes } from '@/data/mock';
 import { useT } from '@/i18n';
+import { saveProfile } from '@/api/auth';
+import { isLive } from '@/api/client';
 import { useStore } from '@/store/AppStore';
+import { type, useTheme } from '@/theme';
 
 // M05 «Твоя сцена» — onboarding step 3 of 3, finishes onboarding.
 export default function SceneSelectScreen() {
   const { state, dispatch } = useStore();
   const { t } = useT();
+  const { c } = useTheme();
   const [draft, setDraft] = useState<SceneDraft>({ sceneId: state.sceneId ?? 'ucu', studentEmail: state.studentEmail });
   const [notify, setNotify] = useState(state.settings.notify.soloOnMyEvent);
   const [fallbackMe] = useState(emptyProfile);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const valid = sceneValid(draft);
 
-  const start = () => {
+  const start = async () => {
     if (!valid || !draft.sceneId) return;
+    if (isLive) {
+      const res = await saveProfile({ ...state, sceneId: draft.sceneId, studentEmail: draft.studentEmail });
+      if (!res.ok) return setSaveError(t('onboarding.errors.save'));
+    }
     dispatch({ type: 'setScene', sceneId: draft.sceneId, studentEmail: draft.studentEmail });
-    dispatch({ type: 'completeOnboarding', notify });
+    dispatch({ type: 'completeOnboarding', notify, seedDemo: !isLive });
     // The root Stack.Protected guard flips on the next render; navigate once the app routes are available.
     setTimeout(() => router.replace('/'), 0);
   };
@@ -43,6 +52,7 @@ export default function SceneSelectScreen() {
       <View style={{ gap: 30 }}>
         <SceneForm value={draft} onChange={setDraft} />
         <NotifyCard value={notify} onChange={setNotify} />
+        {saveError && <Text style={[type.footnote, { color: c.danger }]}>{saveError}</Text>}
       </View>
     </OnboardingFrame>
   );

@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Avatar, goBack } from '@/components/ui';
 import { getEvent, getUser } from '@/data/mock';
 import { useT } from '@/i18n';
-import { chatState, expiresAt } from '@/lib/selectors';
+import { chatState, expiresAt, nameAge } from '@/lib/selectors';
 import { countdown, time } from '@/lib/time';
 import { dmChatId, useNow, useStore } from '@/store/AppStore';
 import { onest, type Palette, useStyles, useTheme } from '@/theme';
@@ -81,7 +81,7 @@ export function ChatConversation({ eventId, userId, variant }: { eventId: string
         <Avatar name={user.name} gradient={user.gradient} size={panel ? 44 : 40} ring={!panel} />
         <View style={[s.flex, { minWidth: 0, gap: panel ? 2 : 1 }]}>
           <Text style={[onest('bold', panel ? 17 : 16), { color: c.text }]} numberOfLines={1}>
-            {panel ? `${user.name}, ${user.age}` : user.name}
+            {panel ? nameAge(user) : user.name}
           </Text>
           <Text style={[onest('regular', 13), { color: c.muted }]} numberOfLines={1}>
             {sub}

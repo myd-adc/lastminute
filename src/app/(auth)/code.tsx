@@ -10,6 +10,8 @@ import { formatE164 } from '@/components/onboarding/PhoneInput';
 import { Button } from '@/components/ui';
 import { useT } from '@/i18n';
 import { useIsWide } from '@/lib/layout';
+import { verifyCode } from '@/api/auth';
+import { isLive } from '@/api/client';
 import { useStore } from '@/store/AppStore';
 import { display, onest, useTheme } from '@/theme';
 
@@ -22,12 +24,28 @@ export default function CodeScreen() {
   const { state, dispatch } = useStore();
   const wide = useIsWide();
   const [code, setCode] = useState('');
-  const complete = code.length === CODE_LENGTH;
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const complete = code.length === CODE_LENGTH && !busy;
 
   if (!state.phone) return <Redirect href="/login" />;
+  const phone = state.phone;
 
-  const submit = () => {
+  const submit = async () => {
     if (!complete) return;
+    if (isLive) {
+      setBusy(true);
+      setError(null);
+      const res = await verifyCode(phone, code);
+      setBusy(false);
+      if (!res.ok) return setError(t('onboarding.errors.code'));
+      if (res.data) {
+        // Returning user: restore the saved profile and skip onboarding (the guard switches to the app).
+        dispatch({ type: 'restoreAccount', ...res.data });
+        setTimeout(() => router.replace('/'), 0);
+        return;
+      }
+    }
     dispatch({ type: 'verifyPhone' });
     router.push('/profile-setup');
   };
@@ -42,7 +60,12 @@ export default function CodeScreen() {
       </Text>
     </View>
   );
-  const form = <CodeForm code={code} onChange={setCode} onSubmit={submit} onChangeNumber={back} />;
+  const form = (
+    <View style={{ gap: 10 }}>
+      <CodeForm code={code} onChange={setCode} onSubmit={submit} onChangeNumber={back} />
+      {error && <Text style={[onest('medium', 13), { color: c.danger }]}>{error}</Text>}
+    </View>
+  );
   const cta = <Button label={t('common.confirm')} disabled={!complete} onPress={submit} />;
 
   if (wide)

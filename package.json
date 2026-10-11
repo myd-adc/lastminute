@@ -6,6 +6,8 @@
     "@expo-google-fonts/onest": "^0.4.2",
     "@expo-google-fonts/unbounded": "^0.4.1",
     "@react-native-async-storage/async-storage": "2.2.0",
+    "@supabase/supabase-js": "^2.109.0",
+    "@tanstack/react-query": "^5.104.1",
     "eslint-config-expo": "~57.0.2",
     "expo": "~57.0.26",
     "expo-blur": "~57.0.3",
@@ -38,7 +40,9 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "db:types": "npx supabase gen types typescript --local > src/api/database.types.ts && npx oxfmt src/api/database.types.ts",
+    "db:test": "npx supabase test db"
   },
   "private": true
 }

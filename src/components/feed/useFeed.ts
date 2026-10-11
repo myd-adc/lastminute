@@ -20,6 +20,7 @@ export function useFeed(showToast: (msg: string) => void) {
   // Avatar previews depend only on mock data (rebuilt per language) + blocked users, so identities survive clock ticks.
   const blocked = state.blocked;
   const lang = state.language;
+  const syncedAt = state.syncedAt;
   const previews = useMemo(() => {
     const map: Record<string, PeoplePreview> = {};
     for (const e of events) {
@@ -32,9 +33,9 @@ export function useFeed(showToast: (msg: string) => void) {
       map[e.id] = { people };
     }
     return map;
-    // `lang`: mock arrays are live bindings swapped on language change, so names must be re-read.
+    // `lang`, `syncedAt`: the data arrays are live bindings swapped on language change and server sync, so re-read them.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [blocked, lang]);
+  }, [blocked, lang, syncedAt]);
 
   const nowRef = useRef(now);
   useEffect(() => {

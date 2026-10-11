@@ -41,20 +41,20 @@ function NotFound() {
 
 // Shared room logic for both layouts.
 function useRoom(event: Event, onMatch?: (userId: string) => void) {
-  const { state, dispatch } = useStore();
+  const { state, dispatch, decide: decideOn } = useStore();
   const now = useNow();
   const queue = roomQueue(state, event.id);
   const going = !!state.going[event.id];
 
   const decide = useCallback(
     (a: Attendee, choice: Choice) => {
-      dispatch({ type: 'decide', eventId: event.id, userId: a.user.id, choice });
-      if (choice === 'go' && a.attendance.likesYou && !state.blocked[a.user.id]) {
+      decideOn(event.id, a.user.id, choice).then((matched) => {
+        if (!matched) return;
         onMatch?.(a.user.id);
         router.push({ pathname: '/match/[eventId]/[userId]', params: { eventId: event.id, userId: a.user.id } });
-      }
+      });
     },
-    [dispatch, event.id, state.blocked, onMatch],
+    [decideOn, event.id, onMatch],
   );
 
   const report = useCallback(

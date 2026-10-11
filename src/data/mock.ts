@@ -1,6 +1,7 @@
 // In-memory demo data in Ukrainian and English. Dates are relative to app start so «Сьогодні · 20:00» stays true.
 // Text fields are written as { uk, en } pairs and resolved by `setDataLanguage` (called by the store provider);
 // the exported arrays are live bindings, so always read them at use time (not into module-level constants).
+import { isLive } from '@/api/client';
 import type { Lang } from '@/i18n/core';
 import { at } from '@/lib/time';
 
@@ -8,9 +9,9 @@ import type { Attendance, Event, Interest, Message, Photo, Scene, SceneId, User 
 
 const BASE = Date.now();
 
-type L = { uk: string; en: string };
+export type L = { uk: string; en: string };
 const l = (uk: string, en: string): L => ({ uk, en });
-type Localized<T, K extends keyof T> = Omit<T, K> & { [P in K]: L };
+export type Localized<T, K extends keyof T> = Omit<T, K> & { [P in K]: L };
 
 // ── Raw bilingual data ───────────────────────────────────────────────────────
 
@@ -304,7 +305,7 @@ const rawEvents: RawEvent[] = [
   },
 ];
 
-export const PAST_EVENT_IDS = ['past-indie', 'past-film'];
+const DEMO_PAST_EVENT_IDS = ['past-indie', 'past-film'];
 
 const rawUsers: Localized<User, 'name' | 'affiliation' | 'talkAbout'>[] = [
   { id: 'darynka', name: l('Даринка', 'Darynka'), age: 20, gender: 'f', sceneId: 'ucu', affiliation: l('Соціологія, 3 курс', 'Sociology, 3rd year'), talkAbout: l('чому всі фільми A24 однакові, але я все одно дивлюсь кожен', 'why all A24 films are the same and I still watch every one'), tags: ['indie', 'standup', 'boardgames'], gradient: 'aurora', sharedEvents: 2 },
@@ -411,7 +412,7 @@ const tile = (eventId: string, i: number, authorId: string, emoji: string, gradi
   at: at(BASE, 0, 20, 5 + i * 4),
 });
 
-export const albumPhotos: Photo[] = [
+const demoAlbumPhotos: Photo[] = [
   tile('open-mic', 1, 'darynka', '🎤', 'sunset'),
   tile('open-mic', 2, 'ostap', '😂', 'violet'),
   tile('open-mic', 3, 'yulia', '🍻', 'lime'),
@@ -430,7 +431,40 @@ export const albumPhotos: Photo[] = [
 const pickL = (v: L, lang: Lang) => v[lang];
 const msgIn = (m: RawMessage, lang: Lang): Message => ({ ...m, text: pickL(m.text, lang) });
 
+// Server data (live backend), already shaped like the domain types; text the server stores per language stays as { uk, en }.
+export type RemoteData = {
+  scenes: Localized<Scene, 'name' | 'description'>[];
+  events: Localized<Event, 'title' | 'description'>[];
+  users: User[];
+  attendances: Attendance[];
+};
+
+let remote: RemoteData | null = null;
+let remoteLoaded = false; // live backend: real data (cached or fresh) is in place, as opposed to the empty placeholder
+
+export const isRemoteLoaded = () => remoteLoaded;
+
+function buildRemote(r: RemoteData, lang: Lang) {
+  const base = buildDemo(lang);
+  const sceneList = r.scenes.length ? r.scenes : rawScenes;
+  return {
+    ...base,
+    scenes: sceneList.map((s) => ({ ...s, name: pickL(s.name, lang), description: pickL(s.description, lang) })) as Scene[],
+    events: r.events.map((e) => ({ ...e, title: pickL(e.title, lang), description: pickL(e.description, lang) })),
+    users: r.users,
+    attendances: r.attendances,
+    soloGroups: {} as typeof base.soloGroups,
+    pastChats: [] as typeof base.pastChats,
+    albumPhotos: [] as Photo[],
+    pastEventIds: [] as string[],
+  };
+}
+
 function build(lang: Lang) {
+  return remote ? buildRemote(remote, lang) : buildDemo(lang);
+}
+
+function buildDemo(lang: Lang) {
   return {
     interests: rawInterests.map((i) => ({ ...i, label: pickL(i.label, lang) })) as Interest[],
     vibes: rawVibes.map((v) => ({ ...v, label: pickL(v.label, lang) })),
@@ -459,6 +493,8 @@ function build(lang: Lang) {
       ]),
     ) as Record<string, { meetPlace: string; meetTime: string; confirmed: string[]; opensAt: string; messages: Message[] }>,
     pastChats: rawPastChats.map((c) => ({ ...c, messages: c.messages.map((m) => msgIn(m, lang)) })),
+    albumPhotos: demoAlbumPhotos,
+    pastEventIds: DEMO_PAST_EVENT_IDS,
   };
 }
 
@@ -474,16 +510,39 @@ export let users: User[] = [];
 export let attendances: Attendance[] = [];
 export let soloGroups: ReturnType<typeof build>['soloGroups'] = {};
 export let pastChats: ReturnType<typeof build>['pastChats'] = [];
+export let albumPhotos: Photo[] = [];
+export let PAST_EVENT_IDS: string[] = []; // seeded demo history, excluded from the upcoming feed
 
 export function setDataLanguage(lang: Lang) {
   if (dataLang === lang) return;
   dataLang = lang;
   const d = (cache[lang] ??= build(lang));
-  ({ interests, vibes, goesWithOptions, scenes, events, users, attendances, soloGroups, pastChats } = d);
+  ({ interests, vibes, goesWithOptions, scenes, events, users, attendances, soloGroups, pastChats, albumPhotos } = d);
+  PAST_EVENT_IDS = d.pastEventIds;
 }
+
+// Swaps the demo data for server data (null = back to demo) and rebuilds the live bindings.
+export function setRemoteData(data: RemoteData | null, loaded = true) {
+  remote = data;
+  remoteLoaded = !!data && loaded;
+  for (const k of Object.keys(cache) as Lang[]) delete cache[k];
+  const lang = dataLang ?? 'uk';
+  dataLang = null;
+  setDataLanguage(lang);
+}
+
+// The live app never shows the demo people or events, not even before the first sync.
+if (isLive) remote = { scenes: [], events: [], users: [], attendances: [] };
 setDataLanguage('uk');
 
-export const getScene = (id: SceneId) => scenes.find((s) => s.id === id)!;
+// Falls back to the built-in scene list while the server one has not loaded yet (sign-in screens).
+export const getScene = (id: SceneId): Scene => {
+  const found = scenes.find((s) => s.id === id);
+  if (found) return found;
+  const raw = rawScenes.find((s) => s.id === id)!;
+  const lang = dataLang ?? 'uk';
+  return { ...raw, name: pickL(raw.name, lang), description: pickL(raw.description, lang) };
+};
 export const getEvent = (id: string) => events.find((e) => e.id === id);
 export const getUser = (id: string) => users.find((u) => u.id === id);
 export const getInterest = (id: string) => interests.find((i) => i.id === id);

@@ -57,6 +57,9 @@ export function roomQueue(state: State, eventId: string) {
   return { pending, decided: all.length - pending.length, total: all.length };
 }
 
+// «Даринка, 20»; live profiles have no age yet, so just the name.
+export const nameAge = (u: User) => (u.age ? `${u.name}, ${u.age}` : u.name);
+
 export const decisionOf = (state: State, eventId: string, userId: string) => state.decisions[pairKey(eventId, userId)]?.choice;
 
 // Match = the user pressed «Піти разом» and the other side already did too.

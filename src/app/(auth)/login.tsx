@@ -11,6 +11,8 @@ import { QrPlaceholder } from '@/components/onboarding/QrPlaceholder';
 import { Button } from '@/components/ui';
 import { useT } from '@/i18n';
 import { useIsWide } from '@/lib/layout';
+import { requestCode } from '@/api/auth';
+import { isLive } from '@/api/client';
 import { useStore } from '@/store/AppStore';
 import { display, onest, type, useTheme } from '@/theme';
 
@@ -22,23 +24,34 @@ export default function LoginScreen() {
   const { state, dispatch } = useStore();
   const wide = useIsWide();
   const [digits, setDigits] = useState(() => onlyDigits(state.phone ?? '').replace(/^380/, ''));
-  const valid = digits.length === PHONE_DIGITS;
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { t } = useT();
+  const valid = digits.length === PHONE_DIGITS && !busy;
 
-  const submit = () => {
+  const submit = async () => {
     if (!valid) return;
-    dispatch({ type: 'setPhone', phone: toE164(digits) });
+    const phone = toE164(digits);
+    if (isLive) {
+      setBusy(true);
+      setError(null);
+      const res = await requestCode(phone);
+      setBusy(false);
+      if (!res.ok) return setError(t('onboarding.errors.send'));
+    }
+    dispatch({ type: 'setPhone', phone });
     router.push('/code');
   };
 
-  if (wide) return <WideLogin digits={digits} setDigits={setDigits} valid={valid} submit={submit} />;
-  return <MobileLogin digits={digits} setDigits={setDigits} valid={valid} submit={submit} />;
+  if (wide) return <WideLogin digits={digits} setDigits={setDigits} valid={valid} submit={submit} error={error} />;
+  return <MobileLogin digits={digits} setDigits={setDigits} valid={valid} submit={submit} error={error} />;
 }
 
-type FormProps = { digits: string; setDigits: (d: string) => void; valid: boolean; submit: () => void };
+type FormProps = { digits: string; setDigits: (d: string) => void; valid: boolean; submit: () => void; error: string | null };
 
 // M01: logo row 14 pt below the safe area, hero at y 268 (≈ 172 pt of free space above it), the form right under the
 // tagline and ≈ 120 pt free below the trust line. The two flexible gaps keep that 172 : 83 split on any screen height.
-function MobileLogin({ digits, setDigits, valid, submit }: FormProps) {
+function MobileLogin({ digits, setDigits, valid, submit, error }: FormProps) {
   const { c } = useTheme();
   const { t } = useT();
   return (
@@ -54,6 +67,7 @@ function MobileLogin({ digits, setDigits, valid, submit }: FormProps) {
         <FieldLabel label={t('onboarding.login.phoneLabel')} />
         <PhoneInput digits={digits} onChange={setDigits} onSubmit={submit} />
         <Button label={t('onboarding.login.getCode')} disabled={!valid} onPress={submit} />
+        {error && <Text style={[type.footnote, { color: c.danger }]}>{error}</Text>}
         <TrustLine text={t('onboarding.login.trust')} />
       </View>
       <View style={[styles.flexGap, { flexGrow: 83 }]} />
@@ -62,7 +76,7 @@ function MobileLogin({ digits, setDigits, valid, submit }: FormProps) {
 }
 
 // W01 auth panel: «Вхід» form, «або», QR block, trust line (16 pt rhythm).
-function WideLogin({ digits, setDigits, valid, submit }: FormProps) {
+function WideLogin({ digits, setDigits, valid, submit, error }: FormProps) {
   const { c } = useTheme();
   const { t } = useT();
   return (
@@ -74,6 +88,7 @@ function WideLogin({ digits, setDigits, valid, submit }: FormProps) {
           <PhoneInput digits={digits} onChange={setDigits} onSubmit={submit} autoFocus size="md" />
         </Field>
         <Button label={t('onboarding.login.getCode')} disabled={!valid} onPress={submit} />
+        {error && <Text style={[type.footnote, { color: c.danger }]}>{error}</Text>}
         <View style={styles.orRow}>
           <View style={[styles.orLine, { backgroundColor: c.line }]} />
           <Text style={[onest('medium', 13), { color: c.muted }]}>{t('onboarding.login.or')}</Text>

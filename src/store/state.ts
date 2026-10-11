@@ -1,3 +1,4 @@
+import type { Synced } from '@/api/sync';
 import { pastChats, PAST_EVENT_IDS } from '@/data/mock';
 import type { GoesWith, InterestId, Message, Photo, ReportReason, SceneId, Survey, Vibe } from '@/data/types';
 import { deviceLang, type Lang } from '@/i18n/core';
@@ -64,6 +65,7 @@ export type State = {
   reports: Report[];
   blocked: Record<string, true>; // userId
   demoOffsetMs: number; // demo clock: shifts «now» to preview live/after-event states
+  syncedAt: string | null; // live backend: last server snapshot (server data itself lives in the data layer)
 };
 
 export const pairKey = (eventId: string, userId: string) => `${eventId}:${userId}`;
@@ -103,6 +105,7 @@ export const initialState: State = {
   reports: [],
   blocked: {},
   demoOffsetMs: 0,
+  syncedAt: null,
 };
 
 export type Action =
@@ -111,7 +114,8 @@ export type Action =
   | { type: 'setMe'; me: Me }
   | { type: 'setPreferences'; interests: InterestId[]; vibe: Vibe | null; goesWith: GoesWith | null }
   | { type: 'setScene'; sceneId: SceneId; studentEmail?: string | null }
-  | { type: 'completeOnboarding'; notify: boolean }
+  | { type: 'completeOnboarding'; notify: boolean; seedDemo?: boolean }
+  | { type: 'restoreAccount'; me: Me; interests: InterestId[]; vibe: Vibe | null; goesWith: GoesWith | null; sceneId: SceneId | null; studentEmail: string | null }
   | { type: 'setTheme'; theme: ThemeMode }
   | { type: 'setLanguage'; language: Lang }
   | { type: 'setNotify'; key: keyof State['settings']['notify']; value: boolean }
@@ -136,6 +140,7 @@ export type Action =
   | { type: 'unblock'; userId: string }
   | { type: 'setDemoOffset'; ms: number }
   | { type: 'hydrate'; state: State }
+  | { type: 'sync'; synced: Synced }
   | { type: 'logout' };
 
 // History a freshly onboarded demo user starts with: two past events with matches in «Минулі події».
@@ -178,7 +183,12 @@ export function reducer(state: State, action: Action): State {
         onboarded: true,
         settings: { ...state.settings, notify: { ...state.settings.notify, soloOnMyEvent: action.notify, albumOpened: action.notify } },
       };
-      return seedHistory(next);
+      // Demo mode starts with a fake history; the live backend starts empty.
+      return action.seedDemo === false ? next : seedHistory(next);
+    }
+    case 'restoreAccount': {
+      const { type: _, ...account } = action;
+      return { ...state, ...account, phoneVerified: true, onboarded: true };
     }
     case 'setLanguage':
       return { ...state, language: action.language };
@@ -260,6 +270,8 @@ export function reducer(state: State, action: Action): State {
       return { ...state, demoOffsetMs: action.ms };
     case 'hydrate':
       return action.state;
+    case 'sync':
+      return { ...state, ...action.synced };
     case 'logout':
       return { ...initialState, language: state.language, settings: { ...initialState.settings, theme: state.settings.theme } };
   }

@@ -1,9 +1,10 @@
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 
+import { isLive } from '@/api/client';
 import { Button, Gradient } from '@/components/ui';
-import { getScene } from '@/data/mock';
+import { getScene, isRemoteLoaded } from '@/data/mock';
 import { useT } from '@/i18n';
 import { goingCount, matchesAt, myUpcoming, sceneEvents } from '@/lib/selectors';
 import { going as goingLabel, whenLabel } from '@/lib/time';
@@ -29,6 +30,16 @@ export function EndOfFeed({ header, contentStyle }: Props) {
   const skipped = Object.keys(state.skipped).length;
   const seen = sceneEvents(state, now).length;
   const light = scheme === 'light';
+
+  // Live backend before the first snapshot: the feed is loading, not finished.
+  if (isLive && !isRemoteLoaded()) {
+    return (
+      <View style={{ flex: 1, backgroundColor: c.bg }}>
+        <View style={contentStyle}>{header}</View>
+        <ActivityIndicator color={c.muted} style={styles.loading} />
+      </View>
+    );
+  }
 
   const copy =
     state.feedTab === 'saved'
@@ -125,6 +136,7 @@ export function EndOfFeed({ header, contentStyle }: Props) {
 
 // Figma M10: content column (gap 10) starts 32 pt under the illustration; extra 4 pt before the buttons, 8 pt before «You’re going».
 const styles = StyleSheet.create({
+  loading: { marginTop: 120 },
   content: { paddingHorizontal: 20 },
   flex: { flex: 1 },
   center: { textAlign: 'center' },

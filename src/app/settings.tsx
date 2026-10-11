@@ -13,6 +13,7 @@ import {
 import { BackTitle } from '@/components/profile/BackTitle';
 import { Group, Row } from '@/components/profile/Rows';
 import { goBack, Screen } from '@/components/ui';
+import { isLive } from '@/api/client';
 import { getScene } from '@/data/mock';
 import { LANGS, useT } from '@/i18n';
 import { useIsWide } from '@/lib/layout';
@@ -84,8 +85,13 @@ export default function SettingsScreen() {
         </Pressable>
       )}
 
-      <View style={styles.demoGap} />
-      <DemoSection dense />
+      {/* The live backend runs on server time, so the demo clock would only desync the UI. */}
+      {!isLive && (
+        <>
+          <View style={styles.demoGap} />
+          <DemoSection dense />
+        </>
+      )}
     </Screen>
   );
 }

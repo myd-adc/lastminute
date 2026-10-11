@@ -121,4 +121,9 @@ export const onboarding: Translation<typeof Uk> = {
   preferences: {
     title: 'Interests and scenes',
   },
+  errors: {
+    send: 'Couldn’t send the code. Check the number and try again.',
+    code: 'The code is wrong or has expired.',
+    save: 'Couldn’t save your profile. Check your connection and try again.',
+  },
 };
