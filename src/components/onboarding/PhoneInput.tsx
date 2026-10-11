@@ -26,11 +26,13 @@ export function PhoneInput({
   onChange,
   onSubmit,
   autoFocus,
+  size = 'lg',
 }: {
   digits: string;
   onChange: (digits: string) => void;
   onSubmit?: () => void;
   autoFocus?: boolean;
+  size?: 'md' | 'lg'; // lg = M01 (56 pt, 16 radius, 18 inset), md = W01 (52 pt, 14 radius, 16 inset)
 }) {
   const { c } = useTheme();
   const { t } = useT();
@@ -52,10 +54,10 @@ export function PhoneInput({
       returnKeyType="done"
       onSubmitEditing={onSubmit}
       accessibilityLabel={t('onboarding.login.phoneLabel')}
-      boxStyle={styles.box}
+      boxStyle={size === 'lg' ? styles.lg : styles.md}
       left={
         <View style={[styles.prefix, { backgroundColor: c.surface2 }]}>
-          <Text style={[onest('semibold', 15), { color: c.text }]}>+380</Text>
+          <Text style={[onest('semibold', 15, 19), { color: c.text }]}>+380</Text>
           <ChevronDown size={12} color={c.muted} strokeWidth={2.5} />
         </View>
       }
@@ -64,6 +66,7 @@ export function PhoneInput({
 }
 
 const styles = StyleSheet.create({
-  box: { paddingLeft: 8, gap: 12 },
-  prefix: { flexDirection: 'row', alignItems: 'center', gap: 4, height: 36, paddingHorizontal: 10, borderRadius: 10 },
+  lg: { height: 56, borderRadius: 16, paddingHorizontal: 18, gap: 12 },
+  md: { height: 52, minHeight: 52, borderRadius: 14, paddingHorizontal: 16, gap: 12 },
+  prefix: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10 },
 });

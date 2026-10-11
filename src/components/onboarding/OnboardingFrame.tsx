@@ -3,13 +3,14 @@ import { Check, ChevronLeft } from 'lucide-react-native';
 import type { ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { Button, Screen } from '@/components/ui';
+import { Button } from '@/components/ui';
 import { useT } from '@/i18n';
 import { useIsWide } from '@/lib/layout';
 import { useStore } from '@/store/AppStore';
-import { display, onest, type, useTheme } from '@/theme';
+import { display, onest, useTheme } from '@/theme';
 
-import { HeroBlobs } from './HeroBlobs';
+import { AuthScreen } from './AuthScreen';
+import type { GlowVariant } from './HeroBlobs';
 import { Logo, StepBar } from './kit';
 import { PreviewCard, type PreviewPerson } from './PreviewCard';
 
@@ -36,27 +37,34 @@ export function OnboardingFrame(props: Props) {
   return wide ? <WideFrame {...props} /> : <MobileFrame {...props} />;
 }
 
+// Per-frame vertical rhythm (Figma «Content» stacks): header → title, title → subtitle, subtitle → body, title size.
+const RHYTHM: Record<Step, { top: number; sub: number; body: number; title: number; titleLine: number; glow?: GlowVariant }> = {
+  1: { top: 28, sub: 12, body: 12, title: 26, titleLine: 30, glow: 'profile' }, // M03
+  2: { top: 22, sub: 8, body: 22, title: 28, titleLine: 32, glow: 'interests' }, // M04
+  3: { top: 28, sub: 12, body: 26, title: 28, titleLine: 35 }, // M05 (no glow)
+};
+
 function MobileFrame({ step, title, subtitle, children, cta }: Props) {
   const { c } = useTheme();
   const { t } = useT();
+  const r = RHYTHM[step];
   return (
-    <Screen keyboard footer={<Button label={cta.label} onPress={cta.onPress} disabled={cta.disabled} />}>
-      <HeroBlobs variant="corner" height={320} />
+    <AuthScreen glow={r.glow} footer={<Button label={cta.label} onPress={cta.onPress} disabled={cta.disabled} />}>
       <View style={styles.header}>
         <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12} onPress={() => backFrom(step)}>
-          <ChevronLeft size={26} color={c.text} strokeWidth={2} />
+          <ChevronLeft size={24} color={c.text} strokeWidth={2} />
         </Pressable>
         <StepBar step={step} />
       </View>
-      <View style={{ gap: 8, marginTop: 4 }}>
-        <Text style={[type.title, { color: c.text }]}>{title}</Text>
-        <Text style={[type.body, { color: c.muted }]}>{subtitle}</Text>
-      </View>
-      {children}
-    </Screen>
+      <Text style={[display(r.title, r.titleLine), { color: c.text, marginTop: r.top }]}>{title}</Text>
+      <Text style={[onest('regular', 15, 21), { color: c.muted, marginTop: r.sub }]}>{subtitle}</Text>
+      <View style={{ marginTop: r.body }}>{children}</View>
+    </AuthScreen>
   );
 }
 
+// W02: logo + stepper rail, a 620 pt form column starting at x 360 / y 120, nav buttons 48 pt above the bottom,
+// and the 380 pt «Так тебе бачитимуть» preview panel.
 function WideFrame({ step, title, subtitle, children, cta, preview }: Props) {
   const { c } = useTheme();
   const { t } = useT();
@@ -70,15 +78,15 @@ function WideFrame({ step, title, subtitle, children, cta, preview }: Props) {
       <View style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.wideContent} keyboardShouldPersistTaps="handled">
           <View style={styles.column}>
-            <Text style={[type.footnote, { color: c.muted }]}>{t('onboarding.frame.stepOf', { step, total: 3 })}</Text>
-            <Text style={[display(34, 42), { color: c.text, marginTop: 4 }]}>{title}</Text>
-            <Text style={[type.body, { color: c.muted, marginTop: 8, marginBottom: 28 }]}>{subtitle}</Text>
+            <Text style={[onest('medium', 13, 17), { color: c.muted }]}>{t('onboarding.frame.stepOf', { step, total: 3 })}</Text>
+            <Text style={[display(36, 40), { letterSpacing: -1.08, color: c.text, marginTop: 12 }]}>{title}</Text>
+            <Text style={[onest('regular', 16, 22), { color: c.muted, marginTop: 12, marginBottom: 32 }]}>{subtitle}</Text>
             <View style={{ gap: 16 }}>{children}</View>
           </View>
         </ScrollView>
         <View style={styles.wideFooter}>
           <View style={[styles.column, styles.footerRow]}>
-            <Button label={t('onboarding.frame.back')} variant="ghost" onPress={() => backFrom(step)} style={{ minWidth: 140 }} />
+            <Button label={t('onboarding.frame.back')} variant="ghost" onPress={() => backFrom(step)} style={{ width: 140 }} />
             <Button label={cta.label} onPress={cta.onPress} disabled={cta.disabled} style={{ minWidth: 240 }} />
           </View>
         </View>
@@ -105,7 +113,7 @@ function Stepper({ step }: { step: Step }) {
     { label: t('onboarding.frame.steps.scene'), sub: '' },
   ];
   return (
-    <View style={{ gap: 4 }}>
+    <View style={{ gap: 6 }}>
       {items.map((it, i) => {
         const n = i + 1;
         const done = n < step;
@@ -121,13 +129,13 @@ function Stepper({ step }: { step: Step }) {
               {done ? (
                 <Check size={14} color={c.onAccent} strokeWidth={3} />
               ) : (
-                <Text style={[onest('bold', 12), { color: current ? c.onAccent : c.muted }]}>{n}</Text>
+                <Text style={[onest('bold', 13), { color: current ? c.onAccent : c.muted }]}>{n}</Text>
               )}
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={[onest('semibold', 14), { color: done || current ? c.text : c.muted }]}>{it.label}</Text>
+              <Text style={[onest('semibold', 15, 19), { color: done || current ? c.text : c.muted }]}>{it.label}</Text>
               {done && !!it.sub && (
-                <Text style={[type.caption, { color: c.muted }]} numberOfLines={1}>
+                <Text style={[onest('regular', 12, 15), { color: c.muted }]} numberOfLines={1}>
                   {it.sub}
                 </Text>
               )}
@@ -140,14 +148,14 @@ function Stepper({ step }: { step: Step }) {
 }
 
 const styles = StyleSheet.create({
-  header: { flexDirection: 'row', alignItems: 'center', gap: 16, minHeight: 44 },
+  header: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 24 },
   wide: { flex: 1, flexDirection: 'row' },
-  rail: { width: 260, paddingHorizontal: 40, paddingVertical: 40, gap: 64 },
-  wideContent: { paddingTop: 120, paddingBottom: 32, paddingHorizontal: 40 },
-  column: { width: '100%', maxWidth: 680, alignSelf: 'center' },
-  wideFooter: { paddingHorizontal: 40, paddingTop: 16, paddingBottom: 40 },
+  rail: { width: 336, paddingLeft: 48, paddingRight: 48, paddingTop: 40, gap: 78 },
+  wideContent: { paddingTop: 120, paddingBottom: 32, paddingLeft: 24, paddingRight: 80 },
+  column: { width: '100%', maxWidth: 620 },
+  wideFooter: { paddingLeft: 24, paddingRight: 80, paddingTop: 16, paddingBottom: 48 },
   footerRow: { flexDirection: 'row', gap: 12 },
-  previewPanel: { width: 380, paddingHorizontal: 36, justifyContent: 'center' },
-  stepRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 10, paddingVertical: 10, borderRadius: 14 },
-  stepDot: { width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center' },
+  previewPanel: { width: 380, paddingHorizontal: 40, paddingTop: 140 },
+  stepRow: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: 14 },
+  stepDot: { width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
 });

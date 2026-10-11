@@ -1,9 +1,9 @@
-import { Clock, PhoneCall } from 'lucide-react-native';
+import { Clock } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
 import { Platform, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { useT } from '@/i18n';
-import { onest, type, useTheme } from '@/theme';
+import { fonts, onest, useTheme } from '@/theme';
 
 import { TextLink, webNoOutline } from './kit';
 
@@ -46,23 +46,19 @@ export function CodeForm({
   const active = Math.min(code.length, CODE_LENGTH - 1);
 
   return (
-    <View style={{ gap: 16 }}>
+    <View style={{ gap: 10 }}>
       <View>
         <View style={styles.boxes}>
           {Array.from({ length: CODE_LENGTH }, (_, i) => {
             const isActive = focused && i === active && code.length < CODE_LENGTH;
+            // Figma: filled boxes have a surface2 hairline, the active one a 2 pt accent border with an accent caret.
+            const border = isActive ? c.accent : code[i] ? c.surface2 : c.line;
             return (
-              <View
-                key={i}
-                style={[
-                  styles.box,
-                  { backgroundColor: c.surface, borderColor: isActive ? c.accent : c.line, borderWidth: isActive ? 1.5 : 1 },
-                ]}
-              >
+              <View key={i} style={[styles.box, { backgroundColor: c.surface, borderColor: border, borderWidth: isActive ? 2 : 1 }]}>
                 {code[i] ? (
-                  <Text style={[onest('semibold', 26), { color: c.text }]}>{code[i]}</Text>
+                  <Text style={[styles.digit, { color: c.text }]}>{code[i]}</Text>
                 ) : (
-                  isActive && <View style={[styles.caret, { backgroundColor: c.text }]} />
+                  isActive && <View style={[styles.caret, { backgroundColor: c.accent }]} />
                 )}
               </View>
             );
@@ -91,7 +87,7 @@ export function CodeForm({
         {left > 0 ? (
           <View style={styles.timer}>
             <Clock size={14} color={c.muted} />
-            <Text style={[type.footnote, { color: c.muted }]}>{t('onboarding.code.resendIn', { time: mmss(left) })}</Text>
+            <Text style={[onest('regular', 13, 17), { color: c.muted }]}>{t('onboarding.code.resendIn', { time: mmss(left) })}</Text>
           </View>
         ) : (
           <TextLink label={t('onboarding.code.resend')} onPress={resend} />
@@ -100,9 +96,9 @@ export function CodeForm({
       </View>
 
       <View style={[styles.info, { backgroundColor: c.surface }]}>
-        <PhoneCall size={18} color={c.danger} style={{ marginTop: 1 }} />
+        <Text style={styles.emoji}>📮</Text>
         <View style={{ flex: 1, gap: 8 }}>
-          <Text style={[type.footnote, { color: c.muted }]}>
+          <Text style={[onest('regular', 13, 18), { color: c.muted }]}>
             {calling ? t('onboarding.code.calling') : t('onboarding.code.callHint')}
           </Text>
           {left <= 0 && !calling && <TextLink label={t('onboarding.code.callMe')} onPress={() => setCalling(true)} />}
@@ -119,5 +115,7 @@ const styles = StyleSheet.create({
   hidden: { opacity: 0, color: 'transparent', fontSize: 1 },
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
   timer: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  info: { flexDirection: 'row', gap: 10, padding: 14, borderRadius: 14 },
+  info: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14, paddingVertical: 12, borderRadius: 14 },
+  digit: { fontFamily: fonts.displaySemibold, fontSize: 24 },
+  emoji: { fontSize: 18 },
 });

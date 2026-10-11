@@ -5,7 +5,7 @@ import { Gradient, Pill } from '@/components/ui';
 import { getInterest } from '@/data/mock';
 import type { InterestId } from '@/data/types';
 import { useT } from '@/i18n';
-import { display, onest, type, useTheme, type GradientId } from '@/theme';
+import { display, onest, useTheme, type GradientId } from '@/theme';
 
 export type PreviewPerson = {
   name: string;
@@ -27,7 +27,7 @@ export function PreviewCard({ person }: { person: PreviewPerson }) {
   const tags = person.interests.map(getInterest).filter((i) => !!i);
   return (
     <View style={{ gap: 14 }}>
-      <Text style={[type.footnoteStrong, { color: c.muted }]}>{t('onboarding.preview.title')}</Text>
+      <Text style={[onest('semibold', 14, 18), { color: c.muted }]}>{t('onboarding.preview.title')}</Text>
       <View style={[styles.card, { backgroundColor: c.bg, borderColor: c.line }]}>
         <View style={styles.photo}>
           {person.photoUri ? (
@@ -40,11 +40,11 @@ export function PreviewCard({ person }: { person: PreviewPerson }) {
           {person.solo && <Pill label={t('onboarding.preview.solo')} tone="bg" style={styles.soloPill} />}
         </View>
         <View style={styles.body}>
-          <Text style={[display(20, 26), { color: c.text }]} numberOfLines={1}>
+          <Text style={[display(20, 25), { color: c.text }]} numberOfLines={1}>
             {name}
           </Text>
           {!!meta && (
-            <Text style={[type.footnote, { color: c.muted, marginTop: -6 }]} numberOfLines={1}>
+            <Text style={[onest('regular', 13, 17), { color: c.muted }]} numberOfLines={1}>
               {meta}
             </Text>
           )}
@@ -57,15 +57,15 @@ export function PreviewCard({ person }: { person: PreviewPerson }) {
           )}
           {!!person.talkAbout.trim() && (
             <View style={[styles.talk, { backgroundColor: c.surface }]}>
-              <Text style={[onest('medium', 12), { color: c.muted }]}>{t('onboarding.preview.talkAbout')}</Text>
-              <Text style={[onest('semibold', 14, 19), { color: c.text }]}>{person.talkAbout.trim()}</Text>
+              <Text style={[onest('medium', 11, 14), { color: c.muted }]}>{t('onboarding.preview.talkAbout')}</Text>
+              <Text style={[onest('semibold', 14, 18), { color: c.text }]}>{person.talkAbout.trim()}</Text>
             </View>
           )}
         </View>
       </View>
       <View style={styles.note}>
         <Lock size={14} color={c.muted} style={{ marginTop: 2 }} />
-        <Text style={[type.footnote, { color: c.muted, flex: 1 }]}>{t('onboarding.preview.note')}</Text>
+        <Text style={[onest('regular', 13, 18), { color: c.muted, flex: 1 }]}>{t('onboarding.preview.note')}</Text>
       </View>
     </View>
   );
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   photo: { height: 180, overflow: 'hidden' },
   center: { alignItems: 'center', justifyContent: 'center' },
   soloPill: { position: 'absolute', top: 12, left: 12 },
-  body: { padding: 16, gap: 12 },
+  body: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 16, gap: 8 },
   tags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   talk: { borderRadius: 14, paddingHorizontal: 12, paddingVertical: 10, gap: 4 },
   note: { flexDirection: 'row', gap: 8 },

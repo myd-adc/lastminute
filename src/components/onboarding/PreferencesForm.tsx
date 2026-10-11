@@ -5,6 +5,7 @@ import { Chip } from '@/components/ui';
 import { goesWithOptions, interests, vibes } from '@/data/mock';
 import type { GoesWith, InterestId, Vibe } from '@/data/types';
 import { useT } from '@/i18n';
+import { useIsWide } from '@/lib/layout';
 import { onest, useTheme } from '@/theme';
 
 export const MIN_INTERESTS = 3;
@@ -18,12 +19,14 @@ export type PreferencesDraft = { interests: InterestId[]; vibe: Vibe | null; goe
 export const preferencesValid = (p: PreferencesDraft) => p.interests.length >= MIN_INTERESTS;
 
 // M04 body, shared by onboarding (interests) and «Вподобання і сцени».
+// Figma: 22 pt between sections and 8 pt under a section title on phones (M04); 30 pt and 12 pt on wide web (W02).
 export function PreferencesForm({ value, onChange }: { value: PreferencesDraft; onChange: (v: PreferencesDraft) => void }) {
   const toggle = (id: InterestId) =>
     onChange({ ...value, interests: value.interests.includes(id) ? value.interests.filter((x) => x !== id) : [...value.interests, id] });
   const { t } = useT();
+  const wide = useIsWide();
   return (
-    <View style={{ gap: 24 }}>
+    <View style={{ gap: wide ? 30 : 22 }}>
       <View style={styles.chips}>
         {pickableInterests().map((i) => (
           <Chip key={i.id} label={`${i.emoji} ${i.label}`} selected={value.interests.includes(i.id)} onPress={() => toggle(i.id)} />
@@ -45,9 +48,10 @@ export function PreferencesForm({ value, onChange }: { value: PreferencesDraft; 
 
 function Group({ title, children }: { title: string; children: ReactNode }) {
   const { c } = useTheme();
+  const wide = useIsWide();
   return (
-    <View style={{ gap: 12 }}>
-      <Text style={[onest('semibold', 16), { color: c.text }]}>{title}</Text>
+    <View style={{ gap: wide ? 12 : 8 }}>
+      <Text style={[onest('semibold', 17, 22), { color: c.text }]}>{title}</Text>
       <View style={styles.chips}>{children}</View>
     </View>
   );

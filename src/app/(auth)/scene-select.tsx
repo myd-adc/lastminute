@@ -39,9 +39,11 @@ export default function SceneSelectScreen() {
         sceneName: scenes.find((s) => s.id === draft.sceneId)?.name,
       }}
     >
-      <SceneForm value={draft} onChange={setDraft} />
-      <View style={{ height: 8 }} />
-      <NotifyCard value={notify} onChange={setNotify} />
+      {/* M05: scene cards, then 30 pt to the notifications card. */}
+      <View style={{ gap: 30 }}>
+        <SceneForm value={draft} onChange={setDraft} />
+        <NotifyCard value={notify} onChange={setNotify} />
+      </View>
     </OnboardingFrame>
   );
 }

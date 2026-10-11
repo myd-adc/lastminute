@@ -90,16 +90,16 @@ function SceneCard({
     >
       <Pressable accessibilityRole="radio" accessibilityState={{ checked: selected }} onPress={onSelect} style={styles.row}>
         <Gradient id={scene.gradient} style={styles.dot} />
-        <View style={{ flex: 1, gap: 4 }}>
-          <Text style={[onest('bold', 16), { color: c.text }]}>
+        <View style={{ flex: 1, gap: 3 }}>
+          <Text style={[onest('bold', 16, 20), { color: c.text }]}>
             {scene.emoji ? `${scene.emoji} ` : ''}
             {scene.name}
           </Text>
-          <Text style={[type.footnote, { color: scene.requiresStudentEmail && verifiedEmail ? ink : c.muted }]}>{sub}</Text>
+          <Text style={[onest('regular', 13, 17.5), { color: scene.requiresStudentEmail && verifiedEmail ? ink : c.muted }]}>{sub}</Text>
         </View>
         {selected ? (
           <View style={[styles.check, { backgroundColor: c.accent }]}>
-            <Check size={15} color={c.onAccent} strokeWidth={3} />
+            <Check size={14} color={c.onAccent} strokeWidth={3} />
           </View>
         ) : (
           <View style={[styles.check, { borderWidth: 1.5, borderColor: c.line }]} />
@@ -150,12 +150,10 @@ export function NotifyCard({ value, onChange }: { value: boolean; onChange: (v: 
   const { t } = useT();
   return (
     <View style={[styles.notify, { backgroundColor: c.surface }]}>
-      <Bell size={20} color={accentInk(c, scheme)} />
-      <View style={{ flex: 1, gap: 4 }}>
-        <Text style={[onest('bold', 16), { color: c.text }]}>{t('onboarding.scene.notify')}</Text>
-        <Text style={[type.footnote, { color: c.muted }]}>
-          {t('onboarding.scene.notifyText')}
-        </Text>
+      <Bell size={22} color={accentInk(c, scheme)} strokeWidth={2} />
+      <View style={{ flex: 1, gap: 3 }}>
+        <Text style={[onest('bold', 15, 19), { color: c.text }]}>{t('onboarding.scene.notify')}</Text>
+        <Text style={[onest('regular', 13, 17.5), { color: c.muted }]}>{t('onboarding.scene.notifyText')}</Text>
       </View>
       <Toggle value={value} onChange={onChange} accessibilityLabel={t('onboarding.scene.notify')} />
     </View>
@@ -164,10 +162,10 @@ export function NotifyCard({ value, onChange }: { value: boolean; onChange: (v: 
 
 const styles = StyleSheet.create({
   card: { borderRadius: 18, overflow: 'hidden' },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 16, paddingVertical: 16 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingLeft: 14, paddingRight: 16, paddingVertical: 14 },
   dot: { width: 44, height: 44, borderRadius: 22 },
   check: { width: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  email: { paddingHorizontal: 16, paddingBottom: 16, gap: 8 },
+  email: { paddingLeft: 14, paddingRight: 16, paddingBottom: 14, gap: 8 },
   verify: { height: 36, paddingHorizontal: 14, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
-  notify: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16, borderRadius: 18 },
+  notify: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingLeft: 16, paddingRight: 14, paddingVertical: 14, borderRadius: 18 },
 });

@@ -4,23 +4,23 @@ import { Pressable, StyleSheet, Text, TextInput, View, type StyleProp, type Text
 
 import { useT } from '@/i18n';
 import { useStore } from '@/store/AppStore';
-import { onest, type, useTheme, type Palette, type Scheme } from '@/theme';
+import { display, onest, useTheme, type Palette, type Scheme } from '@/theme';
 
-// Accent-coloured text (links, «підтверджено») is unreadable on the light background, so light mode inks it in `text`.
-export const accentInk = (c: Palette, scheme: Scheme) => (scheme === 'light' ? c.text : c.accent);
+// Accent-coloured text (links, «підтверджено»): lime on dark, the deep-olive `accentInk` on light (Figma color/accent-text).
+export const accentInk = (c: Palette, scheme: Scheme) => (scheme === 'light' ? c.accentInk : c.accent);
 
 export function useAccentInk() {
   const { c, scheme } = useTheme();
   return accentInk(c, scheme);
 }
 
-// «• lastminute» wordmark.
+// «• lastminute» wordmark: 10 pt accent dot + Unbounded Bold 18, tracking −3 %.
 export function Logo({ size = 18 }: { size?: number }) {
   const { c } = useTheme();
   return (
     <View style={styles.logo}>
       <View style={[styles.logoDot, { backgroundColor: c.accent }]} />
-      <Text style={[onest('bold', size), { color: c.text }]}>lastminute</Text>
+      <Text style={[display(size, Math.round(size * 1.24)), { letterSpacing: -size * 0.03, color: c.text }]}>lastminute</Text>
     </View>
   );
 }
@@ -39,19 +39,29 @@ export function LanguagePill({ style }: { style?: StyleProp<ViewStyle> }) {
       style={({ pressed }) => [styles.lang, { backgroundColor: c.surface, borderColor: c.line }, pressed && { opacity: 0.8 }, style]}
     >
       <Globe size={16} color={c.text} strokeWidth={2} />
-      <Text style={[onest('bold', 13), { color: c.text }]}>{t('onboarding.language.short')}</Text>
+      <Text style={[onest('semibold', 13), { color: c.text }]}>{t('onboarding.language.short')}</Text>
       <ChevronDown size={14} color={c.muted} strokeWidth={2} />
     </Pressable>
   );
 }
 
-// Field label row: «Говори зі мною про» ……… «31 / 80».
+// Field label row: «Говори зі мною про» ……… «31 / 80» (Onest Medium 13, muted).
 export function FieldLabel({ label, right }: { label: string; right?: ReactNode }) {
   const { c } = useTheme();
   return (
     <View style={styles.labelRow}>
-      <Text style={[type.footnote, { color: c.muted }]}>{label}</Text>
-      {right}
+      <Text style={[onest('medium', 13), { color: c.muted, flexShrink: 1 }]}>{label}</Text>
+      {typeof right === 'string' ? <Text style={[onest('medium', 13), { color: c.muted }]}>{right}</Text> : right}
+    </View>
+  );
+}
+
+// Label above its control, 8 pt apart (Figma «Field · …»).
+export function Field({ label, right, children }: { label: string; right?: ReactNode; children: ReactNode }) {
+  return (
+    <View style={styles.field}>
+      <FieldLabel label={label} right={right} />
+      {children}
     </View>
   );
 }
@@ -104,13 +114,13 @@ export const TextField = forwardRef<TextInput, TextFieldProps>(function TextFiel
 // RN-web draws a browser focus ring on inputs; the accent border replaces it.
 export const webNoOutline = { outlineStyle: 'none' } as object;
 
-// 3-segment step indicator next to the back chevron (M03–M05).
+// 3-segment step indicator next to the back chevron (M03–M05): 4 pt bars, accent / line.
 export function StepBar({ step, total = 3 }: { step: number; total?: number }) {
   const { c } = useTheme();
   return (
     <View style={styles.steps} accessibilityRole="progressbar" accessibilityValue={{ min: 1, max: total, now: step }}>
       {Array.from({ length: total }, (_, i) => (
-        <View key={i} style={[styles.step, { backgroundColor: i < step ? c.accent : c.surface2 }]} />
+        <View key={i} style={[styles.step, { backgroundColor: i < step ? c.accent : c.line }]} />
       ))}
     </View>
   );
@@ -125,7 +135,7 @@ export function IdeaChip({ label, onPress }: { label: string; onPress: () => voi
       onPress={onPress}
       style={({ pressed }) => [styles.idea, { borderColor: c.line }, pressed && { backgroundColor: c.surface2 }]}
     >
-      <Text style={[onest('regular', 12), { color: c.muted }]}>{label}</Text>
+      <Text style={[onest('medium', 12), { color: c.muted }]}>{label}</Text>
     </Pressable>
   );
 }
@@ -142,12 +152,13 @@ export function TextLink({ label, onPress, size = 13 }: { label: string; onPress
 
 const styles = StyleSheet.create({
   logo: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  logoDot: { width: 8, height: 8, borderRadius: 4 },
-  lang: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 34, paddingHorizontal: 12, borderRadius: 17, borderWidth: 1 },
-  labelRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: -6 },
-  box: { minHeight: 56, borderRadius: 16, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, gap: 10 },
+  logoDot: { width: 10, height: 10, borderRadius: 5 },
+  lang: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 32, paddingHorizontal: 10, borderRadius: 16, borderWidth: 1 },
+  labelRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
+  field: { gap: 8 },
+  box: { minHeight: 54, borderRadius: 16, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, gap: 10 },
   input: { flex: 1, alignSelf: 'stretch', ...onest('medium', 16), paddingVertical: 0 },
   steps: { flex: 1, flexDirection: 'row', gap: 6 },
   step: { flex: 1, height: 4, borderRadius: 2 },
-  idea: { height: 28, paddingHorizontal: 12, borderRadius: 14, borderWidth: 1, justifyContent: 'center' },
+  idea: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12, borderWidth: 1, justifyContent: 'center' },
 });

@@ -8,7 +8,7 @@ import { useT } from '@/i18n';
 import type { Me } from '@/store/AppStore';
 import { gradientIds, onest, type, useTheme } from '@/theme';
 
-import { FieldLabel, IdeaChip, InputBox, TextField, TextLink } from './kit';
+import { Field, IdeaChip, InputBox, TextField, TextLink } from './kit';
 
 export const TALK_MAX = 80;
 
@@ -45,64 +45,61 @@ export function ProfileForm({ value, onChange }: { value: ProfileDraft; onChange
     if (!res.canceled && res.assets[0]) set({ photoUri: res.assets[0].uri });
   };
 
+  // M03: 12 pt between blocks, 8 pt between a label and its input, 54 pt inputs.
   return (
-    <View style={{ gap: 16 }}>
+    <View style={{ gap: 12 }}>
       <View style={styles.photoRow}>
         <Pressable accessibilityRole="button" accessibilityLabel={t('onboarding.profile.addPhoto')} onPress={pickPhoto}>
-          <Avatar name={value.name || '?'} gradient={value.gradient} size={96} photoUri={value.photoUri} />
+          <Avatar name={value.name || '?'} gradient={value.gradient} size={88} photoUri={value.photoUri} />
           <View style={[styles.camera, { backgroundColor: c.accent, borderColor: c.bg }]}>
-            <Camera size={15} color={c.onAccent} strokeWidth={2.2} />
+            <Camera size={16} color={c.onAccent} strokeWidth={2} />
           </View>
         </Pressable>
         <View style={{ flex: 1, gap: 4 }}>
           <Pressable onPress={pickPhoto} hitSlop={6}>
-            <Text style={[type.bodyStrong, { color: c.text }]}>{value.photoUri ? t('onboarding.profile.changePhoto') : t('onboarding.profile.addPhoto')}</Text>
+            <Text style={[onest('semibold', 15, 19), { color: c.text }]}>{value.photoUri ? t('onboarding.profile.changePhoto') : t('onboarding.profile.addPhoto')}</Text>
           </Pressable>
-          <Text style={[type.footnote, { color: c.muted }]}>{t('onboarding.profile.photoHint')}</Text>
+          <Text style={[onest('regular', 13, 17.5), { color: c.muted }]}>{t('onboarding.profile.photoHint')}</Text>
           {value.photoUri && <TextLink label={t('onboarding.profile.removePhoto')} onPress={() => set({ photoUri: undefined })} />}
         </View>
       </View>
 
-      <FieldLabel label={t('onboarding.profile.name')} />
-      <TextField
-        value={value.name}
-        onChangeText={(name) => set({ name })}
-        placeholder={t('onboarding.profile.namePlaceholder')}
-        maxLength={24}
-        autoCapitalize="words"
-        autoComplete="given-name"
-        textContentType="givenName"
-        returnKeyType="next"
-        accessibilityLabel={t('onboarding.profile.name')}
-      />
+      <Field label={t('onboarding.profile.name')}>
+        <TextField
+          value={value.name}
+          onChangeText={(name) => set({ name })}
+          placeholder={t('onboarding.profile.namePlaceholder')}
+          maxLength={24}
+          autoCapitalize="words"
+          autoComplete="given-name"
+          textContentType="givenName"
+          returnKeyType="next"
+          accessibilityLabel={t('onboarding.profile.name')}
+        />
+      </Field>
 
-      <FieldLabel label={t('onboarding.profile.affiliationOptional')} />
-      <Pressable accessibilityRole="button" accessibilityLabel={t('onboarding.profile.affiliation')} onPress={() => setPicking(true)}>
-        <InputBox focused={picking}>
-          <Text style={[onest('medium', 16), { color: value.affiliation ? c.text : c.muted, flex: 1 }]} numberOfLines={1}>
-            {value.affiliation || t('onboarding.profile.affiliationPlaceholder')}
-          </Text>
-          <ChevronDown size={20} color={c.muted} />
-        </InputBox>
-      </Pressable>
+      <Field label={t('onboarding.profile.affiliationOptional')}>
+        <Pressable accessibilityRole="button" accessibilityLabel={t('onboarding.profile.affiliation')} onPress={() => setPicking(true)}>
+          <InputBox focused={picking}>
+            <Text style={[onest('medium', 16), { color: value.affiliation ? c.text : c.muted, flex: 1 }]} numberOfLines={1}>
+              {value.affiliation || t('onboarding.profile.affiliationPlaceholder')}
+            </Text>
+            <ChevronDown size={18} color={c.muted} strokeWidth={2} />
+          </InputBox>
+        </Pressable>
+      </Field>
 
-      <FieldLabel
-        label={t('onboarding.profile.talkAbout')}
-        right={
-          <Text style={[type.footnote, { color: c.muted }]}>
-            {value.talkAbout.length} / {TALK_MAX}
-          </Text>
-        }
-      />
-      <TextField
-        value={value.talkAbout}
-        onChangeText={(talkAbout) => set({ talkAbout })}
-        placeholder={t('onboarding.profile.talkPlaceholder')}
-        maxLength={TALK_MAX}
-        accessibilityLabel={t('onboarding.profile.talkAbout')}
-      />
+      <Field label={t('onboarding.profile.talkAbout')} right={`${value.talkAbout.length} / ${TALK_MAX}`}>
+        <TextField
+          value={value.talkAbout}
+          onChangeText={(talkAbout) => set({ talkAbout })}
+          placeholder={t('onboarding.profile.talkPlaceholder')}
+          maxLength={TALK_MAX}
+          accessibilityLabel={t('onboarding.profile.talkAbout')}
+        />
+      </Field>
       <View style={styles.ideas}>
-        <Text style={[onest('regular', 12), { color: c.muted }]}>{t('onboarding.profile.ideas')}</Text>
+        <Text style={[onest('medium', 13), { color: c.muted }]}>{t('onboarding.profile.ideas')}</Text>
         {IDEAS.map((key) => {
           const idea = t(`onboarding.profile.idea.${key}`);
           return <IdeaChip key={key} label={idea} onPress={() => set({ talkAbout: idea })} />;
@@ -150,15 +147,16 @@ function AffiliationSheet({
               </Pressable>
             ))}
           </View>
-          <FieldLabel label={t('onboarding.profile.affiliationCustom')} />
-          <TextField
-            value={custom}
-            onChangeText={setCustom}
-            placeholder={t('onboarding.profile.affiliationCustomPlaceholder')}
-            maxLength={40}
-            returnKeyType="done"
-            onSubmitEditing={() => custom.trim() && pick(custom.trim())}
-          />
+          <Field label={t('onboarding.profile.affiliationCustom')}>
+            <TextField
+              value={custom}
+              onChangeText={setCustom}
+              placeholder={t('onboarding.profile.affiliationCustomPlaceholder')}
+              maxLength={40}
+              returnKeyType="done"
+              onSubmitEditing={() => custom.trim() && pick(custom.trim())}
+            />
+          </Field>
           <Button label={t('common.done')} disabled={!custom.trim()} onPress={() => pick(custom.trim())} />
           {!!value && <Button label={t('onboarding.profile.affiliationNone')} variant="ghost" onPress={() => pick('')} />}
         </Sheet>
@@ -173,14 +171,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: -2,
     bottom: -2,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     borderWidth: 3,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  ideas: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8, marginTop: -4 },
+  ideas: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6 },
   list: { borderRadius: 16, overflow: 'hidden' },
   option: { flexDirection: 'row', alignItems: 'center', minHeight: 50, paddingHorizontal: 16 },
 });

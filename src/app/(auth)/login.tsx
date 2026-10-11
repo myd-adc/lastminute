@@ -4,11 +4,11 @@ import { useState } from 'react';
 import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { AuthSplit } from '@/components/onboarding/AuthSplit';
-import { HeroBlobs } from '@/components/onboarding/HeroBlobs';
-import { FieldLabel, LanguagePill, Logo, useAccentInk } from '@/components/onboarding/kit';
+import { AuthScreen } from '@/components/onboarding/AuthScreen';
+import { Field, FieldLabel, LanguagePill, Logo, useAccentInk } from '@/components/onboarding/kit';
 import { onlyDigits, PHONE_DIGITS, PhoneInput, toE164 } from '@/components/onboarding/PhoneInput';
 import { QrPlaceholder } from '@/components/onboarding/QrPlaceholder';
-import { Button, Screen } from '@/components/ui';
+import { Button } from '@/components/ui';
 import { useT } from '@/i18n';
 import { useIsWide } from '@/lib/layout';
 import { useStore } from '@/store/AppStore';
@@ -36,52 +36,54 @@ export default function LoginScreen() {
 
 type FormProps = { digits: string; setDigits: (d: string) => void; valid: boolean; submit: () => void };
 
+// M01: logo row 14 pt below the safe area, hero at y 268 (≈ 172 pt of free space above it), the form right under the
+// tagline and ≈ 120 pt free below the trust line. The two flexible gaps keep that 172 : 83 split on any screen height.
 function MobileLogin({ digits, setDigits, valid, submit }: FormProps) {
   const { c } = useTheme();
   const { t } = useT();
   return (
-    <Screen keyboard padded={false} contentStyle={styles.mobile}>
-      <HeroBlobs variant="hero" height={600} />
+    <AuthScreen glow="login" top={14}>
       <View style={styles.topRow}>
         <Logo />
         <LanguagePill />
       </View>
-      <View style={styles.spacer} />
-      <Text style={[type.hero, { color: c.text }]}>{t('onboarding.hero')}</Text>
-      <Text style={[type.body, { color: c.muted, marginBottom: 24 }]}>{t('onboarding.tagline')}</Text>
-      <FieldLabel label={t('onboarding.login.phoneLabel')} />
-      <PhoneInput digits={digits} onChange={setDigits} onSubmit={submit} />
-      <Button label={t('onboarding.login.getCode')} disabled={!valid} onPress={submit} />
-      <TrustLine text={t('onboarding.login.trust')} />
-    </Screen>
+      <View style={[styles.flexGap, { flexGrow: 172 }]} />
+      <Text style={[styles.hero, { color: c.text }]}>{t('onboarding.hero')}</Text>
+      <Text style={[onest('regular', 16, 22), { color: c.muted, marginTop: 39 }]}>{t('onboarding.tagline')}</Text>
+      <View style={styles.form}>
+        <FieldLabel label={t('onboarding.login.phoneLabel')} />
+        <PhoneInput digits={digits} onChange={setDigits} onSubmit={submit} />
+        <Button label={t('onboarding.login.getCode')} disabled={!valid} onPress={submit} />
+        <TrustLine text={t('onboarding.login.trust')} />
+      </View>
+      <View style={[styles.flexGap, { flexGrow: 83 }]} />
+    </AuthScreen>
   );
 }
 
+// W01 auth panel: «Вхід» form, «або», QR block, trust line (16 pt rhythm).
 function WideLogin({ digits, setDigits, valid, submit }: FormProps) {
   const { c } = useTheme();
   const { t } = useT();
   return (
     <AuthSplit languagePill>
       <View style={{ gap: 16 }}>
-        <Text style={[display(34, 42), { color: c.text }]}>{t('onboarding.login.title')}</Text>
-        <Text style={[type.subhead, { color: c.muted, marginBottom: 4 }]}>
-          {t('onboarding.login.wideSubtitle')}
-        </Text>
-        <FieldLabel label={t('onboarding.login.phoneLabel')} />
-        <PhoneInput digits={digits} onChange={setDigits} onSubmit={submit} autoFocus />
+        <Text style={[display(32, 40), { color: c.text }]}>{t('onboarding.login.title')}</Text>
+        <Text style={[onest('regular', 15, 22), { color: c.muted }]}>{t('onboarding.login.wideSubtitle')}</Text>
+        <Field label={t('onboarding.login.phoneLabel')}>
+          <PhoneInput digits={digits} onChange={setDigits} onSubmit={submit} autoFocus size="md" />
+        </Field>
         <Button label={t('onboarding.login.getCode')} disabled={!valid} onPress={submit} />
         <View style={styles.orRow}>
           <View style={[styles.orLine, { backgroundColor: c.line }]} />
-          <Text style={[type.footnote, { color: c.muted }]}>{t('onboarding.login.or')}</Text>
+          <Text style={[onest('medium', 13), { color: c.muted }]}>{t('onboarding.login.or')}</Text>
           <View style={[styles.orLine, { backgroundColor: c.line }]} />
         </View>
         <View style={[styles.qrCard, { backgroundColor: c.bg }]}>
-          <QrPlaceholder size={124} />
+          <QrPlaceholder size={132} />
           <View style={{ flex: 1, gap: 8 }}>
             <Text style={[onest('bold', 16), { color: c.text }]}>{t('onboarding.login.phoneBetter')}</Text>
-            <Text style={[type.footnote, { color: c.muted }]}>
-              {t('onboarding.login.phoneBetterText')}
-            </Text>
+            <Text style={[onest('regular', 13, 18), { color: c.muted }]}>{t('onboarding.login.phoneBetterText')}</Text>
             <View style={styles.stores}>
               <StorePill label="App Store" url={APP_STORE} />
               <StorePill label="▶ Google Play" url={GOOGLE_PLAY} />
@@ -119,13 +121,15 @@ function TrustLine({ text }: { text: string }) {
 }
 
 const styles = StyleSheet.create({
-  mobile: { flexGrow: 1, paddingHorizontal: 20 },
   topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  spacer: { flexGrow: 1, minHeight: 72 },
+  flexGap: { flexBasis: 0, minHeight: 24 },
+  // Figma: Unbounded Bold 38, line height 1.08, tracking −3 %.
+  hero: { ...display(38, 41), letterSpacing: -1.14 },
+  form: { gap: 12, marginTop: 48 },
   trust: { flexDirection: 'row', gap: 10, alignItems: 'flex-start' },
   orRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   orLine: { flex: 1, height: 1 },
-  qrCard: { flexDirection: 'row', alignItems: 'center', gap: 18, padding: 16, borderRadius: 20 },
-  stores: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 4 },
-  store: { height: 32, paddingHorizontal: 12, borderRadius: 10, justifyContent: 'center' },
+  qrCard: { flexDirection: 'row', alignItems: 'center', gap: 20, padding: 20, borderRadius: 20 },
+  stores: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  store: { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 14 },
 });
