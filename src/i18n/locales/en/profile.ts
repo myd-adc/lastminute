@@ -60,6 +60,7 @@ export const profile: Translation<typeof Uk> = {
     resetDemo: 'Reset demo',
   },
   wide: {
+    edit: 'Edit profile',
     talkAbout: 'Talk to me about',
     myScenes: 'My scenes',
     primary: 'Primary',
@@ -133,7 +134,7 @@ export const profile: Translation<typeof Uk> = {
     notFound: 'Event not found',
     title: 'How did it go?',
     talkedQuestion: 'Did you talk to someone new?',
-    talked: { lots: '🙌 Yes, a few people', single: '☝️ One person', none: '🤷 No' },
+    talked: { lots: '🙌 Yes, a few people', single: '☝️ One person', none: '🙅 No' },
     cameWithQuestion: 'You came…',
     cameWith: { match: '👯 With my match', solo: '🙋 Solo', friends: '🎉 With friends' },
     contactTitle: 'Keep in touch with {name}?',
@@ -145,6 +146,7 @@ export const profile: Translation<typeof Uk> = {
     nextOnScene: 'Next in your scene: {title}',
     friendToo: '{name} too ✓',
     go: '👋 I’m going',
+    goWide: '👋 I’m going',
   },
   pronouns: {
     f: { he: 'she', He: 'She', him: 'her', theirs: 'hers' },

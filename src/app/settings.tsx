@@ -10,14 +10,17 @@ import {
   NotificationsSection,
   Section,
 } from '@/components/profile/ProfileSections';
-import { goBack, Header, List, ListRow, Screen } from '@/components/ui';
+import { BackTitle } from '@/components/profile/BackTitle';
+import { Group, Row } from '@/components/profile/Rows';
+import { goBack, Screen } from '@/components/ui';
 import { getScene } from '@/data/mock';
 import { LANGS, useT } from '@/i18n';
 import { useIsWide } from '@/lib/layout';
 import { useStore } from '@/store/AppStore';
-import { onest, type, useTheme } from '@/theme';
+import { onest, useTheme } from '@/theme';
 
 // M16b «Налаштування» (+ «Демо» section for testing the live / after-event states).
+// Frame rhythm: 40 pt header 6 pt under the status bar, 12 pt to the first caption, then a uniform 7 pt gap.
 export default function SettingsScreen() {
   const { c, scheme } = useTheme();
   const { t, lang } = useT();
@@ -28,69 +31,69 @@ export default function SettingsScreen() {
   const language = LANGS.find((l) => l.id === lang)?.native;
 
   return (
-    <Screen contentStyle={wide ? styles.wide : undefined}>
-      <Header large title={t('profile.settingsTitle')} onBack={() => goBack('/me')} />
+    <Screen contentStyle={[styles.content, wide && styles.wide]}>
+      <BackTitle title={t('profile.settingsTitle')} onBack={() => goBack('/me')} style={styles.header} />
 
       <Section label={t('profile.account.label')}>
-        <List>
-          <ListRow label={t('profile.settings.phone')} value={maskPhone(state.phone)} />
-          <ListRow
+        <Group dense>
+          <Row label={t('profile.settings.phone')} value={maskPhone(state.phone)} chevron />
+          <Row
             label={t('profile.settings.studentEmail')}
             sub={t('profile.settings.studentEmailSub')}
-            right={
-              <Text style={[type.subhead, { color: verified ? accentText(c, scheme) : c.muted }]}>
-                {verified ? `${getScene('ucu').name} ✓` : t('profile.settings.add')}
-              </Text>
-            }
+            value={verified ? `${getScene('ucu').name} ✓` : t('profile.settings.add')}
+            valueColor={verified ? accentText(c, scheme) : undefined}
             chevron
             onPress={() => router.push('/preferences')}
           />
-          <ListRow last label={t('profile.settings.language')} value={language} chevron onPress={() => router.push('/language')} />
-        </List>
+          <Row last label={t('profile.settings.language')} value={language} chevron onPress={() => router.push('/language')} />
+        </Group>
       </Section>
 
       <AppearanceSection />
-      <NotificationsSection />
+      <NotificationsSection dense />
 
       <Section label={t('profile.settings.privacy')}>
-        <List>
-          <ListRow last label={t('profile.settings.whoSeesCard')} value={t('profile.settings.onlyGoing')} />
-        </List>
+        <Group dense>
+          <Row last label={t('profile.settings.whoSeesCard')} value={t('profile.settings.onlyGoing')} chevron />
+        </Group>
       </Section>
 
       <Section label={t('profile.settings.other')}>
-        <List>
-          <ListRow label={t('profile.safety.rules')} chevron onPress={() => router.push('/rules')} />
-          <ListRow last label={t('profile.settings.version')} value="0.1 beta" />
-        </List>
+        <Group dense>
+          <Row label={t('profile.safety.rules')} chevron onPress={() => router.push('/rules')} />
+          <Row last label={t('profile.settings.version')} value="0.1 beta" />
+        </Group>
       </Section>
 
       {confirmDelete ? (
-        <List>
+        <Group>
           <ConfirmRow
             question={t('profile.account.deleteQuestion')}
             confirmLabel={t('profile.account.delete')}
             onCancel={() => setConfirmDelete(false)}
             onConfirm={() => dispatch({ type: 'logout' })}
           />
-        </List>
+        </Group>
       ) : (
         <Pressable
           accessibilityRole="button"
           onPress={() => setConfirmDelete(true)}
           style={({ pressed }) => [styles.delete, { backgroundColor: pressed ? c.surface2 : c.surface }]}
         >
-          <Text style={[onest('semibold', 16), { color: c.danger }]}>{t('profile.account.deleteAccount')}</Text>
+          <Text style={[onest('semibold', 15, 19), { color: c.danger }]}>{t('profile.account.deleteAccount')}</Text>
         </Pressable>
       )}
 
-      <View style={{ height: 8 }} />
-      <DemoSection />
+      <View style={styles.demoGap} />
+      <DemoSection dense />
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
+  content: { gap: 7 },
   wide: { maxWidth: 640, width: '100%', alignSelf: 'center' },
-  delete: { height: 52, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  header: { marginTop: -2, marginBottom: 5 },
+  delete: { paddingVertical: 12, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
+  demoGap: { height: 9 },
 });

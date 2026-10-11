@@ -41,8 +41,8 @@ export function pronouns(user: Pick<User, 'gender'> | undefined, lang: Lang = ge
   };
 }
 
-// Accent text has to stay readable on the light background: Figma uses a deep olive there.
-export const accentText = (c: Palette, scheme: Scheme) => (scheme === 'light' ? '#5A7A00' : c.accent);
+// Accent text has to stay readable on the light background: Figma uses a deep olive there (color/accent-text #4F6B00).
+export const accentText = (c: Palette, scheme: Scheme) => (scheme === 'light' ? '#4F6B00' : c.accent);
 
 // «+380 67 ••• 45 67» from the stored phone digits.
 export function maskPhone(phone: string | null): string {

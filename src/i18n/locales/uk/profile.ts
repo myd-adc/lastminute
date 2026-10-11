@@ -59,6 +59,7 @@ export const profile = {
     resetDemo: 'Скинути демо',
   },
   wide: {
+    edit: 'Редагувати',
     talkAbout: 'Говори зі мною про',
     myScenes: 'Мої сцени',
     primary: 'Основна',
@@ -133,7 +134,7 @@ export const profile = {
     notFound: 'Подію не знайдено',
     title: 'Як пройшло?',
     talkedQuestion: 'Ти поговорив(ла) з кимось новим?',
-    talked: { lots: '🙌 Так, з кількома', single: '☝️ З однією людиною', none: '🤷 Ні' },
+    talked: { lots: '🙌 Так, з кількома', single: '☝️ З однією людиною', none: '🙅 Ні' },
     cameWithQuestion: 'Ти прийшов(ла)…',
     cameWith: { match: '👯 Разом з метчем', solo: '🙋 Сам(а)', friends: '🎉 Зі своїми' },
     contactTitle: 'Залишити контакт з {name}?',
@@ -145,6 +146,7 @@ export const profile = {
     nextOnScene: 'Далі на сцені: {title}',
     friendToo: '{name} теж ✓',
     go: 'Я йду',
+    goWide: '👋 Я йду',
   },
   // Pronouns for M15/M17 copy, by gender (f / m / unknown).
   pronouns: {

@@ -2,32 +2,36 @@ import { router } from 'expo-router';
 import { useState, type ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { Avatar, Chip, List, ListRow, Segmented, SectionLabel, Toggle } from '@/components/ui';
+import { Avatar, Chip, Toggle } from '@/components/ui';
 import { getScene } from '@/data/mock';
 import { useT } from '@/i18n';
+import { useIsWide } from '@/lib/layout';
 import { pendingSurveys, profileStats } from '@/lib/selectors';
 import { useNow, useStore } from '@/store/AppStore';
 import { display, onest, type, useTheme, type ThemeMode } from '@/theme';
 
 import { demoMode, demoOffsetFor, demoTarget, type DemoMode } from './demo';
 import { accentText } from './names';
+import { Group, GroupLabel, Row } from './Rows';
 
 // Building blocks shared by M16 «Профіль», M16b «Налаштування» and the two-column W09 web profile.
+// A section is a caption plus its group as siblings, so the parent column's gap spaces them exactly as the frames do
+// (12 pt in M16, 7 pt in M16b, 16 pt in W09).
 
 export function Section({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <View style={styles.section}>
-      <SectionLabel>{label}</SectionLabel>
+    <>
+      <GroupLabel>{label}</GroupLabel>
       {children}
-    </View>
+    </>
   );
 }
 
-// Small soft-accent pill: «УКУ ✓» / «UCU ✓».
+// Small soft-accent pill: «УКУ ✓» / «UCU ✓» (Figma «Pill»: 10×5 padding, radius 12, SemiBold 12).
 export function VerifiedPill({ label }: { label: string }) {
   const { c, scheme } = useTheme();
   return (
-    <View style={[styles.verified, { backgroundColor: c.accentSoft }]}>
+    <View style={[styles.pill, { backgroundColor: c.accentSoft }]}>
       <Text style={[onest('semibold', 12), { color: accentText(c, scheme) }]}>{label} ✓</Text>
     </View>
   );
@@ -35,6 +39,7 @@ export function VerifiedPill({ label }: { label: string }) {
 
 const campusName = () => getScene('ucu').name;
 
+// M16 profile card: 14 pt padding, 60 pt avatar, name Onest Bold 17, «Змінити» SemiBold 13 in accent.
 export function ProfileCard() {
   const { c, scheme } = useTheme();
   const { t } = useT();
@@ -42,30 +47,32 @@ export function ProfileCard() {
   const me = state.me;
   if (!me) return null;
   return (
-    <View style={[styles.card, styles.profile, { backgroundColor: c.surface }]}>
-      <Avatar name={me.name} gradient={me.gradient} photoUri={me.photoUri} size={64} />
-      <View style={{ flex: 1, gap: 3 }}>
+    <View style={[styles.profile, { backgroundColor: c.surface }]}>
+      <Avatar name={me.name} gradient={me.gradient} photoUri={me.photoUri} size={60} />
+      <View style={styles.profileText}>
         <View style={styles.nameRow}>
-          <Text style={[onest('bold', 17), { color: c.text, flexShrink: 1 }]} numberOfLines={1}>
+          <Text style={[onest('bold', 17, 22), { color: c.text, flexShrink: 1 }]} numberOfLines={1}>
             {me.name}
           </Text>
           {state.studentEmail && <VerifiedPill label={campusName()} />}
         </View>
-        {!!me.affiliation && <Text style={[type.footnote, { color: c.muted }]}>{me.affiliation}</Text>}
-        {!!me.talkAbout && <Text style={[type.footnote, { color: c.text }]}>«{me.talkAbout}»</Text>}
+        {!!me.affiliation && <Text style={[onest('regular', 13, 17), { color: c.muted }]}>{me.affiliation}</Text>}
+        {!!me.talkAbout && <Text style={[onest('medium', 13, 17), { color: c.text }]}>«{me.talkAbout}»</Text>}
       </View>
       <Pressable accessibilityRole="button" hitSlop={10} onPress={() => router.push('/edit-profile')}>
-        <Text style={[onest('semibold', 14), { color: accentText(c, scheme) }]}>{t('profile.edit')}</Text>
+        <Text style={[onest('semibold', 13), { color: accentText(c, scheme) }]}>{t('profile.edit')}</Text>
       </Pressable>
     </View>
   );
 }
 
+// Outlined stats strip (no fill): M16 — 12 pt vertical padding, Unbounded 20 / Onest 12; W09 — 16 pt, 24 / 13.
 export function StatsCard() {
   const { c, scheme } = useTheme();
   const { t } = useT();
   const { state } = useStore();
   const now = useNow();
+  const wide = useIsWide();
   const s = profileStats(state, now);
   const cols = [
     { key: 'events', n: s.attended, label: t('profile.stats.events', { count: s.attended }) },
@@ -73,11 +80,11 @@ export function StatsCard() {
     { key: 'contacts', n: s.contacts, label: t('profile.stats.contacts', { count: s.contacts }) },
   ];
   return (
-    <View style={[styles.card, styles.stats, { backgroundColor: c.surface, borderColor: c.line }]}>
+    <View style={[styles.stats, wide && styles.statsWide, { borderColor: c.line }]}>
       {cols.map((col) => (
         <View key={col.key} style={styles.stat}>
-          <Text style={[display(24, 30), { color: col.accent ? accentText(c, scheme) : c.text }]}>{col.n}</Text>
-          <Text style={[type.footnote, { color: c.muted }]} numberOfLines={1}>
+          <Text style={[wide ? display(24, 30) : display(20, 25), { letterSpacing: 0, color: col.accent ? accentText(c, scheme) : c.text }]}>{col.n}</Text>
+          <Text style={[onest('regular', wide ? 13 : 12, wide ? 17 : 15), { color: c.muted }]} numberOfLines={1}>
             {col.label}
           </Text>
         </View>
@@ -92,13 +99,13 @@ export function VisibilitySection() {
   const { showSolo, showSharedEvents } = state.settings;
   return (
     <Section label={t('profile.visibility.label')}>
-      <List>
-        <ListRow
+      <Group>
+        <Row
           label={t('profile.visibility.showSolo')}
           sub={t('profile.visibility.showSoloSub')}
           right={<Toggle value={showSolo} accessibilityLabel={t('profile.visibility.showSolo')} onChange={(v) => dispatch({ type: 'setPrivacy', key: 'showSolo', value: v })} />}
         />
-        <ListRow
+        <Row
           last
           label={t('profile.visibility.showShared')}
           sub={t('profile.visibility.showSharedSub')}
@@ -110,7 +117,7 @@ export function VisibilitySection() {
             />
           }
         />
-      </List>
+      </Group>
     </Section>
   );
 }
@@ -121,10 +128,10 @@ export function SafetySection() {
   const blocked = Object.keys(state.blocked).length;
   return (
     <Section label={t('profile.safety.label')}>
-      <List>
-        <ListRow label={t('profile.safety.blocked')} value={blocked ? String(blocked) : undefined} chevron onPress={() => router.push('/blocked')} />
-        <ListRow last label={t('profile.safety.rules')} chevron onPress={() => router.push('/rules')} />
-      </List>
+      <Group>
+        <Row label={t('profile.safety.blocked')} value={blocked ? String(blocked) : undefined} chevron onPress={() => router.push('/blocked')} />
+        <Row last label={t('profile.safety.rules')} chevron onPress={() => router.push('/rules')} />
+      </Group>
     </Section>
   );
 }
@@ -152,8 +159,8 @@ export function AccountSection({ confirming, setConfirming }: { confirming: bool
   const scene = state.sceneId ? getScene(state.sceneId) : null;
   return (
     <Section label={t('profile.account.label')}>
-      <List>
-        <ListRow label={t('profile.account.preferences')} value={scene?.name} chevron onPress={() => router.push('/preferences')} />
+      <Group>
+        <Row label={t('profile.account.preferences')} value={scene?.name} chevron onPress={() => router.push('/preferences')} />
         {confirming ? (
           <ConfirmRow
             question={t('profile.account.logoutQuestion')}
@@ -162,40 +169,53 @@ export function AccountSection({ confirming, setConfirming }: { confirming: bool
             onConfirm={() => dispatch({ type: 'logout' })}
           />
         ) : (
-          <ListRow last label={t('profile.account.logout')} destructive onPress={() => setConfirming(true)} />
+          <Row last label={t('profile.account.logout')} destructive onPress={() => setConfirming(true)} />
         )}
-      </List>
+      </Group>
     </Section>
   );
 }
 
 const themeModes: ThemeMode[] = ['dark', 'light', 'system'];
 
+// M16b «Вигляд»: 12 pt card padding around a bg-coloured track (4 pt inset, radius 14), segments 9 pt tall padding,
+// radius 10, Onest SemiBold 13.
 export function AppearanceSection() {
   const { c } = useTheme();
   const { t } = useT();
   const { state, dispatch } = useStore();
-  const themeOptions = themeModes.map((key) => ({ key, label: t(`profile.appearance.${key}`) }));
   return (
     <Section label={t('profile.appearance.label')}>
-      <View style={[styles.segWrap, { backgroundColor: c.surface }]}>
-        <Segmented
-          options={themeOptions}
-          value={state.settings.theme}
-          onChange={(theme) => dispatch({ type: 'setTheme', theme })}
-          style={{ backgroundColor: c.bg }}
-        />
-      </View>
+      <Group style={styles.segWrap}>
+        <View accessibilityRole="radiogroup" style={[styles.segTrack, { backgroundColor: c.bg }]}>
+          {themeModes.map((key) => {
+            const on = state.settings.theme === key;
+            return (
+              <Pressable
+                key={key}
+                accessibilityRole="radio"
+                accessibilityState={{ selected: on }}
+                onPress={() => dispatch({ type: 'setTheme', theme: key })}
+                style={[styles.seg, on && { backgroundColor: c.surface2 }]}
+              >
+                <Text style={[onest('semibold', 13, 17), { color: on ? c.text : c.muted }]} numberOfLines={1}>
+                  {t(`profile.appearance.${key}`)}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </Group>
     </Section>
   );
 }
 
-export function NotificationsSection() {
+export function NotificationsSection({ dense }: { dense?: boolean }) {
   const { t } = useT();
   const { state, dispatch } = useStore();
   const n = state.settings.notify;
   const row = (key: keyof typeof n, label: string, sub?: string, last?: boolean) => (
-    <ListRow
+    <Row
       key={key}
       label={label}
       sub={sub}
@@ -205,11 +225,11 @@ export function NotificationsSection() {
   );
   return (
     <Section label={t('profile.notifications.label')}>
-      <List>
+      <Group dense={dense}>
         {row('soloOnMyEvent', t('profile.notifications.soloOnMyEvent'))}
         {row('albumOpened', t('profile.notifications.albumOpened'))}
         {row('newSceneEvents', t('profile.notifications.newSceneEvents'), t('profile.notifications.newSceneEventsSub'), true)}
-      </List>
+      </Group>
     </Section>
   );
 }
@@ -217,7 +237,7 @@ export function NotificationsSection() {
 const demoModes: DemoMode[] = ['now', 'live', 'after'];
 
 // Not in Figma: a demo clock to preview the live and after-event states without waiting for real time.
-export function DemoSection() {
+export function DemoSection({ dense }: { dense?: boolean }) {
   const { c } = useTheme();
   const { t } = useT();
   const { state, dispatch } = useStore();
@@ -229,41 +249,41 @@ export function DemoSection() {
   const survey = pendingSurveys(state, now)[0];
   return (
     <Section label={t('profile.demo.label')}>
-      <View style={[styles.card, styles.demo, { backgroundColor: c.surface }]}>
+      <Group style={styles.demo}>
         <View style={styles.chips}>
           {demoChips.map((d) => (
             <Chip key={d.key} label={d.label} selected={mode === d.key} onPress={() => dispatch({ type: 'setDemoOffset', ms: demoOffsetFor(d.key, target) })} />
           ))}
         </View>
-        <Text style={[type.footnote, { color: c.muted }]}>
-          {t('profile.demo.hint', { title: target.title })}
-        </Text>
-      </View>
-      <List>
+        <Text style={[type.footnote, { color: c.muted }]}>{t('profile.demo.hint', { title: target.title })}</Text>
+      </Group>
+      <Group dense={dense}>
         {survey && (
-          <ListRow label={t('profile.demo.openSurvey')} sub={survey.title} chevron onPress={() => router.push({ pathname: '/event/[id]/after', params: { id: survey.id } })} />
+          <Row label={t('profile.demo.openSurvey')} sub={survey.title} chevron onPress={() => router.push({ pathname: '/event/[id]/after', params: { id: survey.id } })} />
         )}
         {resetting ? (
           <ConfirmRow question={t('profile.demo.resetQuestion')} confirmLabel={t('profile.demo.reset')} onCancel={() => setResetting(false)} onConfirm={() => dispatch({ type: 'logout' })} />
         ) : (
-          <ListRow last label={t('profile.demo.resetDemo')} destructive onPress={() => setResetting(true)} />
+          <Row last label={t('profile.demo.resetDemo')} destructive onPress={() => setResetting(true)} />
         )}
-      </List>
+      </Group>
     </Section>
   );
 }
 
 const styles = StyleSheet.create({
-  section: { gap: 8 },
-  card: { borderRadius: 20 },
-  profile: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16 },
-  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  verified: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 10 },
-  stats: { flexDirection: 'row', paddingVertical: 14, borderWidth: 1 },
+  pill: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12 },
+  profile: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14, borderRadius: 20 },
+  profileText: { flex: 1, gap: 3 },
+  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  stats: { flexDirection: 'row', paddingVertical: 12, borderRadius: 18, borderWidth: 1 },
+  statsWide: { paddingVertical: 16, borderRadius: 20 },
   stat: { flex: 1, alignItems: 'center', gap: 2 },
-  confirm: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 52, paddingHorizontal: 16, paddingVertical: 10 },
+  confirm: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 46, paddingHorizontal: 16, paddingVertical: 8 },
   confirmBtn: { height: 34, paddingHorizontal: 14, borderRadius: 17, alignItems: 'center', justifyContent: 'center' },
-  segWrap: { borderRadius: 20, padding: 8 },
+  segWrap: { padding: 12 },
+  segTrack: { flexDirection: 'row', padding: 4, gap: 4, borderRadius: 14 },
+  seg: { flex: 1, paddingVertical: 9, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   demo: { padding: 16, gap: 12 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
 });

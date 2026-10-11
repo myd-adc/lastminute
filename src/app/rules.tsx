@@ -1,6 +1,7 @@
 import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { goBack, Header, Screen } from '@/components/ui';
+import { BackTitle } from '@/components/profile/BackTitle';
+import { goBack, Screen } from '@/components/ui';
 import { useT } from '@/i18n';
 import { useIsWide } from '@/lib/layout';
 import { onest, type, useTheme } from '@/theme';
@@ -20,9 +21,8 @@ export default function RulesScreen() {
   const wide = useIsWide();
   const number = t('profile.emergencyNumber');
   return (
-    <Screen contentStyle={wide ? styles.wide : undefined}>
-      <Header onBack={() => goBack('/me')} />
-      <Text style={[type.title, { color: c.text }]}>{t('profile.rules.title')}</Text>
+    <Screen contentStyle={[styles.content, wide && styles.wide]}>
+      <BackTitle title={t('profile.rules.title')} onBack={() => goBack('/me')} style={styles.header} />
       <Text style={[type.body, { color: c.muted }]}>{t('profile.rules.intro')}</Text>
       {rules.map((r) => (
         <View key={r.key} style={[styles.card, { backgroundColor: c.surface }]}>
@@ -53,7 +53,10 @@ export default function RulesScreen() {
 }
 
 const styles = StyleSheet.create({
+  // Same header as M16b (no dedicated frame).
+  content: { gap: 12 },
+  header: { marginTop: -2 },
   wide: { maxWidth: 640, width: '100%', alignSelf: 'center' },
-  card: { flexDirection: 'row', gap: 14, padding: 16, borderRadius: 20, alignItems: 'flex-start' },
+  card: { flexDirection: 'row', gap: 14, padding: 16, borderRadius: 18, alignItems: 'flex-start' },
   emoji: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
 });

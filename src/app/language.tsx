@@ -1,28 +1,27 @@
-import { Globe } from 'lucide-react-native';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { goBack, Header, List, Radio, Screen } from '@/components/ui';
+import { Button, goBack, Radio, Sheet } from '@/components/ui';
 import { LANGS, useT } from '@/i18n';
-import { useIsWide } from '@/lib/layout';
 import { useStore } from '@/store/AppStore';
-import { onest, type, useTheme } from '@/theme';
+import { onest, useTheme } from '@/theme';
 
-// M16c «Мова» / «Language»: pick the app language; the whole app re-renders immediately.
+// M16c «Мова» / «Language»: bottom sheet over M16b Settings (a centred dialog on wide web), styled like the M17
+// sheet — Onest Bold 18 title, bg-coloured radio group (radius 18, 16×13 rows), 56 pt «Готово».
+// The language applies immediately; the whole app re-renders.
 export default function LanguageScreen() {
   const { c } = useTheme();
   const { t, lang } = useT();
   const { dispatch } = useStore();
-  const wide = useIsWide();
+  const close = () => goBack('/me');
 
   return (
-    <Screen contentStyle={wide ? styles.wide : undefined}>
-      <Header onBack={() => goBack('/me')} />
-      <View style={styles.titleRow}>
-        <Globe size={24} color={c.text} strokeWidth={2} />
-        <Text style={[type.title, { color: c.text, flex: 1 }]}>{t('profile.language.title')}</Text>
-      </View>
-      <List>
-        <View accessibilityRole="radiogroup">
+    <Sheet onClose={close} footer={<Button label={t('common.done')} onPress={close} />}>
+      <View style={styles.body}>
+        <View style={{ gap: 2 }}>
+          <Text style={[onest('bold', 18, 23), { color: c.text }]}>{t('profile.language.title')}</Text>
+          <Text style={[onest('regular', 13, 17.5), { color: c.muted }]}>{t('profile.language.note')}</Text>
+        </View>
+        <View accessibilityRole="radiogroup" style={[styles.list, { backgroundColor: c.bg }]}>
           {LANGS.map((l, i) => {
             const on = l.id === lang;
             return (
@@ -39,22 +38,21 @@ export default function LanguageScreen() {
                 ]}
               >
                 <View style={{ flex: 1, gap: 2 }}>
-                  <Text style={[onest('semibold', 16), { color: c.text }]}>{l.native}</Text>
-                  <Text style={[type.footnote, { color: c.muted }]}>{l.label}</Text>
+                  <Text style={[onest('medium', 15, 19), { color: c.text }]}>{l.native}</Text>
+                  <Text style={[onest('regular', 12, 16), { color: c.muted }]}>{l.label}</Text>
                 </View>
                 <Radio selected={on} />
               </Pressable>
             );
           })}
         </View>
-      </List>
-      <Text style={[type.footnote, { color: c.muted }]}>{t('profile.language.note')}</Text>
-    </Screen>
+      </View>
+    </Sheet>
   );
 }
 
 const styles = StyleSheet.create({
-  wide: { maxWidth: 640, width: '100%', alignSelf: 'center' },
-  titleRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 64, paddingHorizontal: 16, paddingVertical: 12 },
+  body: { gap: 12, marginTop: -5 },
+  list: { borderRadius: 18, overflow: 'hidden' },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 13 },
 });

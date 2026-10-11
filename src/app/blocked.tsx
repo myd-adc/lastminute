@@ -1,7 +1,8 @@
 import { ShieldCheck } from 'lucide-react-native';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { Avatar, goBack, Header, List, Screen } from '@/components/ui';
+import { BackTitle } from '@/components/profile/BackTitle';
+import { Avatar, goBack, Screen } from '@/components/ui';
 import { getUser } from '@/data/mock';
 import { useT } from '@/i18n';
 import { useIsWide } from '@/lib/layout';
@@ -19,8 +20,8 @@ export default function BlockedScreen() {
     .filter((u) => !!u);
 
   return (
-    <Screen contentStyle={wide ? styles.wide : undefined}>
-      <Header large title={t('profile.safety.blocked')} onBack={() => goBack('/me')} />
+    <Screen contentStyle={[styles.content, wide && styles.wide]}>
+      <BackTitle title={t('profile.safety.blocked')} onBack={() => goBack('/me')} style={styles.header} />
       {people.length === 0 ? (
         <View style={[styles.empty, { backgroundColor: c.surface }]}>
           <View style={[styles.emptyIcon, { backgroundColor: c.surface2 }]}>
@@ -34,7 +35,7 @@ export default function BlockedScreen() {
       ) : (
         <>
           <Text style={[type.footnote, { color: c.muted }]}>{t('profile.blocked.hint')}</Text>
-          <List>
+          <View style={[styles.list, { backgroundColor: c.surface }]}>
             {people.map((u, i) => (
               <View key={u.id} style={[styles.row, i < people.length - 1 && { borderBottomWidth: 1, borderBottomColor: c.line }]}>
                 <Avatar name={u.name} gradient={u.gradient} size={44} />
@@ -54,7 +55,7 @@ export default function BlockedScreen() {
                 </Pressable>
               </View>
             ))}
-          </List>
+          </View>
         </>
       )}
     </Screen>
@@ -62,9 +63,13 @@ export default function BlockedScreen() {
 }
 
 const styles = StyleSheet.create({
+  // Same header and grouped-list geometry as M16b (no dedicated frame).
+  content: { gap: 12 },
+  header: { marginTop: -2 },
+  list: { borderRadius: 18, overflow: 'hidden' },
   wide: { maxWidth: 640, width: '100%', alignSelf: 'center' },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 12 },
   unblock: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 14 },
-  empty: { borderRadius: 20, padding: 24, gap: 10, alignItems: 'center' },
+  empty: { borderRadius: 18, padding: 24, gap: 10, alignItems: 'center' },
   emptyIcon: { width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
 });
