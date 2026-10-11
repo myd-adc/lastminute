@@ -9,10 +9,8 @@ import type { Palette, Scheme } from '@/theme';
 export const eventShort = (e: Event) => e.title.split(':')[0].trim();
 
 // Lime text is unreadable on light surfaces: Figma uses the ink colour there and keeps lime only as a fill.
+// (Used by onboarding too.) Chat screens use `c.accentInk` — Figma's `color/accent-text`, deep olive on light.
 export const accentInk = (c: Palette, scheme: Scheme) => (scheme === 'light' ? c.text : c.accent);
-
-// Sender names in group bubbles (M08b): lime on dark, dark olive on light.
-export const senderInk = (c: Palette, scheme: Scheme) => (scheme === 'light' ? '#5A7A00' : c.accent);
 
 // Gender key for she/he phrases in the `chat.contact.*` dictionaries.
 export const genderKey = (u: User | undefined): 'f' | 'm' => (u?.gender === 'm' ? 'm' : 'f');

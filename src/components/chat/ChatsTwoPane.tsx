@@ -1,20 +1,19 @@
 import { router } from 'expo-router';
 import { MessageSquare, Search } from 'lucide-react-native';
-import { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Fragment, useMemo, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
-import { Segmented } from '@/components/ui';
 import { useT } from '@/i18n';
 import { chatList, isPast, type ChatSummary } from '@/lib/selectors';
 import { dayLabel } from '@/lib/time';
 import { useNow, useStore } from '@/store/AppStore';
-import { onest, type, type Palette, useStyles, useTheme } from '@/theme';
+import { display, onest, type Palette, useStyles, useTheme } from '@/theme';
 
 import { ChatConversation } from './ChatConversation';
 import { ChatRow } from './ChatRow';
 import { chatSections, eventShort, matchesQuery } from './chatUtils';
 
-export const CHAT_LIST_WIDTH = 290;
+export const CHAT_LIST_WIDTH = 380;
 
 // W06: chat list column + selected conversation, used by /chats and /chat/[eventId]/[userId] on wide web.
 export function ChatsTwoPane({ initialChatId }: { initialChatId?: string }) {
@@ -50,7 +49,7 @@ export function ChatsTwoPane({ initialChatId }: { initialChatId?: string }) {
   return (
     <View style={s.root}>
       <View style={s.list}>
-        <Text style={[type.title, { fontSize: 26, lineHeight: 32, color: c.text }]}>{t('chat.title')}</Text>
+        <Text style={[display(26, 32), { color: c.text }]}>{t('chat.title')}</Text>
         <View style={s.search}>
           <Search size={16} color={c.muted} />
           <TextInput
@@ -61,29 +60,40 @@ export function ChatsTwoPane({ initialChatId }: { initialChatId?: string }) {
             style={s.searchInput}
           />
         </View>
-        <Segmented
-          value={tab}
-          onChange={setTab}
-          options={[
-            { key: 'active', label: t('chat.tabActive', { count: active.length }) },
-            { key: 'archive', label: t('chat.tabArchive', { count: archive.length }) },
-          ]}
-          style={{ height: 40 }}
-        />
-        <ScrollView style={s.flex} contentContainerStyle={{ gap: 2, paddingBottom: 24 }}>
+        {/* W06 tabs: a 40 pt track (12 pt radius, 9 pt segments, 13 pt labels) — smaller than the shared Segmented. */}
+        <View style={s.tabs} accessibilityRole="tablist">
+          {(['active', 'archive'] as const).map((key) => {
+            const on = tab === key;
+            const count = key === 'active' ? active.length : archive.length;
+            return (
+              <Pressable
+                key={key}
+                accessibilityRole="tab"
+                accessibilityState={{ selected: on }}
+                onPress={() => setTab(key)}
+                style={[s.tab, on && { backgroundColor: c.surface2 }]}
+              >
+                <Text style={[onest('semibold', 13), { color: on ? c.text : c.muted }]} numberOfLines={1}>
+                  {key === 'active' ? t('chat.tabActive', { count }) : t('chat.tabArchive', { count })}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+        <ScrollView style={s.flex} contentContainerStyle={{ gap: 8, paddingBottom: 24 }}>
           {upcoming.map((g) => (
-            <View key={g.event.id} style={{ gap: 2 }}>
+            <Fragment key={g.event.id}>
               <Text style={s.section}>
                 {`${dayLabel(g.event.startsAt, now)} · ${eventShort(g.event)}`.toUpperCase()}
               </Text>
               {rows(g.chats)}
-            </View>
+            </Fragment>
           ))}
           {past.length > 0 && (
-            <View style={{ gap: 2 }}>
+            <>
               <Text style={s.section}>{t('chat.pastEvents').toUpperCase()}</Text>
               {rows(past)}
-            </View>
+            </>
           )}
           {visible.length === 0 && (
             <Text style={[onest('regular', 13, 18), { color: c.muted, paddingTop: 12 }]}>
@@ -113,9 +123,12 @@ const makeStyles = (c: Palette) =>
   StyleSheet.create({
     root: { flex: 1, flexDirection: 'row', backgroundColor: c.bg },
     flex: { flex: 1 },
-    list: { width: CHAT_LIST_WIDTH, borderRightWidth: 1, borderRightColor: c.line, paddingTop: 28, paddingHorizontal: 14, gap: 12 },
-    search: { flexDirection: 'row', alignItems: 'center', gap: 8, height: 40, borderRadius: 12, backgroundColor: c.surface, paddingHorizontal: 12 },
-    searchInput: { flex: 1, height: 40, color: c.text, ...onest('regular', 14) },
-    section: { ...onest('semibold', 11, 14), letterSpacing: 0.4, color: c.muted, paddingHorizontal: 4, paddingTop: 10, paddingBottom: 4 },
+    // Figma W06 «Chat list»: 380 pt column, 28 pt top, 20 pt sides, 8 pt gap.
+    list: { width: CHAT_LIST_WIDTH, borderRightWidth: 1, borderRightColor: c.line, paddingTop: 28, paddingHorizontal: 20, gap: 8 },
+    search: { flexDirection: 'row', alignItems: 'center', gap: 10, height: 42, borderRadius: 12, backgroundColor: c.surface, paddingLeft: 14, paddingRight: 12 },
+    searchInput: { flex: 1, height: 42, color: c.text, ...onest('regular', 14) },
+    tabs: { flexDirection: 'row', height: 40, padding: 4, gap: 4, borderRadius: 12, backgroundColor: c.surface },
+    tab: { flex: 1, alignItems: 'center', justifyContent: 'center', borderRadius: 9 },
+    section: { ...onest('semibold', 12, 15), color: c.muted },
     empty: { alignItems: 'center', justifyContent: 'center', gap: 10, padding: 24 },
   });

@@ -23,7 +23,7 @@ import { time } from '@/lib/time';
 import { pairKey, useNow, useStore } from '@/store/AppStore';
 import { onest, type Palette, type Scheme, useStyles, useTheme } from '@/theme';
 
-import { accentInk, eventShort, genderKey, nameObject, senderInk } from './chatUtils';
+import { eventShort, genderKey, nameObject } from './chatUtils';
 
 export type ChatThreadProps = {
   chatId: string; // dmChatId(eventId, userId) or groupChatId(eventId)
@@ -36,7 +36,7 @@ export type ChatThreadProps = {
 
 // Shared chat thread: system card, bubbles, album teaser, quick replies, composer and the after-event contact bar.
 export function ChatThread({ chatId, eventId, userId, variant }: ChatThreadProps) {
-  const { c, scheme } = useTheme();
+  const { c } = useTheme();
   const { t } = useT();
   const s = useStyles(makeStyles);
   const insets = useSafeAreaInsets();
@@ -68,7 +68,8 @@ export function ChatThread({ chatId, eventId, userId, variant }: ChatThreadProps
   const myContact = userId ? state.myContacts[pairKey(eventId, userId)] : undefined;
   const theirContact = userId ? attendanceOf(eventId, userId)?.leavesContact : undefined;
   const meName = state.me?.name ?? t('chat.thread.me');
-  const ink = accentInk(c, scheme);
+  const ink = c.accentInk;
+  const panel = variant === 'panel';
 
   const send = (text: string) => {
     const msg = text.trim();
@@ -80,6 +81,19 @@ export function ChatThread({ chatId, eventId, userId, variant }: ChatThreadProps
     setDraft('');
   };
 
+  const contactBar = !isGroup && partner && past && status === 'open' && (
+    <ContactBar
+      name={partner.name}
+      gender={genderKey(partner)}
+      myContact={myContact}
+      onSave={(contact) => dispatch({ type: 'leaveContact', eventId, userId: partner.id, contact })}
+      panel={panel}
+      s={s}
+      c={c}
+      ink={ink}
+    />
+  );
+
   const quick = [t('chat.thread.quickHere'), t('chat.thread.quickLate')];
   const replies = variant === 'panel' ? [...quick, t('chat.thread.quickBar')] : quick;
   const albumIsOpen = albumOpen(event, now);
@@ -89,20 +103,20 @@ export function ChatThread({ chatId, eventId, userId, variant }: ChatThreadProps
       <ScrollView
         ref={scrollRef}
         style={s.flex}
-        contentContainerStyle={[s.scroll, variant === 'panel' && s.scrollPanel]}
+        contentContainerStyle={[s.scroll, isGroup && s.scrollGroup, panel && s.scrollPanel]}
         keyboardShouldPersistTaps="handled"
         onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: true })}
       >
         {isGroup ? (
           <View style={s.systemRow}>
-            <Shield size={18} color={ink} strokeWidth={2} />
-            <Text style={[s.systemText, { flex: 1 }]}>{t('chat.thread.groupIntro')}</Text>
+            <Shield size={16} color={ink} strokeWidth={2} />
+            <Text style={[s.systemTextLeft, { flex: 1 }]}>{t('chat.thread.groupIntro')}</Text>
           </View>
         ) : (
-          <View style={s.systemCard}>
+          <View style={[s.systemCard, !panel && { marginBottom: 8 }]}>
             <Text style={s.systemTitle}>
               {t('chat.thread.dmIntroTitle', { event: eventShort(event) })}
-              {variant === 'panel' ? ` · ${time(event.startsAt)}` : ''}
+              {panel ? ` · ${time(event.startsAt)}` : ''}
             </Text>
             <Text style={s.systemText}>
               {t('chat.thread.dmIntroText')}
@@ -117,9 +131,9 @@ export function ChatThread({ chatId, eventId, userId, variant }: ChatThreadProps
             showSender={isGroup && m.from !== 'me' && m.from !== 'system' && messages[i - 1]?.from !== m.from}
             showAvatar={isGroup && m.from !== 'me' && m.from !== 'system' && messages[i + 1]?.from !== m.from}
             isGroup={isGroup}
+            panel={panel}
             s={s}
             c={c}
-            scheme={scheme}
           />
         ))}
 
@@ -127,7 +141,7 @@ export function ChatThread({ chatId, eventId, userId, variant }: ChatThreadProps
           <Pressable
             disabled={!albumIsOpen}
             onPress={() => router.push({ pathname: '/event/[id]/album', params: { id: eventId } })}
-            style={({ pressed }) => [s.album, albumIsOpen && { borderColor: c.accent }, pressed && { opacity: 0.8 }]}
+            style={({ pressed }) => [s.album, !panel && { backgroundColor: c.surface }, albumIsOpen && { borderColor: c.accent }, pressed && { opacity: 0.8 }]}
           >
             <ImageIcon size={22} color={ink} strokeWidth={2} />
             <View style={s.flex}>
@@ -149,18 +163,16 @@ export function ChatThread({ chatId, eventId, userId, variant }: ChatThreadProps
         )}
       </ScrollView>
 
-      <View style={[s.bottom, variant === 'screen' ? { paddingBottom: footerBottom(insets.bottom) + 14 } : s.bottomPanel]}>
-        {!isGroup && partner && past && status === 'open' && (
-          <ContactBar
-            name={partner.name}
-            gender={genderKey(partner)}
-            myContact={myContact}
-            onSave={(contact) => dispatch({ type: 'leaveContact', eventId, userId: partner.id, contact })}
-            s={s}
-            c={c}
-            ink={ink}
-          />
-        )}
+      {/* W06: the «keep contact» banner spans the whole conversation column above the composer. */}
+      {panel && contactBar}
+      <View
+        style={[
+          s.bottom,
+          // M13 composer ends 50 pt above the frame bottom, M08b's (smaller) one 40 pt.
+          panel ? s.bottomPanel : { paddingBottom: footerBottom(insets.bottom) + (isGroup ? 2 : 12) },
+        ]}
+      >
+        {!panel && contactBar}
 
         {status === 'waiting' && partner && (
           <View style={s.notice}>
@@ -201,12 +213,12 @@ export function ChatThread({ chatId, eventId, userId, variant }: ChatThreadProps
                 placeholder={
                   isGroup
                     ? t('chat.thread.placeholderGroup')
-                    : variant === 'panel' && Platform.OS === 'web'
+                    : panel && Platform.OS === 'web'
                       ? t('chat.thread.placeholderWeb')
                       : t('chat.thread.placeholder')
                 }
                 placeholderTextColor={c.muted}
-                style={s.input}
+                style={[s.input, isGroup && s.inputGroup, panel && s.inputPanel]}
                 returnKeyType="send"
                 submitBehavior="submit"
                 onSubmitEditing={submitDraft}
@@ -216,9 +228,9 @@ export function ChatThread({ chatId, eventId, userId, variant }: ChatThreadProps
                 accessibilityRole="button"
                 accessibilityLabel={t('chat.thread.send')}
                 onPress={submitDraft}
-                style={({ pressed }) => [s.send, variant === 'panel' && s.sendPanel, pressed && { opacity: 0.85 }]}
+                style={({ pressed }) => [s.send, (panel || isGroup) && s.sendSmall, pressed && { opacity: 0.85 }]}
               >
-                <Send size={22} color={c.onAccent} strokeWidth={2} />
+                <Send size={panel || isGroup ? 20 : 22} color={c.onAccent} strokeWidth={2} />
               </Pressable>
             </View>
           </>
@@ -227,7 +239,7 @@ export function ChatThread({ chatId, eventId, userId, variant }: ChatThreadProps
     </View>
   );
 
-  if (variant === 'panel' || Platform.OS !== 'ios') return body;
+  if (panel || Platform.OS !== 'ios') return body;
   return (
     <KeyboardAvoidingView style={s.flex} behavior="padding">
       {body}
@@ -240,35 +252,36 @@ function Bubble({
   showSender,
   showAvatar,
   isGroup,
+  panel,
   s,
   c,
-  scheme,
 }: {
   m: Message;
   showSender: boolean;
   showAvatar: boolean;
   isGroup: boolean;
+  panel: boolean;
   s: Styles;
   c: Palette;
-  scheme: Scheme;
 }) {
   if (m.from === 'system') {
     return <Text style={[s.systemText, { marginVertical: 4 }]}>{m.text}</Text>;
   }
   const mine = m.from === 'me';
   const author = mine ? undefined : getUser(m.from);
+  // M13/W06 DM bubbles vs the denser M08b group bubbles (12 pt sender, 14 pt text, 10 pt time).
   const bubble = (
-    <View style={[s.bubble, mine ? s.bubbleMine : s.bubbleTheirs]}>
-      {showSender && author && <Text style={[onest('semibold', 13), { color: senderInk(c, scheme), marginBottom: 2 }]}>{author.name}</Text>}
-      <Text style={[s.bubbleText, { color: mine ? c.onAccent : c.text }]}>{m.text}</Text>
-      <Text style={[s.stamp, { color: mine ? 'rgba(11,11,16,0.55)' : c.muted }]}>{time(m.at)}</Text>
+    <View style={[s.bubble, isGroup && s.bubbleGroup, panel && s.bubblePanel, mine ? s.bubbleMine : s.bubbleTheirs]}>
+      {showSender && author && <Text style={[onest('bold', 12), { color: c.accentInk }]}>{author.name}</Text>}
+      <Text style={[isGroup ? s.bubbleTextGroup : s.bubbleText, { color: mine ? c.onAccent : c.text }]}>{m.text}</Text>
+      <Text style={[isGroup ? s.stampGroup : s.stamp, { color: mine ? 'rgba(11,11,16,0.55)' : c.muted }]}>{time(m.at)}</Text>
     </View>
   );
   if (mine) return <View style={s.rowMine}>{bubble}</View>;
   if (!isGroup) return <View style={s.rowTheirs}>{bubble}</View>;
   return (
     <View style={[s.rowTheirs, s.groupRow]}>
-      <View style={s.avatarSlot}>{showAvatar && author && <Avatar name={author.name} gradient={author.gradient} size={28} />}</View>
+      <View style={s.avatarSlot}>{showAvatar && author && <Avatar name={author.name} gradient={author.gradient} size={26} />}</View>
       {bubble}
     </View>
   );
@@ -279,6 +292,7 @@ function ContactBar({
   gender,
   myContact,
   onSave,
+  panel,
   s,
   c,
   ink,
@@ -287,6 +301,7 @@ function ContactBar({
   gender: 'f' | 'm';
   myContact?: string;
   onSave: (contact: string) => void;
+  panel: boolean;
   s: Styles;
   c: Palette;
   ink: string;
@@ -301,9 +316,10 @@ function ContactBar({
     setEditing(false);
   };
 
+  const bar = [s.contactBar, panel && s.contactBarPanel];
   if (myContact) {
     return (
-      <View style={s.contactBar}>
+      <View style={bar}>
         <Send size={20} color={ink} strokeWidth={2} />
         <View style={s.flex}>
           <Text style={s.contactTitle}>{t('chat.contact.savedTitle', { contact: myContact })}</Text>
@@ -316,7 +332,7 @@ function ContactBar({
   }
 
   return (
-    <View style={s.contactBar}>
+    <View style={bar}>
       {editing ? (
         <View style={[s.flex, { gap: 8 }]}>
           <Text style={s.contactTitle}>{t('chat.contact.telegram')}</Text>
@@ -358,9 +374,9 @@ function ContactBar({
           <Pressable
             accessibilityRole="button"
             onPress={() => setEditing(true)}
-            style={({ pressed }) => [s.contactBtn, { backgroundColor: c.surface2 }, pressed && { opacity: 0.85 }]}
+            style={({ pressed }) => [s.contactBtn, panel && s.contactBtnPanel, { backgroundColor: c.surface2 }, pressed && { opacity: 0.85 }]}
           >
-            <Text style={[onest('bold', 15), { color: c.text }]}>{t('chat.contact.leave')}</Text>
+            <Text style={[onest('bold', panel ? 17 : 15), { color: c.text }]}>{t('chat.contact.leave')}</Text>
           </Pressable>
         </>
       )}
@@ -373,48 +389,54 @@ type Styles = ReturnType<typeof makeStyles>;
 const makeStyles = (c: Palette, scheme: Scheme) =>
   StyleSheet.create({
     flex: { flex: 1 },
-    scroll: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 16, gap: 10 },
-    scrollPanel: { paddingHorizontal: 24, paddingTop: 20 },
-    systemCard: { backgroundColor: c.surface, borderRadius: 16, paddingHorizontal: 16, paddingVertical: 12, gap: 4, marginBottom: 6 },
+    // M13 «Messages»: 18 pt under the header, 8 pt gap; M08b 6 pt; W06 24 pt top, 28 pt sides, 10 pt gap.
+    scroll: { paddingHorizontal: 20, paddingTop: 18, paddingBottom: 16, gap: 8 },
+    scrollGroup: { paddingTop: 12, gap: 6 },
+    scrollPanel: { paddingHorizontal: 28, paddingTop: 24, gap: 10 },
+    systemCard: { backgroundColor: c.surface, borderRadius: 16, paddingHorizontal: 16, paddingVertical: 12, gap: 4 },
     systemRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 10,
+      gap: 8,
       backgroundColor: c.surface,
-      borderRadius: 16,
-      paddingHorizontal: 14,
+      borderRadius: 14,
+      paddingHorizontal: 12,
       paddingVertical: 10,
-      marginBottom: 6,
     },
-    systemTitle: { ...onest('semibold', 14, 19), color: c.text, textAlign: 'center' },
-    systemText: { ...onest('regular', 12, 16), color: c.muted, textAlign: 'center' },
-    systemTextLeft: { ...onest('regular', 12, 16), color: c.muted },
+    systemTitle: { ...onest('semibold', 14, 18), color: c.text, textAlign: 'center' },
+    systemText: { ...onest('regular', 12, 17), color: c.muted, textAlign: 'center' },
+    systemTextLeft: { ...onest('regular', 12, 15), color: c.muted },
     rowMine: { flexDirection: 'row', justifyContent: 'flex-end' },
     rowTheirs: { flexDirection: 'row', justifyContent: 'flex-start' },
     groupRow: { alignItems: 'flex-end', gap: 8 },
-    avatarSlot: { width: 28 },
-    bubble: { maxWidth: '78%', borderRadius: 20, paddingHorizontal: 14, paddingTop: 10, paddingBottom: 6 },
+    avatarSlot: { width: 26 },
+    // M13 bubble: 250 pt text + 2×14 pt padding = 278 pt max on a 350 pt column.
+    bubble: { maxWidth: 278, borderRadius: 20, paddingHorizontal: 14, paddingTop: 10, paddingBottom: 8, gap: 4 },
+    bubbleGroup: { maxWidth: 264, borderRadius: 18, paddingHorizontal: 12, paddingTop: 8, paddingBottom: 7, gap: 3 },
+    bubblePanel: { maxWidth: 448 },
     bubbleMine: { backgroundColor: c.accent, borderBottomRightRadius: 6 },
-    bubbleTheirs: { backgroundColor: scheme === 'light' ? c.surface : c.surface2, borderBottomLeftRadius: 6 },
-    bubbleText: { ...onest('regular', 15, 21) },
-    stamp: { ...onest('regular', 11, 14), alignSelf: 'flex-end', marginTop: 2 },
+    bubbleTheirs: { backgroundColor: c.surface2, borderBottomLeftRadius: 6 },
+    bubbleText: { ...onest('medium', 15, 20) },
+    bubbleTextGroup: { ...onest('medium', 14, 18) },
+    stamp: { ...onest('regular', 11, 14), alignSelf: 'flex-end' },
+    stampGroup: { ...onest('regular', 10, 13), alignSelf: 'flex-end' },
     album: {
       flexDirection: 'row',
       alignItems: 'center',
       gap: 12,
-      borderWidth: 1.5,
+      borderWidth: 1,
       borderStyle: 'dashed',
       borderColor: c.line,
       borderRadius: 16,
-      paddingHorizontal: 16,
-      paddingVertical: 14,
-      marginTop: 6,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
     },
-    albumTitle: { ...onest('semibold', 14, 19), color: c.text },
+    albumTitle: { ...onest('semibold', 14, 18), color: c.text, marginBottom: 2 },
     contactCard: { backgroundColor: c.accentSoft, borderRadius: 16, padding: 14, gap: 4, borderWidth: 1, borderColor: c.accent },
     contactLabel: { ...onest('bold', 15, 20), color: c.text },
-    bottom: { paddingHorizontal: 20, paddingTop: 8, gap: 10 },
-    bottomPanel: { paddingHorizontal: 24, paddingTop: 4, paddingBottom: 20, gap: 12 },
+    // M13 quick replies sit 12 pt above the 52 pt composer.
+    bottom: { paddingHorizontal: 20, paddingTop: 8, gap: 12 },
+    bottomPanel: { paddingHorizontal: 28, paddingTop: 12, paddingBottom: 24, gap: 10 },
     notice: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -422,34 +444,36 @@ const makeStyles = (c: Palette, scheme: Scheme) =>
       backgroundColor: c.surface,
       borderRadius: 16,
       padding: 14,
-      marginHorizontal: 0,
     },
     noticeText: { ...onest('medium', 14, 19), color: c.muted },
-    replies: { gap: 8, paddingHorizontal: 0 },
+    replies: { gap: 8 },
     reply: {
       height: 40,
-      paddingHorizontal: 14,
+      paddingHorizontal: 16,
       borderRadius: 20,
       backgroundColor: c.surface,
       borderWidth: 1,
       borderColor: c.line,
       justifyContent: 'center',
     },
-    replyText: { ...onest('medium', 14), color: c.text },
+    replyText: { ...onest('medium', 15), color: c.text },
     composer: { flexDirection: 'row', alignItems: 'center', gap: 10 },
     input: {
       flex: 1,
       height: 52,
-      borderRadius: 24,
+      borderRadius: 26,
       backgroundColor: c.surface,
       borderWidth: 1,
       borderColor: c.line,
-      paddingHorizontal: 18,
+      paddingLeft: 18,
+      paddingRight: 14,
       color: c.text,
       ...onest('regular', 15),
     },
-    send: { width: 56, height: 56, borderRadius: 28, backgroundColor: c.accent, alignItems: 'center', justifyContent: 'center' },
-    sendPanel: { width: 44, height: 44, borderRadius: 22 },
+    inputGroup: { height: 48, borderRadius: 24, paddingLeft: 16, ...onest('regular', 14) },
+    inputPanel: { height: 48, borderRadius: 24 },
+    send: { width: 52, height: 52, borderRadius: 26, backgroundColor: c.accent, alignItems: 'center', justifyContent: 'center' },
+    sendSmall: { width: 48, height: 48, borderRadius: 24 },
     contactBar: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -458,8 +482,11 @@ const makeStyles = (c: Palette, scheme: Scheme) =>
       borderRadius: 16,
       padding: 14,
     },
-    contactTitle: { ...onest('semibold', 14, 19), color: c.text },
+    // W06 «Keep contact banner»: full-width strip, 28×14 pt padding.
+    contactBarPanel: { borderRadius: 0, gap: 14, paddingHorizontal: 28, paddingVertical: 14 },
+    contactTitle: { ...onest('semibold', 14, 18), color: c.text, marginBottom: 2 },
     contactBtn: { height: 44, borderRadius: 22, paddingHorizontal: 18, alignItems: 'center', justifyContent: 'center' },
+    contactBtnPanel: { borderRadius: 28, paddingHorizontal: 24 },
     handleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
     handleInput: {
       flex: 1,

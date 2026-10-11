@@ -7,11 +7,9 @@ import { Gradient } from '@/components/ui';
 import { getUser } from '@/data/mock';
 import type { Photo } from '@/data/types';
 import { useT } from '@/i18n';
-import { shortStamp } from '@/lib/time';
+import { countdown, shortStamp } from '@/lib/time';
 import { useNow, useStore } from '@/store/AppStore';
 import { onest, useTheme } from '@/theme';
-
-const GAP = 8;
 
 export function useAuthorName() {
   const { state } = useStore();
@@ -19,35 +17,61 @@ export function useAuthorName() {
   return (authorId: string) => (authorId === 'me' ? (state.me?.name ?? t('chat.thread.me')) : (getUser(authorId)?.name ?? '?'));
 }
 
-// Square photo tiles (M14 / W07): gradient + emoji placeholder or the real photo, author initial bottom-left,
-// last tile «+ Your photo». Tapping a tile opens a full-screen viewer.
-export function AlbumGrid({ photos, columns, onAdd }: { photos: Photo[]; columns: number; onAdd: () => void }) {
-  const { c, scheme } = useTheme();
+// Square photo tiles. Phone (M14): 3 columns, 4 pt gap, 12 pt radius, author initial bottom-left, last tile «+ Your photo».
+// Wide (W07): ~180 pt tiles, 10 pt gap, 14 pt radius, author + «20 хв» chip, own photos outlined with a «Твоє» pill,
+// no add tile (the right panel has the drop zone). Tapping a tile opens a full-screen viewer.
+export function AlbumGrid({ photos, wide, onAdd }: { photos: Photo[]; wide?: boolean; onAdd: () => void }) {
+  const { c } = useTheme();
   const { t } = useT();
+  const now = useNow();
   const [width, setWidth] = useState(0);
   const [viewing, setViewing] = useState<Photo | null>(null);
   const authorName = useAuthorName();
-  const size = width > 0 ? Math.floor((width - GAP * (columns - 1)) / columns) : 0;
-  const ink = scheme === 'light' ? c.text : c.accent;
+  const gap = wide ? 10 : 4;
+  const columns = wide ? Math.max(3, Math.floor((width + gap) / (180 + gap))) : 3;
+  const size = width > 0 ? Math.floor((width - gap * (columns - 1)) / columns) : 0;
 
   return (
-    <View onLayout={(e) => setWidth(e.nativeEvent.layout.width)} style={styles.grid}>
+    <View onLayout={(e) => setWidth(e.nativeEvent.layout.width)} style={[styles.grid, { gap }]}>
       {size > 0 &&
-        photos.map((p) => (
-          <Pressable
-            key={p.id}
-            accessibilityRole="imagebutton"
-            accessibilityLabel={t('chat.album.photoBy', { name: authorName(p.authorId) })}
-            onPress={() => setViewing(p)}
-            style={({ pressed }) => [{ width: size, height: size }, styles.tile, pressed && { opacity: 0.85 }]}
-          >
-            <PhotoFill photo={p} emojiSize={Math.round(size * 0.26)} />
-            <View style={styles.badge}>
-              <Text style={[onest('bold', 11), { color: '#F6F5F2' }]}>{authorName(p.authorId).charAt(0).toUpperCase()}</Text>
-            </View>
-          </Pressable>
-        ))}
-      {size > 0 && (
+        photos.map((p) => {
+          const mine = p.authorId === 'me';
+          const initial = authorName(p.authorId).charAt(0).toUpperCase();
+          return (
+            <Pressable
+              key={p.id}
+              accessibilityRole="imagebutton"
+              accessibilityLabel={t('chat.album.photoBy', { name: authorName(p.authorId) })}
+              onPress={() => setViewing(p)}
+              style={({ pressed }) => [
+                { width: size, height: size, borderRadius: wide ? 14 : 12 },
+                styles.tile,
+                wide && mine && { borderWidth: 3, borderColor: c.accent },
+                pressed && { opacity: 0.85 },
+              ]}
+            >
+              <PhotoFill photo={p} emojiSize={Math.round(size * (wide ? 0.245 : 0.26))} />
+              {wide ? (
+                <View style={[styles.chip, { backgroundColor: c.bg }, mine ? { left: 5, bottom: 1 } : { left: 8, bottom: 4 }]}>
+                  <View style={[styles.chipFace, { backgroundColor: c.surface2 }]}>
+                    <Text style={[onest('bold', 10), { color: c.text }]}>{initial}</Text>
+                  </View>
+                  <Text style={[onest('medium', 11), { color: c.text }]}>{countdown(now - Date.parse(p.at))}</Text>
+                </View>
+              ) : (
+                <View style={[styles.badge, { backgroundColor: c.bg }]}>
+                  <Text style={[onest('bold', 10), { color: c.text }]}>{initial}</Text>
+                </View>
+              )}
+              {wide && mine && (
+                <View style={[styles.mine, { backgroundColor: c.accent }]}>
+                  <Text style={[onest('bold', 13), { color: c.onAccent }]}>{t('chat.album.mine')}</Text>
+                </View>
+              )}
+            </Pressable>
+          );
+        })}
+      {size > 0 && !wide && (
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t('chat.album.addYours')}
@@ -60,8 +84,8 @@ export function AlbumGrid({ photos, columns, onAdd }: { photos: Photo[]; columns
             pressed && { backgroundColor: c.accentSoft },
           ]}
         >
-          <Plus size={28} color={ink} strokeWidth={2} />
-          <Text style={[onest('semibold', 12), { color: ink }]}>{t('chat.album.yourPhoto')}</Text>
+          <Plus size={24} color={c.accentInk} strokeWidth={2} />
+          <Text style={[onest('semibold', 12), { color: c.accentInk }]}>{t('chat.album.yourPhoto')}</Text>
         </Pressable>
       )}
       <PhotoViewer photo={viewing} onClose={() => setViewing(null)} />
@@ -112,21 +136,14 @@ function PhotoViewer({ photo, onClose }: { photo: Photo | null; onClose: () => v
 }
 
 const styles = StyleSheet.create({
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: GAP },
-  tile: { borderRadius: 16, overflow: 'hidden' },
+  grid: { flexDirection: 'row', flexWrap: 'wrap' },
+  tile: { borderRadius: 12, overflow: 'hidden' },
   center: { alignItems: 'center', justifyContent: 'center' },
-  badge: {
-    position: 'absolute',
-    left: 8,
-    bottom: 8,
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: 'rgba(11,11,16,0.85)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  add: { borderWidth: 1.5, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center', gap: 6 },
+  badge: { position: 'absolute', left: 6, bottom: 6, width: 22, height: 22, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
+  chip: { position: 'absolute', flexDirection: 'row', alignItems: 'center', gap: 6, paddingLeft: 4, paddingRight: 10, paddingVertical: 4, borderRadius: 14 },
+  chipFace: { width: 20, height: 20, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+  mine: { position: 'absolute', top: 2, right: 2, paddingHorizontal: 12, paddingVertical: 7, borderRadius: 14 },
+  add: { borderWidth: 1.5, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center', gap: 4 },
   viewer: { flex: 1, backgroundColor: 'rgba(5,5,8,0.96)', alignItems: 'center', justifyContent: 'center' },
   viewerHeader: { position: 'absolute', top: 0, left: 0, right: 0, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20 },
   close: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.14)', alignItems: 'center', justifyContent: 'center' },

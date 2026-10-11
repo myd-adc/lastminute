@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { Ban, Check, ChevronLeft, Clock, Flag, MoreHorizontal, X } from 'lucide-react-native';
+import { Ban, ChevronLeft, Clock, Flag, MoreHorizontal, X } from 'lucide-react-native';
 import { useState, type ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -13,12 +13,12 @@ import { dmChatId, useNow, useStore } from '@/store/AppStore';
 import { onest, type Palette, useStyles, useTheme } from '@/theme';
 
 import { ChatThread } from './ChatThread';
-import { accentInk, dayInline, eventShort } from './chatUtils';
+import { dayInline, eventShort } from './chatUtils';
 
 // DM conversation: header (avatar, name, event line, timer pill, ⋯ menu) + ChatThread.
 // 'screen' = M13 phone screen, 'panel' = right pane of the W06 two-pane layout.
 export function ChatConversation({ eventId, userId, variant }: { eventId: string; userId: string; variant: 'screen' | 'panel' }) {
-  const { c, scheme } = useTheme();
+  const { c } = useTheme();
   const { t } = useT();
   const s = useStyles(makeStyles);
   const insets = useSafeAreaInsets();
@@ -45,7 +45,8 @@ export function ChatConversation({ eventId, userId, variant }: { eventId: string
   }
 
   const status = chatState(state, event, userId, now);
-  const ink = accentInk(c, scheme);
+  const ink = c.accentInk;
+  const panel = variant === 'panel';
   const day = dayInline(event.startsAt, now);
   const sub =
     variant === 'panel'
@@ -54,33 +55,33 @@ export function ChatConversation({ eventId, userId, variant }: { eventId: string
 
   const statusPill =
     status === 'open' ? (
-      <View style={[s.pill, { backgroundColor: c.accentSoft, borderColor: c.accent, borderWidth: 1.5 }]}>
-        <Clock size={14} color={ink} strokeWidth={2.2} />
+      <View style={[s.pill, { borderColor: c.accent }]}>
+        <Clock size={14} color={ink} strokeWidth={2} />
         <Text style={[onest('semibold', 13), { color: ink }]}>{countdown(expiresAt(event) - now)}</Text>
       </View>
     ) : (
-      <View style={[s.pill, { backgroundColor: c.surface2 }]}>
-        <Text style={[onest('semibold', 13), { color: c.text }]}>
-          {status === 'waiting' ? t('chat.status.waiting') : status === 'contact' ? t('chat.status.contact') : t('chat.status.closed')}
+      <View style={[s.pill, { backgroundColor: c.surface2, borderColor: c.surface2 }]}>
+        <Text style={[onest('semibold', 13), { color: c.muted }]}>
+          {status === 'waiting' ? t('chat.status.waiting') : status === 'contact' ? t('chat.row.contactPill') : t('chat.status.closed')}
         </Text>
-        {status === 'contact' && <Check size={13} color={c.text} strokeWidth={2.4} />}
       </View>
     );
 
-  const headerTop = variant === 'screen' ? insets.top + 4 : 0;
+  // M13: the 60 pt header starts right under the status bar (48 pt row + 12 pt bottom padding).
+  const headerTop = variant === 'screen' ? insets.top : 0;
 
   return (
     <View style={s.flex}>
-      <View style={[s.header, variant === 'panel' ? s.headerPanel : { paddingTop: headerTop + 6 }]}>
+      <View style={[s.header, panel ? s.headerPanel : { paddingTop: headerTop + 4 }]}>
         {variant === 'screen' && (
           <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12} onPress={() => goBack('/chats')}>
             <ChevronLeft size={26} color={c.text} strokeWidth={2} />
           </Pressable>
         )}
-        <Avatar name={user.name} gradient={user.gradient} size={40} />
-        <View style={[s.flex, { minWidth: 0 }]}>
-          <Text style={[onest('bold', 16), { color: c.text }]} numberOfLines={1}>
-            {variant === 'panel' ? `${user.name}, ${user.age}` : user.name}
+        <Avatar name={user.name} gradient={user.gradient} size={panel ? 44 : 40} ring={!panel} />
+        <View style={[s.flex, { minWidth: 0, gap: panel ? 2 : 1 }]}>
+          <Text style={[onest('bold', panel ? 17 : 16), { color: c.text }]} numberOfLines={1}>
+            {panel ? `${user.name}, ${user.age}` : user.name}
           </Text>
           <Text style={[onest('regular', 13), { color: c.muted }]} numberOfLines={1}>
             {sub}
@@ -93,7 +94,7 @@ export function ChatConversation({ eventId, userId, variant }: { eventId: string
           onPress={() => setMenuOpen((v) => !v)}
           style={({ pressed }) => [s.more, pressed && { opacity: 0.8 }]}
         >
-          <MoreHorizontal size={20} color={c.text} strokeWidth={2} />
+          <MoreHorizontal size={18} color={c.text} strokeWidth={2} />
         </Pressable>
       </View>
 
@@ -102,10 +103,10 @@ export function ChatConversation({ eventId, userId, variant }: { eventId: string
       {menuOpen && (
         <>
           <Pressable accessibilityLabel={t('chat.menu.close')} style={StyleSheet.absoluteFill} onPress={() => setMenuOpen(false)} />
-          <View style={[s.menu, { top: headerTop + (variant === 'panel' ? 64 : 56) }]}>
+          <View style={[s.menu, panel ? s.menuPanel : { top: headerTop + 58 }]}>
             {status === 'open' && (
               <MenuItem
-                icon={<X size={18} color={c.text} strokeWidth={2} />}
+                icon={<X size={16} color={c.text} strokeWidth={2} />}
                 label={t('chat.menu.closeChat')}
                 color={c.text}
                 onPress={() => {
@@ -115,7 +116,7 @@ export function ChatConversation({ eventId, userId, variant }: { eventId: string
               />
             )}
             <MenuItem
-              icon={<Flag size={18} color={c.text} strokeWidth={2} />}
+              icon={<Flag size={16} color={c.text} strokeWidth={2} />}
               label={t('common.report')}
               color={c.text}
               onPress={() => {
@@ -124,7 +125,7 @@ export function ChatConversation({ eventId, userId, variant }: { eventId: string
               }}
             />
             <MenuItem
-              icon={<Ban size={18} color={c.danger} strokeWidth={2} />}
+              icon={<Ban size={16} color={c.danger} strokeWidth={2} />}
               label={t('common.block')}
               color={c.danger}
               onPress={() => {
@@ -152,13 +153,14 @@ function MenuItem({ icon, label, color, onPress }: { icon: ReactNode; label: str
       ]}
     >
       {icon}
-      <Text style={[onest('medium', 15), { color }]}>{label}</Text>
+      <Text style={[onest('medium', 14), { color }]}>{label}</Text>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  item: { flexDirection: 'row', alignItems: 'center', gap: 12, height: 44, paddingHorizontal: 12, borderRadius: 10 },
+  // W06 menu rows: 12×10 pt padding, 14 pt radius, 16 pt icons.
+  item: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12, paddingVertical: 10, borderRadius: 14 },
 });
 
 const makeStyles = (c: Palette) =>
@@ -169,26 +171,27 @@ const makeStyles = (c: Palette) =>
     header: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 12,
+      gap: 10,
       paddingHorizontal: 20,
-      paddingBottom: 12,
+      paddingBottom: 16,
       borderBottomWidth: 1,
       borderBottomColor: c.line,
       backgroundColor: c.bg,
     },
-    headerPanel: { height: 72, paddingHorizontal: 24, paddingBottom: 0 },
-    pill: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 14 },
+    // W06 conversation header: 20/16 pt vertical, 28 pt left, 24 pt right.
+    headerPanel: { gap: 12, paddingTop: 20, paddingBottom: 16, paddingLeft: 28, paddingRight: 24 },
+    pill: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 14, borderWidth: 1 },
     more: { width: 36, height: 36, borderRadius: 18, backgroundColor: c.surface2, alignItems: 'center', justifyContent: 'center' },
     menu: {
       position: 'absolute',
-      right: 16,
+      right: 20,
       width: 240,
       padding: 6,
-      borderRadius: 16,
+      borderRadius: 20,
       backgroundColor: c.surface2,
       borderWidth: 1,
       borderColor: c.line,
-      boxShadow: '0px 12px 32px rgba(0,0,0,0.35)',
-      gap: 2,
+      boxShadow: '0px 18px 40px rgba(0,0,0,0.45)',
     },
+    menuPanel: { top: 70, right: 24 },
   });

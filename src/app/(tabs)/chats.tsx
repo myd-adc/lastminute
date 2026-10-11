@@ -1,18 +1,18 @@
 import { router } from 'expo-router';
 import { Clock, MessageSquare, Search, X } from 'lucide-react-native';
-import { useMemo, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { ChatRow } from '@/components/chat/ChatRow';
 import { ChatsTwoPane } from '@/components/chat/ChatsTwoPane';
 import { chatSections, eventShort, matchesQuery } from '@/components/chat/chatUtils';
-import { Button, Screen, ScreenTitle } from '@/components/ui';
+import { Button, Screen } from '@/components/ui';
 import { useT } from '@/i18n';
 import { useIsWide } from '@/lib/layout';
 import { chatList, type ChatSummary } from '@/lib/selectors';
 import { dayLabel } from '@/lib/time';
 import { useNow, useStore } from '@/store/AppStore';
-import { onest, type Palette, useStyles, useTheme } from '@/theme';
+import { display, onest, type Palette, useStyles, useTheme } from '@/theme';
 
 export default function ChatsScreen() {
   const wide = useIsWide();
@@ -42,25 +42,23 @@ function ChatsList() {
     list.map((chat) => <ChatRow key={chat.id} chat={chat} now={now} active={chat.status === 'open'} onPress={() => open(chat)} />);
 
   return (
-    <Screen withTabBar contentStyle={{ gap: 12 }}>
-      <ScreenTitle
-        title={t('chat.title')}
-        right={
-          all.length > 0 && (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={searching ? t('chat.closeSearch') : t('chat.search')}
-              hitSlop={12}
-              onPress={() => {
-                setSearching((v) => !v);
-                setQuery('');
-              }}
-            >
-              {searching ? <X size={24} color={c.text} /> : <Search size={24} color={c.text} />}
-            </Pressable>
-          )
-        }
-      />
+    <Screen withTabBar>
+      <View style={s.titleRow}>
+        <Text style={[display(28, 40), { color: c.text, flex: 1 }]}>{t('chat.title')}</Text>
+        {all.length > 0 && (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={searching ? t('chat.closeSearch') : t('chat.search')}
+            hitSlop={12}
+            onPress={() => {
+              setSearching((v) => !v);
+              setQuery('');
+            }}
+          >
+            {searching ? <X size={22} color={c.text} /> : <Search size={22} color={c.text} />}
+          </Pressable>
+        )}
+      </View>
 
       {searching && (
         <View style={s.search}>
@@ -88,31 +86,34 @@ function ChatsList() {
           <Button label={t('chat.toEvents')} onPress={() => router.navigate('/')} style={{ alignSelf: 'stretch', marginTop: 8 }} />
         </View>
       ) : (
-        <>
-          {upcoming.map((g) => (
-            <View key={g.event.id} style={s.section}>
+        // Figma M12 «List»: one column with a 6 pt gap; an extra 8 pt spacer separates event groups.
+        <View style={s.list}>
+          {upcoming.map((g, i) => (
+            <Fragment key={g.event.id}>
+              {i > 0 && <View style={s.spacer} />}
               <Text style={s.label} numberOfLines={1}>
                 {dayLabel(g.event.startsAt, now)} · {eventShort(g.event)} · {g.event.venue}
               </Text>
               {rows(g.chats)}
-            </View>
+            </Fragment>
           ))}
           {past.length > 0 && (
-            <View style={s.section}>
+            <>
+              {upcoming.length > 0 && <View style={s.spacer} />}
               <Text style={s.label}>{t('chat.pastEvents')}</Text>
               {rows(past)}
-            </View>
+            </>
           )}
           {visible.length === 0 && (
             <Text style={[onest('regular', 15), { color: c.muted }]}>{t('chat.notFoundQuery', { query })}</Text>
           )}
           <View style={s.note}>
-            <Clock size={20} color={c.muted} />
+            <Clock size={18} color={c.muted} />
             <Text style={[onest('regular', 13, 18), { color: c.muted, flex: 1 }]}>
               {t('chat.lifetimeNote')}
             </Text>
           </View>
-        </>
+        </View>
       )}
     </Screen>
   );
@@ -120,21 +121,23 @@ function ChatsList() {
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
+    // Figma M12 header: 40 pt row, top at 60 pt on a 50 pt status bar.
+    titleRow: { flexDirection: 'row', alignItems: 'center', height: 40, marginTop: 2 },
     search: { flexDirection: 'row', alignItems: 'center', gap: 10, height: 48, borderRadius: 24, backgroundColor: c.surface, paddingHorizontal: 16 },
     searchInput: { flex: 1, height: 48, color: c.text, ...onest('regular', 15) },
-    section: { gap: 4, marginHorizontal: -8 },
-    label: { ...onest('medium', 14, 19), color: c.muted, paddingHorizontal: 8, paddingBottom: 4 },
+    list: { gap: 6 },
+    spacer: { height: 8 },
+    label: { ...onest('semibold', 13, 17), color: c.muted },
     note: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 12,
-      borderWidth: 1.5,
+      gap: 10,
+      borderWidth: 1,
       borderStyle: 'dashed',
       borderColor: c.line,
-      borderRadius: 16,
-      paddingHorizontal: 16,
-      paddingVertical: 14,
-      marginTop: 4,
+      borderRadius: 14,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
     },
     empty: { alignItems: 'center', gap: 10, paddingTop: 60, paddingHorizontal: 12 },
     emptyIcon: { width: 72, height: 72, borderRadius: 36, backgroundColor: c.surface, alignItems: 'center', justifyContent: 'center', marginBottom: 6 },
