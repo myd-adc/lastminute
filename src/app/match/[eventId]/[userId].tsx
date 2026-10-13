@@ -1,13 +1,14 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Clock } from 'lucide-react-native';
-import { ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { byGender, shortTitle, venueIn, writeTo } from '@/components/room/text';
 import { Face } from '@/components/room/Face';
 import { Glow } from '@/components/room/Glow';
 import { Button, Chip, goBack } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import { getEvent, getUser } from '@/data/mock';
 import { useT } from '@/i18n';
 import { isMatch } from '@/lib/selectors';

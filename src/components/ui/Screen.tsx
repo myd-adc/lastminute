@@ -1,12 +1,14 @@
 import { router } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
 import type { ReactNode } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { footerBottom, tabBarClearance, useIsWide } from '@/lib/layout';
 import { t } from '@/i18n/translate';
 import { type, useTheme } from '@/theme';
+
+import { Text } from './Text';
 
 type Props = {
   children: ReactNode;

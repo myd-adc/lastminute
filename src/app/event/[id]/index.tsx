@@ -1,7 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { Check, ExternalLink, MapPin, Send, Ticket, User, Users, X } from 'lucide-react-native';
 import { useState } from 'react';
-import { Linking, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Linking, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { InfoRow, PeopleStack } from '@/components/feed/DetailsParts';
@@ -10,6 +10,7 @@ import { PosterArt } from '@/components/feed/PosterArt';
 import { shareEvent } from '@/components/feed/share';
 import { useToast } from '@/components/feed/Toast';
 import { AvatarStack, Button, Chip, goBack, IconButton, Pill, Sheet } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import { getEvent, soloGroups } from '@/data/mock';
 import type { Event } from '@/data/types';
 import { useT } from '@/i18n';

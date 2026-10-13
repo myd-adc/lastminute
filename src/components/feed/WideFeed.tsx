@@ -1,9 +1,10 @@
 import { router, useFocusEffect } from 'expo-router';
 import { Bookmark, ChevronDown, ChevronUp, Lock, Send, X } from 'lucide-react-native';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import { Avatar, AvatarStack, Button, IconButton, Pill } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import type { Event } from '@/data/types';
 import { useT } from '@/i18n';
 import { acquaintances, attendeesFor, goingCount, nameAge, nextOnScene, soloCount } from '@/lib/selectors';

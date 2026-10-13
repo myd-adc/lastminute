@@ -1,6 +1,7 @@
 import { ChevronLeft } from 'lucide-react-native';
-import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
+import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
 import { display, useTheme } from '@/theme';
 

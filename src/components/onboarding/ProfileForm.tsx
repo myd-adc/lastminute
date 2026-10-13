@@ -1,9 +1,10 @@
 import * as ImagePicker from 'expo-image-picker';
 import { Camera, Check, ChevronDown } from 'lucide-react-native';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, View } from 'react-native';
 
 import { Avatar, Button, Sheet } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
 import type { Me } from '@/store/AppStore';
 import { gradientIds, onest, type, useTheme } from '@/theme';

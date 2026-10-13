@@ -1,8 +1,9 @@
 import { router } from 'expo-router';
 import { useState, type ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Avatar, Chip, Toggle } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import { getScene } from '@/data/mock';
 import { useT } from '@/i18n';
 import { useIsWide } from '@/lib/layout';

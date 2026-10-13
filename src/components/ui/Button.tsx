@@ -1,7 +1,9 @@
 import type { LucideIcon } from 'lucide-react-native';
-import { ActivityIndicator, Pressable, StyleSheet, Text, type StyleProp, type ViewStyle } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 
 import { type, useTheme } from '@/theme';
+
+import { Text } from './Text';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost';
 

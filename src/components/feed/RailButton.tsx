@@ -1,6 +1,7 @@
 import type { LucideIcon } from 'lucide-react-native';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
+import { Text } from '@/components/ui/Text';
 import { onest, useTheme } from '@/theme';
 
 // Feed rail button (M06 right rail, W03 save/share): 48 pt circle, 12 pt semibold caption 4 pt below.

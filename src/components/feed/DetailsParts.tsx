@@ -1,8 +1,9 @@
 import type { LucideIcon } from 'lucide-react-native';
 import type { ReactNode } from 'react';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, View } from 'react-native';
 
 import { AvatarStack, Gradient } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
 import { onest, type GradientId, type, useTheme } from '@/theme';
 

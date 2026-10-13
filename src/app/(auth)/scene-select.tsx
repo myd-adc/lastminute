@@ -1,10 +1,11 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 
 import { OnboardingFrame } from '@/components/onboarding/OnboardingFrame';
 import { emptyProfile } from '@/components/onboarding/ProfileForm';
 import { NotifyCard, SceneForm, sceneValid, type SceneDraft } from '@/components/onboarding/SceneForm';
+import { Text } from '@/components/ui/Text';
 import { scenes } from '@/data/mock';
 import { useT } from '@/i18n';
 import { saveProfile } from '@/api/auth';

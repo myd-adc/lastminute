@@ -1,7 +1,8 @@
 import { Clock } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
-import { Platform, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Platform, StyleSheet, TextInput, View } from 'react-native';
 
+import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
 import { fonts, onest, useTheme } from '@/theme';
 

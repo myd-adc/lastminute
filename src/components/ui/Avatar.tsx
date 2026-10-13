@@ -1,9 +1,10 @@
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 
 import { fonts, useTheme } from '@/theme';
 import type { GradientId } from '@/theme/palette';
 
 import { Gradient } from './Gradient';
+import { Text } from './Text';
 
 type Props = {
   name: string;

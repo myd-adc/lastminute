@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { ShieldCheck } from 'lucide-react-native';
 import { useState } from 'react';
-import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Linking, Pressable, StyleSheet, View } from 'react-native';
 
 import { AuthSplit } from '@/components/onboarding/AuthSplit';
 import { AuthScreen } from '@/components/onboarding/AuthScreen';
@@ -9,6 +9,7 @@ import { Field, FieldLabel, LanguagePill, Logo, useAccentInk } from '@/component
 import { onlyDigits, PHONE_DIGITS, PhoneInput, toE164 } from '@/components/onboarding/PhoneInput';
 import { QrPlaceholder } from '@/components/onboarding/QrPlaceholder';
 import { Button } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
 import { useIsWide } from '@/lib/layout';
 import { requestCode } from '@/api/auth';

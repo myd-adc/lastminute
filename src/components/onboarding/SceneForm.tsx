@@ -1,8 +1,9 @@
 import { Bell, Check } from 'lucide-react-native';
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Gradient, Toggle } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import { events, PAST_EVENT_IDS, scenes } from '@/data/mock';
 import type { Scene, SceneId } from '@/data/types';
 import { useT } from '@/i18n';

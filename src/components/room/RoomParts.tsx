@@ -1,8 +1,9 @@
 import { router } from 'expo-router';
 import { Lock, X } from 'lucide-react-native';
-import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { Button, IconButton, Segmented } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import { soloGroups } from '@/data/mock';
 import type { Event } from '@/data/types';
 import { useT } from '@/i18n';

@@ -1,9 +1,10 @@
 import { router } from 'expo-router';
 import { Check, ChevronLeft } from 'lucide-react-native';
 import type { ReactNode } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { Button } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
 import { useIsWide } from '@/lib/layout';
 import { useStore } from '@/store/AppStore';

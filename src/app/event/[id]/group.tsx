@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ChatThread } from '@/components/chat/ChatThread';
@@ -9,6 +9,7 @@ import { Faces } from '@/components/room/Face';
 import { shortTitle, venueShort } from '@/components/room/text';
 import { TimerPill } from '@/components/room/TimerPill';
 import { Button, Header, goBack } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import { getEvent } from '@/data/mock';
 import type { Event } from '@/data/types';
 import { useT } from '@/i18n';

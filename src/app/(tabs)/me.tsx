@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { Settings } from 'lucide-react-native';
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import {
   AccountSection,
@@ -12,6 +12,7 @@ import {
 } from '@/components/profile/ProfileSections';
 import { WideProfile } from '@/components/profile/WideProfile';
 import { Screen } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
 import { useIsWide } from '@/lib/layout';
 import { display, useTheme } from '@/theme';

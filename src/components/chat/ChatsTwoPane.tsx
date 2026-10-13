@@ -1,8 +1,9 @@
 import { router } from 'expo-router';
 import { MessageSquare, Search } from 'lucide-react-native';
 import { Fragment, useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
+import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
 import { chatList, isPast, type ChatSummary } from '@/lib/selectors';
 import { dayLabel } from '@/lib/time';

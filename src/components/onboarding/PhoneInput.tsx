@@ -1,6 +1,7 @@
 import { ChevronDown } from 'lucide-react-native';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
+import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
 import { onest, useTheme } from '@/theme';
 

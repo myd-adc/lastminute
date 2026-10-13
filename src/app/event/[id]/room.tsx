@@ -1,7 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
 import { useCallback, useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { CardDeck, type Choice, type DeckHandle } from '@/components/room/CardDeck';
@@ -9,6 +9,7 @@ import { RoomMatchesPanel } from '@/components/room/RoomMatchesPanel';
 import { KeyboardHints, RoomActions, RoomDone, RoomFootnote, RoomLocked, RoomTabs } from '@/components/room/RoomParts';
 import { venueShort } from '@/components/room/text';
 import { Button, Gradient, Header, IconButton, Pill, goBack } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import { getEvent } from '@/data/mock';
 import type { Event } from '@/data/types';
 import { useT } from '@/i18n';

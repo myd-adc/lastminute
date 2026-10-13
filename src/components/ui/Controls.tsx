@@ -1,8 +1,10 @@
 import { Check, ChevronRight } from 'lucide-react-native';
 import { useEffect, useState, type ReactNode } from 'react';
-import { Animated, Platform, Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Animated, Platform, Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { onest, type, useTheme } from '@/theme';
+
+import { Text } from './Text';
 
 // Figma «Segmented» (44 pt, surface track, surface2 active segment).
 export function Segmented<K extends string>({

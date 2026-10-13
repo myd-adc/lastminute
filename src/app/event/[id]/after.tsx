@@ -1,12 +1,13 @@
 import { useLocalSearchParams } from 'expo-router';
 import { Check, Send, X } from 'lucide-react-native';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Glow, glows } from '@/components/profile/Glow';
 import { accentText, instrumental, pronouns, shortTitle } from '@/components/profile/names';
 import { Avatar, Button, Chip, goBack, Gradient } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import { getEvent } from '@/data/mock';
 import type { Event, Survey, User } from '@/data/types';
 import { useT } from '@/i18n';

@@ -1,10 +1,11 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { Check } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
-import { Linking, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Linking, Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import { instrumental, pronouns } from '@/components/profile/names';
 import { Avatar, Button, goBack, Radio, Sheet } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import { getUser } from '@/data/mock';
 import type { ReportReason } from '@/data/types';
 import { useT } from '@/i18n';

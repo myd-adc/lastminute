@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
+import { Text } from '@/components/ui/Text';
 import { type, useTheme } from '@/theme';
 
 // Lightweight transient message («Link copied»). Render `node` last inside the screen root.

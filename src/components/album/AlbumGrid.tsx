@@ -1,9 +1,10 @@
 import { Plus, X } from 'lucide-react-native';
 import { useState } from 'react';
-import { Image, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Modal, Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Gradient } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import { getUser } from '@/data/mock';
 import type { Photo } from '@/data/types';
 import { useT } from '@/i18n';

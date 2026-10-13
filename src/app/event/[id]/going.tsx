@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { CalendarDays, Check } from 'lucide-react-native';
-import { Platform, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { shortTitle } from '@/components/feed/format';
@@ -8,6 +8,7 @@ import { Glows, type GlowSpec } from '@/components/feed/Glow';
 import { addToCalendar } from '@/components/feed/share';
 import { useToast } from '@/components/feed/Toast';
 import { AvatarStack, Button, Chip, Screen } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import { getEvent, soloGroups } from '@/data/mock';
 import type { Event } from '@/data/types';
 import { useT } from '@/i18n';

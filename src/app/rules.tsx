@@ -1,7 +1,8 @@
-import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Linking, Pressable, StyleSheet, View } from 'react-native';
 
 import { BackTitle } from '@/components/profile/BackTitle';
 import { goBack, Screen } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
 import { useIsWide } from '@/lib/layout';
 import { onest, type, useTheme } from '@/theme';

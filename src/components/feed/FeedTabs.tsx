@@ -1,6 +1,7 @@
 import { SlidersHorizontal } from 'lucide-react-native';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
+import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
 import type { FeedTab } from '@/store/AppStore';
 import { onest, useTheme } from '@/theme';

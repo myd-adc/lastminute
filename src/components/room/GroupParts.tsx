@@ -1,9 +1,10 @@
 import { router } from 'expo-router';
 import { Check, MapPin, MoreHorizontal } from 'lucide-react-native';
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Button } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import { soloGroups } from '@/data/mock';
 import type { Event, User } from '@/data/types';
 import { useT } from '@/i18n';

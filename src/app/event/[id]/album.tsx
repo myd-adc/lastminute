@@ -1,13 +1,14 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Camera, Check, ChevronLeft, Eye, Lock, Upload } from 'lucide-react-native';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AlbumGrid } from '@/components/album/AlbumGrid';
 import { pickPhoto } from '@/components/album/pickPhoto';
 import { dayInline } from '@/components/chat/chatUtils';
 import { Avatar, Button, goBack, Segmented } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import { getEvent, getUser } from '@/data/mock';
 import type { Event } from '@/data/types';
 import { useT } from '@/i18n';

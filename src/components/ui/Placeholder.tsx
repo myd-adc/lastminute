@@ -1,8 +1,8 @@
-import { Text } from 'react-native';
 
 import { type, useTheme } from '@/theme';
 
 import { Header, Screen } from './Screen';
+import { Text } from './Text';
 
 // Temporary stand-in for a route that is not implemented yet.
 export function Placeholder({ title, frame }: { title: string; frame: string }) {

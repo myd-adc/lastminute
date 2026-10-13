@@ -1,7 +1,7 @@
 import { router, usePathname } from 'expo-router';
 import { ChevronDown } from 'lucide-react-native';
 import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { getInterest, getScene } from '@/data/mock';
 import { unreadCount } from '@/lib/selectors';
@@ -11,6 +11,7 @@ import { onest, type, useTheme } from '@/theme';
 
 import { Gradient } from './Gradient';
 import { tabLabel, tabs, type TabKey } from './GlassTabBar';
+import { Text } from './Text';
 
 export const SIDEBAR_WIDTH = 248;
 

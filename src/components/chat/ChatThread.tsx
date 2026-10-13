@@ -1,18 +1,10 @@
 import { router } from 'expo-router';
 import { Hourglass, Image as ImageIcon, Lock, Send, Shield } from 'lucide-react-native';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Text } from '@/components/ui/Text';
 import { footerBottom } from '@/lib/layout';
 import { Avatar } from '@/components/ui';
 import { attendanceOf, getEvent, getUser } from '@/data/mock';

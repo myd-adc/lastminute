@@ -1,6 +1,7 @@
 import { Clock } from 'lucide-react-native';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
+import { Text } from '@/components/ui/Text';
 import { countdown } from '@/lib/time';
 import { onest, useTheme } from '@/theme';
 

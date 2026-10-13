@@ -1,7 +1,8 @@
 import { ChevronDown, Globe } from 'lucide-react-native';
 import { forwardRef, useState, type ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View, type StyleProp, type TextInputProps, type ViewStyle } from 'react-native';
+import { Pressable, StyleSheet, TextInput, View, type StyleProp, type TextInputProps, type ViewStyle } from 'react-native';
 
+import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
 import { useStore } from '@/store/AppStore';
 import { display, onest, useTheme, type Palette, type Scheme } from '@/theme';

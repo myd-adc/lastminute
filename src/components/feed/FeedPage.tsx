@@ -1,8 +1,9 @@
 import { Bookmark, Send, Users, X } from 'lucide-react-native';
 import { memo } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { AvatarStack, Button, IconButton, Pill } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import type { Event } from '@/data/types';
 import { useT } from '@/i18n';
 import { going as goingLabel } from '@/lib/time';

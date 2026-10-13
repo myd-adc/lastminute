@@ -1,6 +1,8 @@
-import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { onest, useTheme } from '@/theme';
+
+import { Text } from './Text';
 
 // Figma «Chip» (40 pt): Default = surface + line border, Selected = accent. Used for interests, vibe, quick replies.
 export function Chip({

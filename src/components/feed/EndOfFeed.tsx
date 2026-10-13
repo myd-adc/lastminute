@@ -1,9 +1,10 @@
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { isLive } from '@/api/client';
 import { Button, Gradient } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import { getScene, isRemoteLoaded } from '@/data/mock';
 import { useT } from '@/i18n';
 import { goingCount, matchesAt, myUpcoming, sceneEvents } from '@/lib/selectors';

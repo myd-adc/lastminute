@@ -1,6 +1,7 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Avatar, AvatarStack } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import { getUser } from '@/data/mock';
 import { useT } from '@/i18n';
 import { soloGroupMembers, type ChatSummary } from '@/lib/selectors';

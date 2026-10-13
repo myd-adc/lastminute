@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Text } from 'react-native';
 
 import { EditLayout } from '@/components/onboarding/EditLayout';
 import { MIN_INTERESTS, pickableInterests, PreferencesForm, preferencesValid, type PreferencesDraft } from '@/components/onboarding/PreferencesForm';
 import { SceneForm, sceneValid, type SceneDraft } from '@/components/onboarding/SceneForm';
 import { goBack } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import { scenes } from '@/data/mock';
 import { useT } from '@/i18n';
 import { useStore } from '@/store/AppStore';

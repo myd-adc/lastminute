@@ -1,13 +1,14 @@
 import { Redirect, router } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
 import { useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { AuthSplit } from '@/components/onboarding/AuthSplit';
 import { CODE_LENGTH, CodeForm } from '@/components/onboarding/CodeForm';
 import { AuthScreen } from '@/components/onboarding/AuthScreen';
 import { formatE164 } from '@/components/onboarding/PhoneInput';
 import { Button } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
 import { useIsWide } from '@/lib/layout';
 import { verifyCode } from '@/api/auth';

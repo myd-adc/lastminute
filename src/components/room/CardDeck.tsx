@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useImperativeHandle, useMemo, useState, type Ref } from 'react';
-import { Animated, Easing, PanResponder, Platform, StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
+import { Animated, Easing, PanResponder, Platform, StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 
+import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
 import type { Attendee } from '@/lib/selectors';
 import { onest, useTheme } from '@/theme';

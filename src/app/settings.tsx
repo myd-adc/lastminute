@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { accentText, maskPhone } from '@/components/profile/names';
 import {
@@ -14,6 +14,7 @@ import { BackTitle } from '@/components/profile/BackTitle';
 import { Group, Row } from '@/components/profile/Rows';
 import { goBack, Screen } from '@/components/ui';
 import { isLive } from '@/api/client';
+import { Text } from '@/components/ui/Text';
 import { getScene } from '@/data/mock';
 import { LANGS, useT } from '@/i18n';
 import { useIsWide } from '@/lib/layout';

@@ -1,6 +1,7 @@
-import { Image, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Image, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { Gradient } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import { fonts, useTheme } from '@/theme';
 import type { GradientId } from '@/theme/palette';
 

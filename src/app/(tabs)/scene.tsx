@@ -1,9 +1,10 @@
 import { router } from 'expo-router';
 import { Lock } from 'lucide-react-native';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { DateTile } from '@/components/feed/DateTile';
 import { Gradient, Pill, Screen, ScreenTitle, SectionLabel } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import { getScene, users } from '@/data/mock';
 import { useT } from '@/i18n';
 import { useIsWide } from '@/lib/layout';

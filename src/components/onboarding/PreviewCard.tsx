@@ -1,7 +1,8 @@
 import { Lock } from 'lucide-react-native';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 
 import { Gradient, Pill } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import { getInterest } from '@/data/mock';
 import type { InterestId } from '@/data/types';
 import { useT } from '@/i18n';

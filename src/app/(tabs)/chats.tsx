@@ -1,12 +1,13 @@
 import { router } from 'expo-router';
 import { Clock, MessageSquare, Search, X } from 'lucide-react-native';
 import { Fragment, useMemo, useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import { ChatRow } from '@/components/chat/ChatRow';
 import { ChatsTwoPane } from '@/components/chat/ChatsTwoPane';
 import { chatSections, eventShort, matchesQuery } from '@/components/chat/chatUtils';
 import { Button, Screen } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
 import { useIsWide } from '@/lib/layout';
 import { chatList, type ChatSummary } from '@/lib/selectors';

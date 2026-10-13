@@ -1,6 +1,7 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Button, goBack, Radio, Sheet } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import { LANGS, useT } from '@/i18n';
 import { useStore } from '@/store/AppStore';
 import { onest, useTheme } from '@/theme';

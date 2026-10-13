@@ -1,7 +1,8 @@
 import { ChevronRight } from 'lucide-react-native';
 import { createContext, useContext, type ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
+import { Text } from '@/components/ui/Text';
 import { useIsWide } from '@/lib/layout';
 import { onest, useTheme } from '@/theme';
 

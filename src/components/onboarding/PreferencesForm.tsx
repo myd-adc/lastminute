@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { Chip } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import { goesWithOptions, interests, vibes } from '@/data/mock';
 import type { GoesWith, InterestId, Vibe } from '@/data/types';
 import { useT } from '@/i18n';

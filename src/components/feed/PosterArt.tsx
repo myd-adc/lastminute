@@ -1,8 +1,9 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { memo, useId } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Svg, { Defs, LinearGradient as SvgLinearGradient, Rect, Stop } from 'react-native-svg';
 
+import { Text } from '@/components/ui/Text';
 import type { Event } from '@/data/types';
 import { fonts, gradients, useTheme } from '@/theme';
 

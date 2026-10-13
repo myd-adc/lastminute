@@ -1,7 +1,8 @@
 import { Lock } from 'lucide-react-native';
 import type { ReactNode } from 'react';
-import { Linking, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Linking, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 
+import { Text } from '@/components/ui/Text';
 import { getScene } from '@/data/mock';
 import { t as tr, useT } from '@/i18n';
 import { eventsCount, people } from '@/lib/time';

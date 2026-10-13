@@ -1,6 +1,7 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ChatThread } from '@/components/chat/ChatThread';
+import { Text } from '@/components/ui/Text';
 import type { Event } from '@/data/types';
 import { useT } from '@/i18n';
 import { expiresAt, matchesAt } from '@/lib/selectors';

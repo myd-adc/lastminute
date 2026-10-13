@@ -1,10 +1,11 @@
 import { router } from 'expo-router';
 import { Ban, ChevronLeft, Clock, Flag, MoreHorizontal, X } from 'lucide-react-native';
 import { useState, type ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Avatar, goBack } from '@/components/ui';
+import { Text } from '@/components/ui/Text';
 import { getEvent, getUser } from '@/data/mock';
 import { useT } from '@/i18n';
 import { chatState, expiresAt, nameAge } from '@/lib/selectors';
