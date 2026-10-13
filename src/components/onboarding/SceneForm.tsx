@@ -2,6 +2,8 @@ import { Bell, Check } from 'lucide-react-native';
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { requestStudentEmailCode, verifyStudentEmail } from '@/api/auth';
+import { isLive } from '@/api/client';
 import { Gradient, Toggle } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { events, PAST_EVENT_IDS, scenes } from '@/data/mock';
@@ -65,15 +67,46 @@ function SceneCard({
   const now = useNow();
   const [email, setEmail] = useState('');
   const [error, setError] = useState(false);
+  // Live backend: a code goes to the address first, and the scene unlocks once the code is confirmed.
+  const [stage, setStage] = useState<'email' | 'code'>('email');
+  const [code, setCode] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [failure, setFailure] = useState<null | 'emailSend' | 'emailTaken' | 'code'>(null);
   const needsEmail = scene.requiresStudentEmail && !verifiedEmail;
   const ink = accentInk(c, scheme);
+  const address = email.trim().toLowerCase();
 
-  const submit = () => {
-    if (isStudentEmail(email)) {
-      setError(false);
-      onVerify(email.trim().toLowerCase());
-    } else setError(true);
+  const submit = async () => {
+    if (!isStudentEmail(email)) return setError(true);
+    setError(false);
+    if (!isLive) return onVerify(address);
+    setBusy(true);
+    const res = await requestStudentEmailCode(address);
+    setBusy(false);
+    if (!res.ok) return setFailure(res.error === 'email_taken' ? 'emailTaken' : 'emailSend');
+    setFailure(null);
+    setStage('code');
   };
+
+  const confirm = async () => {
+    setBusy(true);
+    const res = await verifyStudentEmail(address, code.trim());
+    setBusy(false);
+    if (!res.ok) return setFailure('code');
+    setFailure(null);
+    onVerify(address);
+  };
+
+  const inCode = stage === 'code';
+  const action = inCode ? confirm : submit;
+  const actionReady = inCode ? code.trim().length >= 6 : !!email.trim();
+  const hint = failure
+    ? t(failure === 'code' ? 'onboarding.errors.code' : `onboarding.errors.${failure}`)
+    : error
+      ? t('onboarding.scene.emailError', { domain: STUDENT_DOMAIN })
+      : inCode
+        ? t('onboarding.scene.codeSent', { email: address })
+        : t('onboarding.scene.emailHint');
 
   let sub: string;
   if (scene.requiresStudentEmail)
@@ -110,35 +143,49 @@ function SceneCard({
       {selected && needsEmail && (
         <View style={styles.email}>
           <TextField
-            value={email}
+            value={inCode ? code : email}
             onChangeText={(text) => {
-              setEmail(text);
+              if (inCode) setCode(text.replace(/\D/g, '').slice(0, 6));
+              else setEmail(text);
               if (error) setError(false);
+              if (failure) setFailure(null);
             }}
-            placeholder={t('onboarding.scene.emailPlaceholder', { domain: STUDENT_DOMAIN })}
-            keyboardType="email-address"
+            placeholder={inCode ? t('onboarding.scene.codePlaceholder') : t('onboarding.scene.emailPlaceholder', { domain: STUDENT_DOMAIN })}
+            keyboardType={inCode ? 'number-pad' : 'email-address'}
             autoCapitalize="none"
             autoCorrect={false}
-            autoComplete="email"
-            textContentType="emailAddress"
+            autoComplete={inCode ? 'one-time-code' : 'email'}
+            textContentType={inCode ? 'oneTimeCode' : 'emailAddress'}
             returnKeyType="done"
-            onSubmitEditing={submit}
-            accessibilityLabel={t('onboarding.scene.emailA11y')}
+            onSubmitEditing={action}
+            accessibilityLabel={inCode ? t('onboarding.scene.codeA11y') : t('onboarding.scene.emailA11y')}
             boxStyle={{ backgroundColor: c.bg, minHeight: 48, paddingRight: 6 }}
             right={
               <Pressable
                 accessibilityRole="button"
-                onPress={submit}
-                disabled={!email.trim()}
-                style={[styles.verify, { backgroundColor: c.accent, opacity: email.trim() ? 1 : 0.4 }]}
+                onPress={action}
+                disabled={!actionReady || busy}
+                style={[styles.verify, { backgroundColor: c.accent, opacity: actionReady && !busy ? 1 : 0.4 }]}
               >
-                <Text style={[onest('bold', 14), { color: c.onAccent }]}>{t('onboarding.scene.verify')}</Text>
+                <Text style={[onest('bold', 14), { color: c.onAccent }]}>
+                  {inCode || !isLive ? t('onboarding.scene.verify') : t('onboarding.scene.sendCode')}
+                </Text>
               </Pressable>
             }
           />
-          <Text style={[type.footnote, { color: error ? c.danger : c.muted }]}>
-            {error ? t('onboarding.scene.emailError', { domain: STUDENT_DOMAIN }) : t('onboarding.scene.emailHint')}
-          </Text>
+          <Text style={[type.footnote, { color: error || failure ? c.danger : c.muted }]}>{hint}</Text>
+          {inCode && (
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => {
+                setStage('email');
+                setCode('');
+                setFailure(null);
+              }}
+            >
+              <Text style={[type.footnote, { color: ink }]}>{t('onboarding.scene.changeEmail')}</Text>
+            </Pressable>
+          )}
         </View>
       )}
     </View>

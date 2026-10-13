@@ -452,7 +452,7 @@ export type Database = {
       is_blocked: { Args: { p_a: string; p_b: string }; Returns: boolean };
       is_going: { Args: { p_event: string; p_user?: string }; Returns: boolean };
       is_match_member: { Args: { p_match: string; p_user?: string }; Returns: boolean };
-      join_scene: { Args: { p_email?: string; p_scene: string }; Returns: undefined };
+      join_scene: { Args: { p_scene: string }; Returns: undefined };
       scene_stats: {
         Args: Record<PropertyKey, never>;
         Returns: {

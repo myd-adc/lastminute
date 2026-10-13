@@ -74,11 +74,24 @@ export async function saveProfile(state: State): Promise<AuthResult> {
   });
   if (error) return fail(error, 'save_failed');
   if (state.sceneId) {
-    // Campus scenes check the e-mail domain on the server.
-    const { error: joinError } = await supabase.rpc('join_scene', { p_scene: state.sceneId, p_email: state.studentEmail ?? undefined });
+    // Campus scenes check the confirmed e-mail domain on the server.
+    const { error: joinError } = await supabase.rpc('join_scene', { p_scene: state.sceneId });
     if (joinError) return fail(joinError, 'join_failed');
   }
   return { ok: true, data: undefined };
+}
+
+// Student e-mail check for campus scenes: Auth mails a code to the new address, the confirmed address is what
+// join_scene trusts on the server.
+export async function requestStudentEmailCode(email: string): Promise<AuthResult> {
+  const { error } = await supabase.auth.updateUser({ email });
+  if (!error) return { ok: true, data: undefined };
+  return { ok: false, error: /already|registered|taken/i.test(error.message) ? 'email_taken' : 'email_failed' };
+}
+
+export async function verifyStudentEmail(email: string, token: string): Promise<AuthResult> {
+  const { error } = await supabase.auth.verifyOtp({ email, token, type: 'email_change' });
+  return error ? fail(error, 'code_failed') : { ok: true, data: undefined };
 }
 
 export const signOut = () => supabase.auth.signOut();
