@@ -21,7 +21,7 @@ const FEATURES = [
 ] as const;
 
 // Built at call time so the subject follows the current language.
-export const partnerMail = () => `mailto:partners@lastminute.app?subject=${encodeURIComponent(tr('onboarding.wide.partnerSubject'))}`;
+export const partnerMail = () => `mailto:partners@lastminute.software?subject=${encodeURIComponent(tr('onboarding.wide.partnerSubject'))}`;
 
 // W01 wide web: hero half (840 of 1440) with the three glows on the left, the 600 pt auth panel (login / code) on the right.
 // Logo at 48, hero block at y 200 and the scene line at the bottom; the 130 : 146 flexible gaps keep that rhythm.
