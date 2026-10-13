@@ -158,7 +158,8 @@ const styles = StyleSheet.create({
   labelRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
   field: { gap: 8 },
   box: { minHeight: 54, borderRadius: 16, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, gap: 10 },
-  input: { flex: 1, alignSelf: 'stretch', ...onest('medium', 16), paddingVertical: 0 },
+  // minWidth 0: web inputs otherwise keep their intrinsic width and push `right` out of a narrow box.
+  input: { flex: 1, minWidth: 0, alignSelf: 'stretch', ...onest('medium', 16), paddingVertical: 0 },
   steps: { flex: 1, flexDirection: 'row', gap: 6 },
   step: { flex: 1, height: 4, borderRadius: 2 },
   idea: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12, borderWidth: 1, justifyContent: 'center' },

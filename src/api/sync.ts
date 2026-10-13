@@ -113,6 +113,7 @@ export async function fetchSnapshot(me: string): Promise<Snapshot> {
     knownUsers.set(p.id, {
       id: p.id,
       name: p.name,
+      username: p.username,
       gender: (p.gender as User['gender']) ?? undefined,
       affiliation: p.affiliation,
       talkAbout: p.talk_about,

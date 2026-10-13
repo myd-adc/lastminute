@@ -6,10 +6,12 @@ import { Text } from '@/components/ui/Text';
 import { getInterest } from '@/data/mock';
 import type { InterestId } from '@/data/types';
 import { useT } from '@/i18n';
+import { withHandle } from '@/lib/username';
 import { display, onest, useTheme, type GradientId } from '@/theme';
 
 export type PreviewPerson = {
   name: string;
+  username?: string;
   affiliation: string;
   talkAbout: string;
   gradient: GradientId;
@@ -23,7 +25,7 @@ export function PreviewCard({ person }: { person: PreviewPerson }) {
   const { c } = useTheme();
   const { t } = useT();
   const name = person.name.trim() || t('onboarding.preview.namePlaceholder');
-  const meta = person.affiliation.trim();
+  const meta = withHandle(person.username, person.affiliation);
   const tags = person.interests.map(getInterest).filter((i) => !!i);
   return (
     <View style={{ gap: 14 }}>

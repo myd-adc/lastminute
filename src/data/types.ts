@@ -56,6 +56,7 @@ export type Event = {
 export type User = {
   id: string;
   name: string;
+  username?: string; // «darynka», shown as @darynka
   age?: number; // not collected by the live backend yet
   gender?: 'f' | 'm';
   affiliation: string; // «Соціологія, 3 курс»

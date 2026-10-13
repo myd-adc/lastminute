@@ -1,17 +1,19 @@
 import { useState } from 'react';
 
 import { EditLayout } from '@/components/onboarding/EditLayout';
-import { cleanProfile, emptyProfile, isProfileValid, ProfileForm } from '@/components/onboarding/ProfileForm';
+import { cleanProfile, emptyProfile, isProfileValid, ProfileForm, useUsernameStatus } from '@/components/onboarding/ProfileForm';
 import { goBack } from '@/components/ui';
 import { useT } from '@/i18n';
+import { suggestUsername } from '@/lib/username';
 import { useStore } from '@/store/AppStore';
 
 // M16 → «Змінити профіль»: the M03 form prefilled from the stored profile.
 export default function EditProfileScreen() {
   const { state, dispatch } = useStore();
   const { t } = useT();
-  const [draft, setDraft] = useState(() => state.me ?? emptyProfile());
-  const valid = isProfileValid(draft);
+  const [draft, setDraft] = useState(() => (state.me ? { ...state.me, username: state.me.username ?? suggestUsername(state.me.name, state.email) } : emptyProfile(state.email)));
+  const usernameStatus = useUsernameStatus(draft.username);
+  const valid = isProfileValid(draft, usernameStatus);
 
   const save = () => {
     if (!valid) return;
@@ -30,7 +32,7 @@ export default function EditProfileScreen() {
         solo: state.goesWith === 'solo',
       }}
     >
-      <ProfileForm value={draft} onChange={setDraft} />
+      <ProfileForm value={draft} onChange={setDraft} usernameStatus={usernameStatus} email={state.email} />
     </EditLayout>
   );
 }

@@ -105,7 +105,7 @@ function Stepper({ step }: { step: Step }) {
   const { t } = useT();
   const me = state.me;
   const items = [
-    { label: t('onboarding.frame.steps.profile'), sub: me ? [me.name, me.affiliation].filter(Boolean).join(' · ') : '' },
+    { label: t('onboarding.frame.steps.profile'), sub: me ? [me.name, me.username && `@${me.username}`].filter(Boolean).join(' · ') : '' },
     {
       label: t('onboarding.frame.steps.interests'),
       sub: state.interests.length ? t('onboarding.frame.picked', { count: state.interests.length }) : '',

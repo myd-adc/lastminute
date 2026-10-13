@@ -38,6 +38,7 @@ export async function loadAccount(userId: string): Promise<ExistingAccount | nul
   return {
     me: {
       name: p.name,
+      username: p.username,
       affiliation: p.affiliation,
       talkAbout: p.talk_about,
       gradient: p.gradient as GradientId,
@@ -82,7 +83,9 @@ export async function saveProfile(state: State): Promise<AuthResult> {
     show_shared: state.settings.showSharedEvents,
     language: state.language,
     photo_path,
+    ...(state.me.username && { username: state.me.username }),
   });
+  if (error?.code === '23505') return { ok: false, error: 'username_taken' };
   if (error) return fail(error, 'save_failed');
   if (previous && previous !== photo_path) await removeImage(AVATARS, previous);
   return { ok: true, data: undefined };
@@ -102,3 +105,9 @@ export async function verifyStudentEmail(email: string, token: string): Promise<
 }
 
 export const signOut = () => supabase.auth.signOut();
+
+// Whether a username is free (the user's own counts as free). A failed check reads as free; the save still guards it.
+export async function usernameAvailable(username: string): Promise<boolean> {
+  const { data, error } = await supabase.rpc('username_available', { p_username: username });
+  return error ? true : !!data;
+}

@@ -6,6 +6,7 @@ import { Avatar, Chip, Toggle } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
 import { useIsWide } from '@/lib/layout';
+import { withHandle } from '@/lib/username';
 import { myCommunities, pendingSurveys, profileStats, verifiedCommunity } from '@/lib/selectors';
 import { useNow, useStore } from '@/store/AppStore';
 import { display, onest, type, useTheme, type ThemeMode } from '@/theme';
@@ -55,7 +56,9 @@ export function ProfileCard() {
           </Text>
           {verified && <VerifiedPill label={verified.name} />}
         </View>
-        {!!me.affiliation && <Text style={[onest('regular', 13, 17), { color: c.muted }]}>{me.affiliation}</Text>}
+        {!!withHandle(me.username, me.affiliation) && (
+          <Text style={[onest('regular', 13, 17), { color: c.muted }]}>{withHandle(me.username, me.affiliation)}</Text>
+        )}
         {!!me.talkAbout && <Text style={[onest('medium', 13, 17), { color: c.text }]}>{lang === 'uk' ? `«${me.talkAbout}»` : `“${me.talkAbout}”`}</Text>}
       </View>
       <Pressable accessibilityRole="button" hitSlop={10} onPress={() => router.push('/edit-profile')}>

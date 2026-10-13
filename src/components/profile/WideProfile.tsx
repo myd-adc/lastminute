@@ -9,6 +9,7 @@ import { getInterest, goesWithOptions, vibes } from '@/data/mock';
 import { CommunityAvatar } from '@/components/community/CommunityAvatar';
 import { communityMeta } from '@/components/community/text';
 import { myCommunities, verifiedCommunity } from '@/lib/selectors';
+import { withHandle } from '@/lib/username';
 import { LANGS, useT, type Lang } from '@/i18n';
 import { useStore } from '@/store/AppStore';
 import { display, onest, useTheme } from '@/theme';
@@ -111,7 +112,7 @@ function BigProfileCard() {
     vibe && `${vibe.emoji} ${vibe.label}`,
     goes && `${goes.emoji} ${goes.label}`,
   ].filter((tag): tag is string => !!tag);
-  const meta = [me.affiliation, state.email].filter(Boolean).join(' · ');
+  const meta = withHandle(me.username, me.affiliation, state.email);
   const verified = verifiedCommunity(state);
   return (
     <View style={[styles.card, { backgroundColor: c.surface }]}>

@@ -335,6 +335,7 @@ export type Database = {
           show_solo: boolean;
           talk_about: string;
           updated_at: string;
+          username: string;
           vibe: string | null;
         };
         ComputedFields: never;
@@ -353,6 +354,7 @@ export type Database = {
           show_solo?: boolean;
           talk_about?: string;
           updated_at?: string;
+          username?: string;
           vibe?: string | null;
         };
         Update: {
@@ -370,6 +372,7 @@ export type Database = {
           show_solo?: boolean;
           talk_about?: string;
           updated_at?: string;
+          username?: string;
           vibe?: string | null;
         };
         Relationships: [];
@@ -457,6 +460,7 @@ export type Database = {
         }[];
       };
       shares_event: { Args: { p_other: string; p_user?: string }; Returns: boolean };
+      username_available: { Args: { p_username: string }; Returns: boolean };
     };
     Enums: {
       decision: "go" | "skip";

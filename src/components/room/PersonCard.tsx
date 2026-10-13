@@ -5,6 +5,7 @@ import { Gradient, Pill } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { getInterest } from '@/data/mock';
 import { useT } from '@/i18n';
+import { withHandle } from '@/lib/username';
 import { t as translate } from '@/i18n/translate';
 import { nameAge, type Attendee } from '@/lib/selectors';
 import { display, fonts, onest, useTheme } from '@/theme';
@@ -24,7 +25,7 @@ type Props = {
 
 export const sharedLabel = (n: number) => translate('room.card.shared', { count: n });
 
-// M09 person card: the photo (or a gradient with a huge initial), pills, name, scene · affiliation, tags, «Говори зі мною про».
+// M09 person card: the photo (or a gradient with a huge initial), pills, name, @username · affiliation, tags, «Говори зі мною про».
 // Figma M09: photo 240 / initial 150 / pills inset 14 / body 16·19; W05: 250 / 160 / 16 / 18·20.
 export function PersonCard({ attendee, width, height, showShared, expanded, onMore, onPress, wide }: Props) {
   const { c } = useTheme();
@@ -75,7 +76,7 @@ export function PersonCard({ attendee, width, height, showShared, expanded, onMo
           {nameAge(user)}
         </Text>
         <Text style={[onest('regular', 14, 18), { color: c.muted }]} numberOfLines={1}>
-          {user.affiliation}
+          {withHandle(user.username, user.affiliation)}
         </Text>
         {tags.length > 0 && (
           <View style={styles.tags}>

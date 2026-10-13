@@ -9,6 +9,7 @@ export const STATE_VERSION = 7;
 
 export type Me = {
   name: string;
+  username?: string; // «taras.k», shown as @taras.k; unique on the server
   affiliation: string; // «Філософія, 4 курс», optional
   talkAbout: string; // «Говори зі мною про…», ≤ 80 chars
   gradient: GradientId;

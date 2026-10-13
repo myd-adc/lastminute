@@ -1,15 +1,18 @@
 import { Camera, Check, ChevronDown } from 'lucide-react-native';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, View } from 'react-native';
 
 import { Avatar, Button, Sheet } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
+import { usernameAvailable } from '@/api/auth';
+import { isLive } from '@/api/client';
 import { pickSquareImage } from '@/lib/pickSquareImage';
+import { cleanUsernameInput, isValidUsername, suggestUsername } from '@/lib/username';
 import type { Me } from '@/store/AppStore';
 import { gradientIds, onest, type, useTheme } from '@/theme';
 
-import { Field, IdeaChip, InputBox, TextField, TextLink } from './kit';
+import { accentInk, Field, IdeaChip, InputBox, TextField, TextLink } from './kit';
 
 export const TALK_MAX = 80;
 
@@ -17,9 +20,39 @@ export type ProfileDraft = Me;
 
 export const randomGradient = () => gradientIds[Math.floor(Math.random() * gradientIds.length)];
 
-export const emptyProfile = (): ProfileDraft => ({ name: '', affiliation: '', talkAbout: '', gradient: randomGradient() });
+export const emptyProfile = (email?: string | null): ProfileDraft => ({
+  name: '',
+  username: suggestUsername('', email),
+  affiliation: '',
+  talkAbout: '',
+  gradient: randomGradient(),
+});
 
-export const isProfileValid = (p: ProfileDraft) => p.name.trim().length > 0;
+export type UsernameStatus = 'invalid' | 'checking' | 'free' | 'taken';
+
+// The server is asked once typing pauses; the demo has nobody to clash with.
+export function useUsernameStatus(username: string | undefined): UsernameStatus {
+  const u = username ?? '';
+  const valid = isValidUsername(u);
+  const [checked, setChecked] = useState<{ u: string; free: boolean } | null>(null);
+  useEffect(() => {
+    if (!valid || !isLive) return;
+    let live = true;
+    const timer = setTimeout(() => {
+      usernameAvailable(u).then((free) => live && setChecked({ u, free }));
+    }, 400);
+    return () => {
+      live = false;
+      clearTimeout(timer);
+    };
+  }, [u, valid]);
+  if (!valid) return 'invalid';
+  if (!isLive) return 'free';
+  if (checked?.u !== u) return 'checking';
+  return checked.free ? 'free' : 'taken';
+}
+
+export const isProfileValid = (p: ProfileDraft, username: UsernameStatus) => p.name.trim().length > 0 && username === 'free';
 
 // Trims the draft before it goes into the store.
 export const cleanProfile = (p: ProfileDraft): Me => ({
@@ -30,16 +63,48 @@ export const cleanProfile = (p: ProfileDraft): Me => ({
 });
 
 // Keys into onboarding.profile.affiliations / .idea; the picked text is stored in the current language.
-const AFFILIATIONS = ['philosophy', 'sociology', 'journalism', 'psychology', 'history', 'cs', 'law', 'philology', 'economics', 'masters', 'teaching'] as const;
+const AFFILIATIONS = [
+  'philosophy',
+  'sociology',
+  'journalism',
+  'psychology',
+  'history',
+  'cs',
+  'law',
+  'philology',
+  'economics',
+  'masters',
+  'teaching',
+] as const;
 
 const IDEAS = ['concert', 'reading', 'boardGame'] as const;
 
 // M03 form, shared by onboarding (profile-setup) and «Змінити профіль».
-export function ProfileForm({ value, onChange }: { value: ProfileDraft; onChange: (v: ProfileDraft) => void }) {
-  const { c } = useTheme();
+export function ProfileForm({
+  value,
+  onChange,
+  usernameStatus,
+  email,
+}: {
+  value: ProfileDraft;
+  onChange: (v: ProfileDraft) => void;
+  usernameStatus: UsernameStatus;
+  email?: string | null;
+}) {
+  const { c, scheme } = useTheme();
   const { t } = useT();
   const [picking, setPicking] = useState(false);
+  // The suggestion follows the name until the user edits the username themselves.
+  const usernameTouched = useRef(!!value.username && value.username !== suggestUsername('', email));
   const set = (patch: Partial<ProfileDraft>) => onChange({ ...value, ...patch });
+  const setName = (name: string) => set(usernameTouched.current ? { name } : { name, username: suggestUsername(name, email) || value.username });
+  const username = value.username ?? '';
+  const usernameError =
+    usernameStatus === 'taken'
+      ? t('onboarding.profile.usernameTaken', { suggestion: `${username.slice(0, 19)}2` })
+      : usernameStatus === 'invalid' && username.length > 0
+        ? t('onboarding.profile.usernameRules')
+        : null;
 
   const pickPhoto = async () => {
     const uri = await pickSquareImage();
@@ -58,26 +123,58 @@ export function ProfileForm({ value, onChange }: { value: ProfileDraft; onChange
         </Pressable>
         <View style={{ flex: 1, gap: 4 }}>
           <Pressable onPress={pickPhoto} hitSlop={6}>
-            <Text style={[onest('semibold', 15, 19), { color: c.text }]}>{value.photoUri ? t('onboarding.profile.changePhoto') : t('onboarding.profile.addPhoto')}</Text>
+            <Text style={[onest('semibold', 15, 19), { color: c.text }]}>
+              {value.photoUri ? t('onboarding.profile.changePhoto') : t('onboarding.profile.addPhoto')}
+            </Text>
           </Pressable>
           <Text style={[onest('regular', 13, 17.5), { color: c.muted }]}>{t('onboarding.profile.photoHint')}</Text>
           {value.photoUri && <TextLink label={t('onboarding.profile.removePhoto')} onPress={() => set({ photoUri: undefined })} />}
         </View>
       </View>
 
-      <Field label={t('onboarding.profile.name')}>
-        <TextField
-          value={value.name}
-          onChangeText={(name) => set({ name })}
-          placeholder={t('onboarding.profile.namePlaceholder')}
-          maxLength={24}
-          autoCapitalize="words"
-          autoComplete="given-name"
-          textContentType="givenName"
-          returnKeyType="next"
-          accessibilityLabel={t('onboarding.profile.name')}
-        />
-      </Field>
+      {/* M03: «Ім’я» and «Нік» share a row; ✓ in the accent ink once the username is free. */}
+      <View style={styles.nameRow}>
+        <View style={styles.half}>
+          <Field label={t('onboarding.profile.name')}>
+            <TextField
+              value={value.name}
+              onChangeText={setName}
+              placeholder={t('onboarding.profile.namePlaceholder')}
+              maxLength={24}
+              autoCapitalize="words"
+              autoComplete="given-name"
+              textContentType="givenName"
+              returnKeyType="next"
+              accessibilityLabel={t('onboarding.profile.name')}
+            />
+          </Field>
+        </View>
+        <View style={styles.half}>
+          <Field label={t('onboarding.profile.username')}>
+            <TextField
+              value={username}
+              onChangeText={(u) => {
+                usernameTouched.current = true;
+                set({ username: cleanUsernameInput(u) });
+              }}
+              placeholder={t('onboarding.profile.usernamePlaceholder')}
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="username"
+              textContentType="username"
+              accessibilityLabel={t('onboarding.profile.username')}
+              boxStyle={usernameError ? { borderColor: c.danger } : undefined}
+              left={<Text style={[onest('medium', 16), { color: c.muted, marginRight: -8 }]}>@</Text>}
+              right={
+                usernameStatus === 'free' ? (
+                  <Check size={18} color={accentInk(c, scheme)} strokeWidth={2.5} accessibilityLabel={t('onboarding.profile.usernameFree')} />
+                ) : undefined
+              }
+            />
+          </Field>
+        </View>
+      </View>
+      {usernameError && <Text style={[type.footnote, { color: c.danger, marginTop: -4 }]}>{usernameError}</Text>}
 
       <Field label={t('onboarding.profile.affiliationOptional')}>
         <Pressable accessibilityRole="button" accessibilityLabel={t('onboarding.profile.affiliation')} onPress={() => setPicking(true)}>
@@ -107,7 +204,12 @@ export function ProfileForm({ value, onChange }: { value: ProfileDraft; onChange
         })}
       </View>
 
-      <AffiliationSheet visible={picking} value={value.affiliation} onClose={() => setPicking(false)} onPick={(affiliation) => set({ affiliation })} />
+      <AffiliationSheet
+        visible={picking}
+        value={value.affiliation}
+        onClose={() => setPicking(false)}
+        onPick={(affiliation) => set({ affiliation })}
+      />
     </View>
   );
 }
@@ -168,6 +270,8 @@ function AffiliationSheet({
 
 const styles = StyleSheet.create({
   photoRow: { flexDirection: 'row', alignItems: 'center', gap: 16 },
+  nameRow: { flexDirection: 'row', gap: 12 },
+  half: { flex: 1, minWidth: 0 },
   camera: {
     position: 'absolute',
     right: -2,
