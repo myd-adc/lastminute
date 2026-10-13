@@ -1,4 +1,4 @@
-import { getInterest, getScene } from '@/data/mock';
+import { getInterest } from '@/data/mock';
 import type { Event } from '@/data/types';
 import { t } from '@/i18n/translate';
 
@@ -11,8 +11,6 @@ export const categoryLabel = (e: Event) => {
   const i = getInterest(e.category);
   return i ? `${i.emoji} ${i.label}` : '';
 };
-
-export const sceneName = (e: Event) => getScene(e.sceneId).name;
 
 export const mapsUrl = (e: Event) =>
   `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${e.venue}, ${e.address}, ${t('feed.city')}`)}`;

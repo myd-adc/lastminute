@@ -23,8 +23,7 @@ export const common = {
   all: 'Усі →',
   free: 'Безкоштовно',
   price: '{price} ₴',
-  tabs: { events: 'Події', scene: 'Сцена', chats: 'Чати', profile: 'Профіль' },
-  myScene: 'Моя сцена',
+  tabs: { events: 'Події', communities: 'Спільноти', chats: 'Чати', profile: 'Профіль' },
   yourPreferences: 'Твої вподобання',
   change: 'Змінити →',
   time: {

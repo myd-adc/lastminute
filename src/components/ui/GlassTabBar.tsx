@@ -8,11 +8,11 @@ import { t, useT, type TKey } from '@/i18n';
 import { tabBarBottom } from '@/lib/layout';
 import { useTheme } from '@/theme';
 
-export type TabKey = 'events' | 'scene' | 'chats' | 'me';
+export type TabKey = 'events' | 'communities' | 'chats' | 'me';
 
-export const tabs: { key: TabKey; labelKey: TKey; icon: LucideIcon; href: '/' | '/scene' | '/chats' | '/me' }[] = [
+export const tabs: { key: TabKey; labelKey: TKey; icon: LucideIcon; href: '/' | '/communities' | '/chats' | '/me' }[] = [
   { key: 'events', labelKey: 'common.tabs.events', icon: Compass, href: '/' },
-  { key: 'scene', labelKey: 'common.tabs.scene', icon: Users, href: '/scene' },
+  { key: 'communities', labelKey: 'common.tabs.communities', icon: Users, href: '/communities' },
   { key: 'chats', labelKey: 'common.tabs.chats', icon: MessageSquare, href: '/chats' },
   { key: 'me', labelKey: 'common.tabs.profile', icon: User, href: '/me' },
 ];

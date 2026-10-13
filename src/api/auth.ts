@@ -1,4 +1,4 @@
-import type { GoesWith, InterestId, SceneId, Vibe } from '@/data/types';
+import type { GoesWith, InterestId, Vibe } from '@/data/types';
 import type { Me, State } from '@/store/state';
 import type { GradientId } from '@/theme/palette';
 
@@ -22,8 +22,6 @@ export type ExistingAccount = {
   interests: InterestId[];
   vibe: Vibe | null;
   goesWith: GoesWith | null;
-  sceneId: SceneId | null;
-  studentEmail: string | null;
 };
 
 // Verifies the code and returns the saved profile for returning users (null = new account → onboarding).
@@ -36,24 +34,15 @@ export async function verifyCode(email: string, token: string): Promise<AuthResu
 export async function loadAccount(userId: string): Promise<ExistingAccount | null> {
   const { data: p } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle();
   if (!p) return null;
-  const { data: member } = await supabase
-    .from('scene_members')
-    .select('verified_email')
-    .eq('user_id', userId)
-    .not('verified_at', 'is', null)
-    .limit(1)
-    .maybeSingle();
   return {
     me: { name: p.name, affiliation: p.affiliation, talkAbout: p.talk_about, gradient: p.gradient as GradientId, photoUri: p.photo_path ?? undefined },
     interests: p.interests as InterestId[],
     vibe: (p.vibe as Vibe | null) ?? null,
     goesWith: (p.goes_with as GoesWith | null) ?? null,
-    sceneId: (p.scene_id as SceneId | null) ?? null,
-    studentEmail: member?.verified_email ?? null,
   };
 }
 
-// Persists the onboarding answers (M03–M05) for the signed-in user.
+// Persists the onboarding answers (M03–M04) for the signed-in user.
 export async function saveProfile(state: State): Promise<AuthResult> {
   const { data: auth } = await supabase.auth.getUser();
   const userId = auth.user?.id;
@@ -67,22 +56,16 @@ export async function saveProfile(state: State): Promise<AuthResult> {
     interests: state.interests,
     vibe: state.vibe,
     goes_with: state.goesWith,
-    scene_id: state.sceneId,
     show_solo: state.settings.showSolo,
     show_shared: state.settings.showSharedEvents,
     language: state.language,
   });
   if (error) return fail(error, 'save_failed');
-  if (state.sceneId) {
-    // Campus scenes check the confirmed e-mail domain on the server.
-    const { error: joinError } = await supabase.rpc('join_scene', { p_scene: state.sceneId });
-    if (joinError) return fail(joinError, 'join_failed');
-  }
   return { ok: true, data: undefined };
 }
 
-// Campus scene for someone who signed in with another address: Auth mails a code to the campus one and, once
-// confirmed, it replaces the sign-in address. join_scene trusts only that confirmed address.
+// Domain-only community for someone who signed in with another address: Auth mails a code to the campus one and,
+// once confirmed, it replaces the sign-in address. join_community trusts only that confirmed address.
 export async function requestStudentEmailCode(email: string): Promise<AuthResult> {
   const { error } = await supabase.auth.updateUser({ email });
   if (!error) return { ok: true, data: undefined };

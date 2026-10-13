@@ -1,11 +1,11 @@
 import type { Synced } from '@/api/sync';
 import { pastChats, PAST_EVENT_IDS } from '@/data/mock';
-import type { GoesWith, InterestId, Message, Photo, ReportReason, SceneId, Survey, Vibe } from '@/data/types';
+import type { Community, Event, GoesWith, InterestId, Message, Photo, ReportReason, Survey, Vibe } from '@/data/types';
 import { deviceLang, type Lang } from '@/i18n/core';
 import type { ThemeMode } from '@/theme';
 import type { GradientId } from '@/theme/palette';
 
-export const STATE_VERSION = 6;
+export const STATE_VERSION = 7;
 
 export type Me = {
   name: string;
@@ -21,7 +21,8 @@ export type Going = {
   joinSoloGroup: boolean; // M08 «Додати мене» to «Самі на …»
 };
 
-export type FeedTab = 'scene' | 'city' | 'saved';
+// 'saved' is reached from the filter sheet, not shown as a tab of its own.
+export type FeedTab = 'forYou' | 'communities' | 'met' | 'saved';
 
 export type Report = { userId: string; eventId?: string; reason: ReportReason; alsoBlock: boolean; at: string };
 
@@ -37,14 +38,16 @@ export type State = {
   interests: InterestId[];
   vibe: Vibe | null;
   goesWith: GoesWith | null;
-  // M05
-  sceneId: SceneId | null;
-  studentEmail: string | null;
   onboarded: boolean;
+  // Communities the user is in (server-owned in live mode).
+  memberships: Record<string, { at: string }>;
+  // Demo mode only: communities and events the user created (the server keeps them in live mode).
+  localCommunities: Community[];
+  localEvents: Event[];
 
   settings: {
     theme: ThemeMode;
-    notify: { soloOnMyEvent: boolean; albumOpened: boolean; newSceneEvents: boolean };
+    notify: { soloOnMyEvent: boolean; albumOpened: boolean; newCommunityEvents: boolean };
     showSolo: boolean; // «Показувати, що я йду сам(а)»
     showSharedEvents: boolean; // «Показувати спільні події»
   };
@@ -81,16 +84,17 @@ export const initialState: State = {
   interests: [],
   vibe: null,
   goesWith: null,
-  sceneId: null,
-  studentEmail: null,
   onboarded: false,
+  memberships: {},
+  localCommunities: [],
+  localEvents: [],
   settings: {
     theme: 'dark',
-    notify: { soloOnMyEvent: true, albumOpened: true, newSceneEvents: false },
+    notify: { soloOnMyEvent: true, albumOpened: true, newCommunityEvents: false },
     showSolo: true,
     showSharedEvents: true,
   },
-  feedTab: 'scene',
+  feedTab: 'forYou',
   skipped: {},
   saved: {},
   going: {},
@@ -113,9 +117,14 @@ export type Action =
   | { type: 'verifyEmail' }
   | { type: 'setMe'; me: Me }
   | { type: 'setPreferences'; interests: InterestId[]; vibe: Vibe | null; goesWith: GoesWith | null }
-  | { type: 'setScene'; sceneId: SceneId; studentEmail?: string | null }
+  | { type: 'joinCommunity'; communityId: string }
+  | { type: 'leaveCommunity'; communityId: string }
+  | { type: 'createCommunity'; community: Community }
+  | { type: 'updateCommunity'; communityId: string; patch: Partial<Community> }
+  | { type: 'deleteCommunity'; communityId: string }
+  | { type: 'createEvent'; event: Event }
   | { type: 'completeOnboarding'; notify: boolean; seedDemo?: boolean }
-  | { type: 'restoreAccount'; me: Me; interests: InterestId[]; vibe: Vibe | null; goesWith: GoesWith | null; sceneId: SceneId | null; studentEmail: string | null }
+  | { type: 'restoreAccount'; me: Me; interests: InterestId[]; vibe: Vibe | null; goesWith: GoesWith | null }
   | { type: 'setTheme'; theme: ThemeMode }
   | { type: 'setLanguage'; language: Lang }
   | { type: 'setNotify'; key: keyof State['settings']['notify']; value: boolean }
@@ -143,7 +152,7 @@ export type Action =
   | { type: 'sync'; synced: Synced }
   | { type: 'logout' };
 
-// History a freshly onboarded demo user starts with: two past events with matches in «Минулі події».
+// History a freshly onboarded demo user starts with: two past events with matches in «Минулі події», two communities.
 function seedHistory(state: State): State {
   const going = { ...state.going };
   const decisions = { ...state.decisions };
@@ -157,7 +166,10 @@ function seedHistory(state: State): State {
     decisions[pairKey(chat.eventId, chat.userId)] = { choice: 'go', at: chat.messages[0].at };
     if (chat.myContact) myContacts[pairKey(chat.eventId, chat.userId)] = chat.myContact;
   }
-  return { ...state, going, decisions, myContacts, surveys };
+  // The demo user is already in two communities, so the Communities tab has something to show.
+  const at = new Date().toISOString();
+  const memberships = { ...state.memberships, ucu: { at }, kulbaba: { at } };
+  return { ...state, going, decisions, myContacts, surveys, memberships };
 }
 
 const omit = <T extends Record<string, unknown>>(obj: T, key: string): T => {
@@ -175,8 +187,30 @@ export function reducer(state: State, action: Action): State {
       return { ...state, me: action.me };
     case 'setPreferences':
       return { ...state, interests: action.interests, vibe: action.vibe, goesWith: action.goesWith };
-    case 'setScene':
-      return { ...state, sceneId: action.sceneId, studentEmail: action.studentEmail ?? state.studentEmail };
+    case 'joinCommunity':
+      return { ...state, memberships: { ...state.memberships, [action.communityId]: { at: new Date().toISOString() } } };
+    case 'leaveCommunity':
+      return { ...state, memberships: omit(state.memberships, action.communityId) };
+    case 'createCommunity':
+      return {
+        ...state,
+        localCommunities: [...state.localCommunities, action.community],
+        memberships: { ...state.memberships, [action.community.id]: { at: new Date().toISOString() } },
+      };
+    case 'updateCommunity':
+      return {
+        ...state,
+        localCommunities: state.localCommunities.map((c) => (c.id === action.communityId ? { ...c, ...action.patch } : c)),
+      };
+    case 'deleteCommunity':
+      return {
+        ...state,
+        localCommunities: state.localCommunities.filter((c) => c.id !== action.communityId),
+        localEvents: state.localEvents.filter((e) => e.communityId !== action.communityId),
+        memberships: omit(state.memberships, action.communityId),
+      };
+    case 'createEvent':
+      return { ...state, localEvents: [...state.localEvents, action.event] };
     case 'completeOnboarding': {
       const next = {
         ...state,

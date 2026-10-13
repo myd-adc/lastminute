@@ -15,7 +15,7 @@ import type { GlowVariant } from './HeroBlobs';
 import { Logo, StepBar } from './kit';
 import { PreviewCard, type PreviewPerson } from './PreviewCard';
 
-export type Step = 1 | 2 | 3;
+export type Step = 1 | 2;
 
 type Props = {
   step: Step;
@@ -29,10 +29,10 @@ type Props = {
 // Back inside the auth stack; on a cold web load there is no history, so fall back to the previous step.
 export function backFrom(step: Step) {
   if (router.canGoBack()) router.back();
-  else router.replace(step === 3 ? '/interests' : step === 2 ? '/profile-setup' : '/login');
+  else router.replace(step === 2 ? '/profile-setup' : '/login');
 }
 
-// M03–M05 chrome on phones (back + 3-segment progress, pinned CTA) and the W02 three-column layout on wide web.
+// M03–M04 chrome on phones (back + 2-segment progress, pinned CTA) and the W02 three-column layout on wide web.
 export function OnboardingFrame(props: Props) {
   const wide = useIsWide();
   return wide ? <WideFrame {...props} /> : <MobileFrame {...props} />;
@@ -42,7 +42,6 @@ export function OnboardingFrame(props: Props) {
 const RHYTHM: Record<Step, { top: number; sub: number; body: number; title: number; titleLine: number; glow?: GlowVariant }> = {
   1: { top: 28, sub: 12, body: 12, title: 26, titleLine: 30, glow: 'profile' }, // M03
   2: { top: 22, sub: 8, body: 22, title: 28, titleLine: 32, glow: 'interests' }, // M04
-  3: { top: 28, sub: 12, body: 26, title: 28, titleLine: 35 }, // M05 (no glow)
 };
 
 function MobileFrame({ step, title, subtitle, children, cta }: Props) {
@@ -79,7 +78,7 @@ function WideFrame({ step, title, subtitle, children, cta, preview }: Props) {
       <View style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.wideContent} keyboardShouldPersistTaps="handled">
           <View style={styles.column}>
-            <Text style={[onest('medium', 13, 17), { color: c.muted }]}>{t('onboarding.frame.stepOf', { step, total: 3 })}</Text>
+            <Text style={[onest('medium', 13, 17), { color: c.muted }]}>{t('onboarding.frame.stepOf', { step, total: 2 })}</Text>
             <Text style={[display(36, 40), { letterSpacing: -1.08, color: c.text, marginTop: 12 }]}>{title}</Text>
             <Text style={[onest('regular', 16, 22), { color: c.muted, marginTop: 12, marginBottom: 32 }]}>{subtitle}</Text>
             <View style={{ gap: 16 }}>{children}</View>
@@ -111,7 +110,6 @@ function Stepper({ step }: { step: Step }) {
       label: t('onboarding.frame.steps.interests'),
       sub: state.interests.length ? t('onboarding.frame.picked', { count: state.interests.length }) : '',
     },
-    { label: t('onboarding.frame.steps.scene'), sub: '' },
   ];
   return (
     <View style={{ gap: 6 }}>

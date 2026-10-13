@@ -4,9 +4,9 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useReducer,
 import { saveProfile } from '@/api/auth';
 import { isLive, supabase } from '@/api/client';
 import * as api from '@/api/sync';
-import { attendanceOf, setDataLanguage, setRemoteData } from '@/data/mock';
+import { attendanceOf, setDataLanguage, setLocalData, setRemoteData } from '@/data/mock';
 import { setLang } from '@/i18n/core';
-import type { Message } from '@/data/types';
+import type { Community, Message } from '@/data/types';
 
 import { initialState, reducer, STATE_VERSION, type Action, type State } from './state';
 
@@ -27,9 +27,13 @@ type Store = {
   sendMessage: (chatId: string, text: string) => void;
   // Room swipe; resolves to whether it completed a match (live: once the server confirms it).
   decide: (eventId: string, userId: string, choice: 'go' | 'skip') => Promise<boolean>;
+  // Communities: creating returns the new id (live: once the server has it), joining resolves to whether it worked.
+  createCommunity: (draft: api.CommunityDraft) => Promise<string | null>;
+  addEvent: (draft: api.EventDraft) => Promise<string | null>;
+  joinCommunity: (community: Community) => Promise<boolean>;
 };
 
-const EMPTY_REMOTE = { scenes: [], events: [], users: [], attendances: [] };
+const EMPTY_REMOTE = { communities: [], events: [], users: [], attendances: [] };
 
 const StoreContext = createContext<Store | null>(null);
 
@@ -156,8 +160,72 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   // Plain functions (formatters, mock data getters) read the language from module state; sync it before children render.
   setLang(state.language);
   setDataLanguage(state.language);
+  setLocalData(state.localCommunities, state.localEvents);
 
-  const value = useMemo(() => ({ state, dispatch, hydrated, sendMessage, decide }), [state, dispatch, hydrated, sendMessage, decide]);
+  const createCommunity = useCallback(
+    async (draft: api.CommunityDraft) => {
+      if (!isLive) {
+        const id = newId('c');
+        baseDispatch({ type: 'createCommunity', community: { ...draft, id, members: 1, eventsThisWeek: 0, mine: true } });
+        return id;
+      }
+      const me = meRef.current;
+      if (!me) return null;
+      try {
+        const id = await api.createCommunity(me, draft);
+        await resync();
+        return id;
+      } catch {
+        return null;
+      }
+    },
+    [resync],
+  );
+
+  const addEvent = useCallback(
+    async (draft: api.EventDraft) => {
+      if (!isLive) {
+        const id = newId('e');
+        baseDispatch({ type: 'createEvent', event: { ...draft, id, partner: false, goingCount: 0, soloCount: 0 } });
+        return id;
+      }
+      const me = meRef.current;
+      if (!me) return null;
+      try {
+        const id = await api.createEvent(me, draft);
+        await resync();
+        return id;
+      } catch {
+        return null;
+      }
+    },
+    [resync],
+  );
+
+  const joinCommunity = useCallback(
+    async (community: Community) => {
+      if (!isLive) {
+        baseDispatch({ type: 'joinCommunity', communityId: community.id });
+        return true;
+      }
+      const me = meRef.current;
+      if (!me) return false;
+      try {
+        await api.joinCommunity(me, community);
+        await resync();
+        return true;
+      } catch {
+        void resync();
+        return false;
+      }
+    },
+    [resync],
+  );
+
+  const value = useMemo(
+    () => ({ state, dispatch, hydrated, sendMessage, decide, createCommunity, addEvent, joinCommunity }),
+    [state, dispatch, hydrated, sendMessage, decide, createCommunity, addEvent, joinCommunity],
+  );
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }
 
@@ -181,9 +249,16 @@ function mirror(me: string, action: Action, next: State): Promise<unknown> | und
       return api.unblock(me, action.userId);
     case 'report':
       return api.report(me, action.report).then(() => (action.report.alsoBlock ? api.block(me, action.report.userId) : undefined));
+    case 'leaveCommunity':
+      return api.leaveCommunity(me, action.communityId);
+    case 'updateCommunity': {
+      const { name, description, gradient, emailDomain } = action.patch;
+      return api.updateCommunity(action.communityId, { name, description, gradient, emailDomain });
+    }
+    case 'deleteCommunity':
+      return api.deleteCommunity(action.communityId);
     case 'setMe':
     case 'setPreferences':
-    case 'setScene':
     case 'setPrivacy':
     case 'setLanguage':
       return next.onboarded

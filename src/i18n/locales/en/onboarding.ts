@@ -7,15 +7,14 @@ export const onboarding: Translation<typeof Uk> = {
     a11y: 'Language: English. Tap to switch to Ukrainian',
   },
   hero: 'Don’t go alone.\nGo with people\nwho are\nalready going.',
-  tagline: 'Events in your scene — and the people from it who are going too.',
+  tagline: 'Events in the city and your communities — and the people who are going too.',
   wide: {
-    tagline: 'Events in your scene — and the people from it who are going too. No feed, no likes, no geolocation.',
+    tagline: 'Events in the city and your communities — and the people who are going too. No likes, no location tracking.',
     features: {
-      see: 'See who from your scene is going — once you’ve tapped “I’m going” yourself',
+      see: 'See who’s going — once you’ve tapped “I’m going” yourself',
       mutual: 'Messaging opens only after mutual consent',
       vanish: 'Event chat and album disappear after 24 h',
     },
-    sceneNow: 'Now on the {scene} scene: {events} this week · {people}',
     partner: 'A venue or an organizer? Become a partner →',
     partnerSubject: 'Partnership with LastMinute',
   },
@@ -45,7 +44,7 @@ export const onboarding: Translation<typeof Uk> = {
   frame: {
     stepOf: 'Step {step} of {total}',
     back: '← Back',
-    steps: { profile: 'Profile', interests: 'Interests', scene: 'Scene' },
+    steps: { profile: 'Profile', interests: 'Interests' },
     picked: { one: '{count} picked', other: '{count} picked' },
   },
   profile: {
@@ -89,7 +88,7 @@ export const onboarding: Translation<typeof Uk> = {
   interests: {
     title: 'What gets you out of the house?',
     subtitle: 'Pick at least 3 so the feed is about you, not the whole city.',
-    next: { one: 'Next · {count} picked', other: 'Next · {count} picked' },
+    start: 'Let’s go 🚀',
     vibe: 'What’s your vibe?',
     goesWith: 'You usually go…',
     tooFew: 'Pick at least {min} — {count} so far.',
@@ -98,24 +97,7 @@ export const onboarding: Translation<typeof Uk> = {
       other: '{count} picked. The feed will adapt to them.',
     },
   },
-  scene: {
-    title: 'Your scene',
-    subtitle: 'Events and people only from here. So every event is full of your people, not the whole city.',
-    start: 'Let’s go 🚀',
-    needsEmail: 'Student email {domain} required · {people}',
-    emailPlaceholder: 'name.surname{domain}',
-    emailA11y: 'Student email',
-    sendCode: 'Send code',
-    changeEmail: 'Change address',
-    codeSent: 'We sent a code to {email}. Once confirmed, this becomes the address you sign in with.',
-    codePlaceholder: 'Code from the email',
-    codeA11y: 'Code from the email',
-    verify: 'Verify',
-    emailError: 'The address must end with {domain}',
-    emailHint: 'Nobody will see your email — we only check that you’re from UCU.',
-    notify: 'Notifications',
-    notifyText: 'We’ll tell you when someone is going solo to your event or the album opens. No more than once a day.',
-  },
+
   preview: {
     title: 'How you’ll look at events',
     namePlaceholder: 'Your name',
@@ -124,11 +106,9 @@ export const onboarding: Translation<typeof Uk> = {
     note: 'Only people who tapped “I’m going” on the same event see this card.',
   },
   preferences: {
-    title: 'Interests and scenes',
+    title: 'Interests',
   },
   errors: {
-    emailTaken: 'This email is already verified on another account.',
-    emailSend: 'Couldn’t send the email. Check the address and try again.',
     send: 'Couldn’t send the code. Check the address and try again.',
     code: 'The code is wrong or has expired.',
     save: 'Couldn’t save your profile. Check your connection and try again.',

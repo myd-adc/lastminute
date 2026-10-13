@@ -25,10 +25,9 @@ export const common: Translation<typeof Uk> = {
   all: 'All →',
   free: 'Free',
   price: '₴{price}',
-  tabs: { events: 'Events', scene: 'Scene', chats: 'Chats', profile: 'Profile' },
-  myScene: 'My scene',
-  yourPreferences: 'Your preferences',
-  change: 'Change →',
+  tabs: { events: 'Events', communities: 'Communities', chats: 'Chats', profile: 'Profile' },
+  yourPreferences: 'Your interests',
+  change: 'Edit →',
   time: {
     today: 'Today',
     tomorrow: 'Tomorrow',

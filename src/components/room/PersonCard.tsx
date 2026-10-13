@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Gradient, Pill } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
-import { getInterest, getScene } from '@/data/mock';
+import { getInterest } from '@/data/mock';
 import { useT } from '@/i18n';
 import { t as translate } from '@/i18n/translate';
 import { nameAge, type Attendee } from '@/lib/selectors';
@@ -71,7 +71,7 @@ export function PersonCard({ attendee, width, height, showShared, expanded, onMo
           {nameAge(user)}
         </Text>
         <Text style={[onest('regular', 14, 18), { color: c.muted }]} numberOfLines={1}>
-          {getScene(user.sceneId).name} · {user.affiliation}
+          {user.affiliation}
         </Text>
         {tags.length > 0 && (
           <View style={styles.tags}>

@@ -39,6 +39,8 @@ export const glows = {
     { x: 49, y: 29, r: 150, sigma: 55, opacity: 0.35, dark: '#FF8A3D', light: '#FF7426' },
     { fromRight: 91, y: 29, r: 130, sigma: 55, opacity: 0.35, dark: '#FF3D8B', light: '#E3246C' },
   ],
+  // M19/M19b community page: one violet glow behind the back button and title.
+  community: [{ x: 50, y: 70, r: 130, sigma: 45, opacity: 0.35, dark: '#7C5CFF', light: '#6847FF' }],
 } satisfies Record<string, Blob[]>;
 
 export function Glow({ blobs }: { blobs: Blob[] }) {

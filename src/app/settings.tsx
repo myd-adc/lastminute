@@ -2,7 +2,6 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { accentText } from '@/components/profile/names';
 import {
   AppearanceSection,
   ConfirmRow,
@@ -15,7 +14,6 @@ import { Group, Row } from '@/components/profile/Rows';
 import { goBack, Screen } from '@/components/ui';
 import { isLive } from '@/api/client';
 import { Text } from '@/components/ui/Text';
-import { getScene } from '@/data/mock';
 import { LANGS, useT } from '@/i18n';
 import { useIsWide } from '@/lib/layout';
 import { useStore } from '@/store/AppStore';
@@ -24,12 +22,11 @@ import { onest, useTheme } from '@/theme';
 // M16b «Налаштування» (+ «Демо» section for testing the live / after-event states).
 // Frame rhythm: 40 pt header 6 pt under the status bar, 12 pt to the first caption, then a uniform 7 pt gap.
 export default function SettingsScreen() {
-  const { c, scheme } = useTheme();
+  const { c } = useTheme();
   const { t, lang } = useT();
   const { state, dispatch } = useStore();
   const wide = useIsWide();
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const verified = !!state.studentEmail;
   const language = LANGS.find((l) => l.id === lang)?.native;
 
   return (
@@ -39,14 +36,6 @@ export default function SettingsScreen() {
       <Section label={t('profile.account.label')}>
         <Group dense>
           <Row label={t('profile.settings.email')} value={state.email ?? t('profile.emailNotSet')} />
-          <Row
-            label={t('profile.settings.studentEmail')}
-            sub={t('profile.settings.studentEmailSub')}
-            value={verified ? `${getScene('ucu').name} ✓` : t('profile.settings.add')}
-            valueColor={verified ? accentText(c, scheme) : undefined}
-            chevron
-            onPress={() => router.push('/preferences')}
-          />
           <Row last label={t('profile.settings.language')} value={language} chevron onPress={() => router.push('/language')} />
         </Group>
       </Section>

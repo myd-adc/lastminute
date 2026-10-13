@@ -1,6 +1,6 @@
 // Pure derived data over store state + mock data. Every function takes `now` (demo clock) explicitly.
-import { albumPhotos, attendanceOf, attendeesOf, events, getEvent, getUser, PAST_EVENT_IDS, pastChats, soloGroups } from '@/data/mock';
-import type { Attendance, Event, Message, Photo, User } from '@/data/types';
+import { albumPhotos, attendanceOf, attendeesOf, communities, events, getCommunity, getEvent, getUser, PAST_EVENT_IDS, pastChats, soloGroups } from '@/data/mock';
+import type { Attendance, Community, Event, Message, Photo, User } from '@/data/types';
 import { dmChatId, groupChatId, pairKey, type State } from '@/store/state';
 
 import { DAY } from './time';
@@ -15,25 +15,66 @@ export const isPast = (e: Event, now: number) => Date.parse(e.endsAt) <= now;
 export const isLive = (e: Event, now: number) => Date.parse(e.startsAt) <= now && now < Date.parse(e.endsAt);
 export const expiresAt = (e: Event) => Date.parse(e.endsAt) + CHAT_TTL_AFTER_EVENT_MS;
 
-const upcoming = (now: number) =>
-  events.filter((e) => !PAST_EVENT_IDS.includes(e.id) && !isPast(e, now)).sort((a, b) => a.startsAt.localeCompare(b.startsAt));
+// ── Communities ─────────────────────────────────────────────────────────
 
-export const sceneEvents = (state: State, now: number) => upcoming(now).filter((e) => e.sceneId === state.sceneId);
+export const isMember = (state: State, communityId: string) => !!state.memberships[communityId];
+export const myCommunities = (state: State): Community[] => communities.filter((c) => isMember(state, c.id));
+// The «УКУ ✓» pill next to the user's name: the first community they joined with a confirmed address.
+export const verifiedCommunity = (state: State): Community | undefined => myCommunities(state).find((c) => !!c.emailDomain);
+export const discoverCommunities = (state: State): Community[] => communities.filter((c) => !isMember(state, c.id));
+// City events and open communities are for everyone; a domain-only community's events only for its members.
+export const canSee = (state: State, e: Event) => {
+  if (!e.communityId) return true;
+  const c = getCommunity(e.communityId);
+  return !c || !c.emailDomain || isMember(state, c.id);
+};
 
-// Swipe feed for the current tab: unseen events first; skipped and «Я йду» ones drop out of the stack.
-export function feedEvents(state: State, now: number): Event[] {
-  const base =
-    state.feedTab === 'saved'
-      ? upcoming(now).filter((e) => state.saved[e.id])
-      : state.feedTab === 'city'
-        ? upcoming(now)
-        : sceneEvents(state, now);
-  return base.filter((e) => !state.skipped[e.id] && !state.going[e.id]);
+const upcoming = (state: State, now: number) =>
+  events
+    .filter((e) => !PAST_EVENT_IDS.includes(e.id) && !isPast(e, now) && canSee(state, e))
+    .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
+
+export const communityEvents = (state: State, now: number, communityId: string) =>
+  upcoming(state, now).filter((e) => e.communityId === communityId);
+
+// People the user already matched with (any event). Live: the server counts them per event instead.
+function friendIds(state: State): Set<string> {
+  const ids = new Set<string>();
+  for (const [key, d] of Object.entries(state.decisions)) {
+    const [eventId, userId] = key.split(':');
+    if (d.choice === 'go' && attendanceOf(eventId, userId)?.likesYou && !state.blocked[userId]) ids.add(userId);
+  }
+  return ids;
 }
 
-export const myUpcoming = (state: State, now: number) => upcoming(now).filter((e) => state.going[e.id]);
-export const nextOnScene = (state: State, now: number, exceptId?: string) =>
-  sceneEvents(state, now).filter((e) => e.id !== exceptId);
+// «Знайомі»: how many people you met before are going. A count only, never who (symmetry).
+export function metCount(state: State, e: Event, friends = friendIds(state)): number {
+  if (e.metCount !== undefined) return e.metCount;
+  return attendeesOf(e.id).filter((a) => friends.has(a.userId)).length;
+}
+
+// «Для тебе» ranking: events matching the user's interests first, then by time.
+const byInterest = (state: State) => (a: Event, b: Event) =>
+  Number(state.interests.includes(b.category)) - Number(state.interests.includes(a.category)) || a.startsAt.localeCompare(b.startsAt);
+
+export function tabEvents(state: State, now: number, tab: State['feedTab']): Event[] {
+  const all = upcoming(state, now);
+  if (tab === 'saved') return all.filter((e) => state.saved[e.id]);
+  if (tab === 'communities') return all.filter((e) => e.communityId && isMember(state, e.communityId));
+  if (tab === 'met') {
+    const friends = friendIds(state);
+    return all.filter((e) => metCount(state, e, friends) > 0);
+  }
+  return [...all].sort(byInterest(state));
+}
+
+// Swipe feed for the current tab: unseen events first; skipped and «Я йду» ones drop out of the stack.
+export const feedEvents = (state: State, now: number): Event[] =>
+  tabEvents(state, now, state.feedTab).filter((e) => !state.skipped[e.id] && !state.going[e.id]);
+
+export const myUpcoming = (state: State, now: number) => upcoming(state, now).filter((e) => state.going[e.id]);
+export const nextForYou = (state: State, now: number, exceptId?: string) =>
+  tabEvents(state, now, 'forYou').filter((e) => e.id !== exceptId && !state.going[e.id]);
 
 // ── People ──────────────────────────────────────────────────────────────
 

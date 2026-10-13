@@ -4,9 +4,8 @@ import { FlatList, Platform, StyleSheet, View, type LayoutChangeEvent, type Nati
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { Event } from '@/data/types';
-import { useT } from '@/i18n';
 import { tabBarClearance } from '@/lib/layout';
-import { goingCount, soloCount } from '@/lib/selectors';
+import { goingCount, metCount, soloCount } from '@/lib/selectors';
 import { whenLabel } from '@/lib/time';
 import { useTheme } from '@/theme';
 
@@ -14,18 +13,16 @@ import { EndOfFeed } from './EndOfFeed';
 import { FeedPage } from './FeedPage';
 import { FeedTabs } from './FeedTabs';
 import { FilterSheet } from './FilterSheet';
-import { sceneName } from './format';
 import { useToast } from './Toast';
 import { useFeed } from './useFeed';
 
 // M06 phone feed: full-height vertical pages (FlatList paging). Web also pages on wheel/trackpad and ↑/↓/←/→ keys.
 export function MobileFeed() {
   const { c } = useTheme();
-  const { t } = useT();
   const insets = useSafeAreaInsets();
   const clearance = tabBarClearance(insets.bottom);
   const toast = useToast(clearance + 8);
-  const { state, dispatch, now, feed, scene, previews, handlers, setTab } = useFeed(toast.show);
+  const { state, dispatch, now, feed, previews, handlers, setTab } = useFeed(toast.show);
   const [size, setSize] = useState({ w: 0, h: 0 });
   const [filters, setFilters] = useState(false);
   const listRef = useRef<FlatList<Event>>(null);
@@ -35,7 +32,7 @@ export function MobileFeed() {
     feedRef.current = feed;
   }, [feed]);
   const hasList = feed.length > 0 && size.h > 0;
-  // Switching scene / city / saved starts the new stack from its first poster.
+  // Switching tabs starts the new stack from its first poster.
   useEffect(() => {
     index.current = 0;
     listRef.current?.scrollToOffset({ offset: 0, animated: false });
@@ -95,9 +92,8 @@ export function MobileFeed() {
     }, [goTo, handlers, hasList]),
   );
 
-  const sceneLabel = scene ? t('feed.tabs.myScene', { scene: scene.name }) : t('common.myScene');
   const header = (onPoster: boolean) => (
-    <FeedTabs value={state.feedTab} onChange={setTab} sceneLabel={sceneLabel} onPoster={onPoster} onFilters={() => setFilters(true)} />
+    <FeedTabs value={state.feedTab} onChange={setTab} onPoster={onPoster} onFilters={() => setFilters(true)} />
   );
 
   const renderItem = ({ item }: { item: Event }) => (
@@ -111,7 +107,7 @@ export function MobileFeed() {
       saved={!!state.saved[item.id]}
       goingN={goingCount(state, item)}
       soloN={soloCount(state, item)}
-      scene={sceneName(item)}
+      metN={metCount(state, item)}
       preview={previews[item.id]}
       {...handlers}
     />
@@ -149,7 +145,6 @@ export function MobileFeed() {
         onClose={() => setFilters(false)}
         value={state.feedTab}
         onChange={setTab}
-        sceneLabel={sceneLabel}
         savedCount={Object.keys(state.saved).length}
         skippedCount={Object.keys(state.skipped).length}
         onResetSkipped={() => dispatch({ type: 'resetSkipped' })}

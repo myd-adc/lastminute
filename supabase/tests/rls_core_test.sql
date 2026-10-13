@@ -13,10 +13,10 @@ insert into auth.users (id, email) values
 insert into public.profiles (id, name) values
   ('11111111-1111-4111-8111-111111111111', 'Alice'),
   ('22222222-2222-4222-8222-222222222222', 'Bob');
--- Open mic is on the campus scene: both need a verified membership to go.
-insert into public.scene_members (user_id, scene_id, verified_email, verified_at) values
-  ('11111111-1111-4111-8111-111111111111', 'ucu', 'alice@ucu.edu.ua', now()),
-  ('22222222-2222-4222-8222-222222222222', 'ucu', 'bob@ucu.edu.ua', now());
+-- Open mic belongs to the UCU community (domain-only): both need a membership to go.
+insert into public.community_members (community_id, user_id, verified_email) values
+  ('00000000-0000-4000-9000-000000000001', '11111111-1111-4111-8111-111111111111', 'alice@ucu.edu.ua'),
+  ('00000000-0000-4000-9000-000000000001', '22222222-2222-4222-8222-222222222222', 'bob@ucu.edu.ua');
 -- Bob is already going.
 insert into public.attendances (event_id, user_id) values
   ('00000000-0000-4000-8000-000000000001', '22222222-2222-4222-8222-222222222222');

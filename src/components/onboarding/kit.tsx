@@ -116,7 +116,7 @@ export const TextField = forwardRef<TextInput, TextFieldProps>(function TextFiel
 export const webNoOutline = { outlineStyle: 'none' } as object;
 
 // 3-segment step indicator next to the back chevron (M03–M05): 4 pt bars, accent / line.
-export function StepBar({ step, total = 3 }: { step: number; total?: number }) {
+export function StepBar({ step, total = 2 }: { step: number; total?: number }) {
   const { c } = useTheme();
   return (
     <View style={styles.steps} accessibilityRole="progressbar" accessibilityValue={{ min: 1, max: total, now: step }}>

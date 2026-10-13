@@ -6,7 +6,7 @@ import { unreadCount } from '@/lib/selectors';
 import { useNow, useStore } from '@/store/AppStore';
 import { useTheme } from '@/theme';
 
-// Four tabs (Події · Сцена · Чати · Профіль). Phone: floating glass bar; wide web: the WebShell sidebar instead.
+// Four tabs (Події · Спільноти · Чати · Профіль). Phone: floating glass bar; wide web: the WebShell sidebar instead.
 export default function TabsLayout() {
   const { c } = useTheme();
   const { state } = useStore();
@@ -21,7 +21,7 @@ export default function TabsLayout() {
       screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: c.bg } }}
     >
       <Tabs.Screen name="index" options={{ title: 'Події' }} />
-      <Tabs.Screen name="scene" options={{ title: 'Сцена' }} />
+      <Tabs.Screen name="communities" options={{ title: 'Спільноти' }} />
       <Tabs.Screen name="chats" options={{ title: 'Чати' }} />
       <Tabs.Screen name="me" options={{ title: 'Профіль' }} />
     </Tabs>

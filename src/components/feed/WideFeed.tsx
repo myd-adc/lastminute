@@ -7,14 +7,14 @@ import { Avatar, AvatarStack, Button, IconButton, Pill } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import type { Event } from '@/data/types';
 import { useT } from '@/i18n';
-import { acquaintances, attendeesFor, goingCount, nameAge, nextOnScene, soloCount } from '@/lib/selectors';
+import { acquaintances, attendeesFor, goingCount, nameAge, nextForYou, soloCount } from '@/lib/selectors';
 import { going as goingLabel, whenLabel } from '@/lib/time';
 import { display, fonts, onest, useTheme } from '@/theme';
 
 import { DateTile } from './DateTile';
 import { EndOfFeed } from './EndOfFeed';
 import { FeedTabs } from './FeedTabs';
-import { priceLabel, sceneName } from './format';
+import { priceLabel } from './format';
 import { posterPillBg } from './FeedPage';
 import { PosterArt } from './PosterArt';
 import { RailButton } from './RailButton';
@@ -29,11 +29,10 @@ export function WideFeed() {
   const { t } = useT();
   const { height: winH } = useWindowDimensions();
   const toast = useToast(40);
-  const { state, now, feed, scene, previews, handlers, setTab } = useFeed(toast.show);
+  const { state, now, feed, previews, handlers, setTab } = useFeed(toast.show);
   const [index, setIndex] = useState(0);
   const i = Math.min(index, Math.max(0, feed.length - 1));
   const event: Event | undefined = feed[i];
-  const sceneLabel = scene ? t('feed.tabs.myScene', { scene: scene.name }) : t('common.myScene');
 
   // W03: 440×720 card 92 pt from the top of a 900 pt window, hints 24 pt under it.
   const cardH = Math.max(480, Math.min(720, winH - 180));
@@ -91,7 +90,6 @@ export function WideFeed() {
         setIndex(0);
         setTab(tab);
       }}
-      sceneLabel={sceneLabel}
       wide
     />
   );
@@ -168,11 +166,11 @@ export function WideFeed() {
     const solo = soloCount(state, e);
     const known = acquaintances(state, e.id).length;
     const list = attendeesFor(state, e.id).slice(0, 3);
-    const next = nextOnScene(state, now, e.id).slice(0, 3);
+    const next = nextForYou(state, now, e.id).slice(0, 3);
     return (
       <ScrollView style={[styles.panel, { borderLeftColor: c.line }]} contentContainerStyle={styles.panelContent}>
         <View style={styles.panelHead}>
-          <Text style={[styles.panelTitle, { color: c.text }]}>{t('feed.wide.whoFrom', { scene: sceneName(e) })}</Text>
+          <Text style={[styles.panelTitle, { color: c.text }]}>{t('feed.wide.who')}</Text>
           <View style={[styles.count, { backgroundColor: c.surface2 }]}>
             <Text style={[onest('bold', 13, 16), { color: c.text }]}>{n}</Text>
           </View>
@@ -211,7 +209,7 @@ export function WideFeed() {
 
         {next.length > 0 && (
           <>
-            <Text style={[styles.nextTitle, { color: c.text }]}>{t('feed.wide.nextOnScene')}</Text>
+            <Text style={[styles.nextTitle, { color: c.text }]}>{t('feed.wide.nextForYou')}</Text>
             {next.map((ne) => (
               <Pressable
                 key={ne.id}

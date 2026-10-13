@@ -12,20 +12,20 @@ type Props = {
   onClose: () => void;
   value: FeedTab;
   onChange: (tab: FeedTab) => void;
-  sceneLabel: string;
   savedCount: number;
   skippedCount: number;
   onResetSkipped: () => void;
 };
 
-// Sliders icon on M06/M10: which stack to swipe (scene / city / saved) and bringing skipped events back.
-export function FilterSheet({ visible, onClose, value, onChange, sceneLabel, savedCount, skippedCount, onResetSkipped }: Props) {
+// Sliders icon on M06/M10: which stack to swipe (for you / communities / met / saved) and bringing skipped events back.
+export function FilterSheet({ visible, onClose, value, onChange, savedCount, skippedCount, onResetSkipped }: Props) {
   const { c } = useTheme();
   const { t } = useT();
   const insets = useSafeAreaInsets();
   const options: { key: FeedTab; label: string; sub: string }[] = [
-    { key: 'scene', label: sceneLabel, sub: t('feed.filter.sceneSub') },
-    { key: 'city', label: t('feed.tabs.city'), sub: t('feed.filter.citySub') },
+    { key: 'forYou', label: t('feed.tabs.forYou'), sub: t('feed.filter.forYouSub') },
+    { key: 'communities', label: t('feed.tabs.communities'), sub: t('feed.filter.communitiesSub') },
+    { key: 'met', label: t('feed.tabs.met'), sub: t('feed.filter.metSub') },
     { key: 'saved', label: t('feed.tabs.saved'), sub: savedCount ? t('feed.filter.savedSub', { count: savedCount }) : t('feed.filter.savedEmpty') },
   ];
   return (

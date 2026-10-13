@@ -15,7 +15,6 @@ export type PreviewPerson = {
   gradient: GradientId;
   photoUri?: string;
   interests: InterestId[];
-  sceneName?: string;
   solo?: boolean;
 };
 
@@ -24,7 +23,7 @@ export function PreviewCard({ person }: { person: PreviewPerson }) {
   const { c } = useTheme();
   const { t } = useT();
   const name = person.name.trim() || t('onboarding.preview.namePlaceholder');
-  const meta = [person.sceneName, person.affiliation.trim()].filter(Boolean).join(' · ');
+  const meta = person.affiliation.trim();
   const tags = person.interests.map(getInterest).filter((i) => !!i);
   return (
     <View style={{ gap: 14 }}>

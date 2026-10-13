@@ -1,7 +1,7 @@
 import { AppState } from 'react-native';
 
 import type { RemoteData } from '@/data/mock';
-import type { Attendance, Event, InterestId, Message, SceneId, User } from '@/data/types';
+import type { Attendance, Community, Event, InterestId, Message, User } from '@/data/types';
 import { DAY } from '@/lib/time';
 import { dmChatId, pairKey, type Going, type State } from '@/store/state';
 import type { GradientId } from '@/theme/palette';
@@ -9,7 +9,7 @@ import type { GradientId } from '@/theme/palette';
 import { supabase, type Tables } from './client';
 
 // Server-owned slices of the store, replaced wholesale on every sync.
-export type Synced = Pick<State, 'going' | 'decisions' | 'messages' | 'closedChats' | 'blocked'> & { syncedAt: string };
+export type Synced = Pick<State, 'going' | 'decisions' | 'messages' | 'closedChats' | 'blocked' | 'memberships'> & { syncedAt: string };
 export type Snapshot = { remote: RemoteData; synced: Synced };
 
 const HISTORY_MS = 30 * DAY; // past events kept for chats, «Минулі події» and shared-event counts
@@ -25,11 +25,11 @@ const must = <T>(res: { data: T | null; error: { message: string } | null }): T 
   return res.data as T;
 };
 
-function toEvent(e: Tables<'events'>, going: number, solo: number): RemoteData['events'][number] {
+function toEvent(e: Tables<'events'>, going: number, solo: number, met: number): RemoteData['events'][number] {
   const poster = e.poster as Partial<Event['poster']> | null;
   return {
     id: e.id,
-    sceneId: e.scene_id as SceneId,
+    communityId: e.community_id,
     title: { uk: e.title_uk, en: e.title_en },
     description: { uk: e.description_uk, en: e.description_en },
     poster: {
@@ -49,14 +49,17 @@ function toEvent(e: Tables<'events'>, going: number, solo: number): RemoteData['
     partner: e.partner,
     goingCount: going,
     soloCount: solo,
+    metCount: met,
   };
 }
 
 export async function fetchSnapshot(me: string): Promise<Snapshot> {
   const since = new Date(Date.now() - HISTORY_MS).toISOString();
-  const [scenes, sceneStats, eventRows, attendances, profiles, decisions, matches, messages, blocks] = await Promise.all([
-    supabase.from('scenes').select('*').then(must),
-    supabase.rpc('scene_stats').then(must),
+  const [communityRows, communityStats, memberRows, metRows, eventRows, attendances, profiles, decisions, matches, messages, blocks] = await Promise.all([
+    supabase.from('communities').select('*').order('created_at').then(must),
+    supabase.rpc('community_stats').then(must),
+    supabase.from('community_members').select('community_id, joined_at').eq('user_id', me).then(must),
+    supabase.rpc('met_events').then(must),
     supabase.from('events').select('*').gt('ends_at', since).order('starts_at').then(must),
     supabase.from('attendances').select('*').then(must),
     supabase.from('profiles').select('*').then(must),
@@ -78,7 +81,8 @@ export async function fetchSnapshot(me: string): Promise<Snapshot> {
     const s = stats.find((x) => x.event_id === e.id);
     const myRow = mine.find((a) => a.event_id === e.id);
     const meSolo = myRow?.going_with === 'solo' && meProfile?.show_solo !== false;
-    return toEvent(e, Math.max(0, (s?.going ?? 0) - (myRow ? 1 : 0)), Math.max(0, (s?.solo ?? 0) - (meSolo ? 1 : 0)));
+    const met = metRows.find((x) => x.event_id === e.id)?.met ?? 0;
+    return toEvent(e, Math.max(0, (s?.going ?? 0) - (myRow ? 1 : 0)), Math.max(0, (s?.solo ?? 0) - (meSolo ? 1 : 0)), met);
   });
 
   const blocked: Synced['blocked'] = {};
@@ -102,7 +106,6 @@ export async function fetchSnapshot(me: string): Promise<Snapshot> {
       id: p.id,
       name: p.name,
       gender: (p.gender as User['gender']) ?? undefined,
-      sceneId: (p.scene_id ?? 'guest') as SceneId,
       affiliation: p.affiliation,
       talkAbout: p.talk_about,
       tags: p.interests as InterestId[],
@@ -141,23 +144,27 @@ export async function fetchSnapshot(me: string): Promise<Snapshot> {
     (threads[chatId] ??= []).push(msg);
   }
 
-  const members = new Map(sceneStats.map((s) => [s.scene_id, s.members]));
+  const statsBy = new Map(communityStats.map((c) => [c.community_id, c]));
+  const communities: Community[] = communityRows.map((c) => ({
+    id: c.id,
+    name: c.name,
+    description: c.description,
+    gradient: c.gradient as GradientId,
+    emailDomain: c.email_domain,
+    members: statsBy.get(c.id)?.members ?? 0,
+    eventsThisWeek: statsBy.get(c.id)?.events_this_week ?? 0,
+    mine: c.created_by === me,
+  }));
+  const memberships: Synced['memberships'] = {};
+  for (const m of memberRows) memberships[m.community_id] = { at: iso(m.joined_at) };
   return {
     remote: {
-      scenes: scenes.map((s) => ({
-        id: s.id as SceneId,
-        name: { uk: s.name_uk, en: s.name_en },
-        description: { uk: s.description_uk, en: s.description_en },
-        kind: s.kind,
-        gradient: s.gradient as GradientId,
-        people: members.get(s.id) ?? 0,
-        requiresStudentEmail: !!s.email_domain,
-      })),
+      communities,
       events,
       users: [...knownUsers.values()],
       attendances: others,
     },
-    synced: { going, decisions: myDecisions, messages: threads, closedChats, blocked, syncedAt: new Date().toISOString() },
+    synced: { going, decisions: myDecisions, messages: threads, closedChats, blocked, memberships, syncedAt: new Date().toISOString() },
   };
 }
 
@@ -203,6 +210,70 @@ export const unblock = (me: string, userId: string) =>
 export const report = (me: string, r: State['reports'][number]) =>
   write(supabase.from('reports').insert({ reporter: me, reported: r.userId, event_id: r.eventId ?? null, reason: r.reason }));
 
+// ── Communities ────────────────────────────────────────────────────────
+
+export type CommunityDraft = Pick<Community, 'name' | 'description' | 'gradient' | 'emailDomain'>;
+export type EventDraft = Pick<Event, 'communityId' | 'title' | 'description' | 'startsAt' | 'endsAt' | 'venue' | 'address' | 'price' | 'category' | 'poster'>;
+
+// Open communities are joined directly; a domain-only one goes through join_community(), which checks the address.
+export const joinCommunity = (me: string, c: Community) =>
+  c.emailDomain
+    ? write(supabase.rpc('join_community', { p_community: c.id }))
+    : write(supabase.from('community_members').upsert({ community_id: c.id, user_id: me }, { ignoreDuplicates: true }));
+
+export const leaveCommunity = (me: string, communityId: string) =>
+  write(supabase.from('community_members').delete().eq('community_id', communityId).eq('user_id', me));
+
+export async function createCommunity(me: string, d: CommunityDraft): Promise<string> {
+  const { data, error } = await supabase
+    .from('communities')
+    .insert({ name: d.name, description: d.description, gradient: d.gradient, email_domain: d.emailDomain, created_by: me })
+    .select('id')
+    .single();
+  if (error) throw new Error(error.message);
+  return data.id;
+}
+
+export const updateCommunity = (communityId: string, d: Partial<CommunityDraft>) =>
+  write(
+    supabase
+      .from('communities')
+      .update({
+        ...(d.name !== undefined && { name: d.name }),
+        ...(d.description !== undefined && { description: d.description }),
+        ...(d.gradient !== undefined && { gradient: d.gradient }),
+        ...(d.emailDomain !== undefined && { email_domain: d.emailDomain }),
+      })
+      .eq('id', communityId),
+  );
+
+export const deleteCommunity = (communityId: string) => write(supabase.from('communities').delete().eq('id', communityId));
+
+// Events created in the app are single-language: the same text goes into both language columns.
+export async function createEvent(me: string, d: EventDraft): Promise<string> {
+  const { data, error } = await supabase
+    .from('events')
+    .insert({
+      community_id: d.communityId,
+      created_by: me,
+      title_uk: d.title,
+      title_en: d.title,
+      description_uk: d.description,
+      description_en: d.description,
+      venue: d.venue,
+      address: d.address,
+      starts_at: d.startsAt,
+      ends_at: d.endsAt,
+      price: d.price,
+      category: d.category,
+      poster: d.poster,
+    })
+    .select('id')
+    .single();
+  if (error) throw new Error(error.message);
+  return data.id;
+}
+
 // ── Live updates ───────────────────────────────────────────────────────
 
 type SyncHandlers = { onSnapshot: (s: Snapshot) => void; onSignedOut: () => void; onError?: (e: unknown) => void };
@@ -247,6 +318,7 @@ export function startSync(me: string, h: SyncHandlers) {
     .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, soon)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'matches' }, soon)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'attendances' }, soon)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'community_members' }, soon)
     .subscribe((status, err) => {
       if (status !== 'SUBSCRIBED' && status !== 'CLOSED') h.onError?.(err ?? new Error(`realtime ${status}`));
     });

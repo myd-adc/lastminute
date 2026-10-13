@@ -3,15 +3,11 @@ import type { ReactNode } from 'react';
 import { Linking, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import { Text } from '@/components/ui/Text';
-import { getScene } from '@/data/mock';
 import { t as tr, useT } from '@/i18n';
-import { eventsCount, people } from '@/lib/time';
-import { useNow } from '@/store/AppStore';
 import { display, onest, useTheme } from '@/theme';
 
 import { HeroBlobs } from './HeroBlobs';
 import { accentInk, LanguagePill, Logo, TextLink } from './kit';
-import { sceneWeekEvents } from './SceneForm';
 
 // Figma: 👋 and ⏳ are emoji, the middle tile is a lock icon in the accent ink.
 const FEATURES = [
@@ -24,12 +20,10 @@ const FEATURES = [
 export const partnerMail = () => `mailto:partners@lastminute.software?subject=${encodeURIComponent(tr('onboarding.wide.partnerSubject'))}`;
 
 // W01 wide web: hero half (840 of 1440) with the three glows on the left, the 600 pt auth panel (login / code) on the right.
-// Logo at 48, hero block at y 200 and the scene line at the bottom; the 130 : 146 flexible gaps keep that rhythm.
+// Logo at 48, hero block at y 200; the 130 : 146 flexible gaps keep that rhythm.
 export function AuthSplit({ children, languagePill }: { children: ReactNode; languagePill?: boolean }) {
   const { c, scheme } = useTheme();
   const { t } = useT();
-  const now = useNow();
-  const ucu = getScene('ucu');
   const { width } = useWindowDimensions();
   const heroSize = Math.round(Math.min(64, Math.max(44, width * 0.0444)));
   return (
@@ -53,9 +47,6 @@ export function AuthSplit({ children, languagePill }: { children: ReactNode; lan
           ))}
         </View>
         <View style={[styles.flexGap, { flexGrow: 146 }]} />
-        <Text style={[onest('medium', 14, 18), { color: c.muted }]}>
-          {t('onboarding.wide.sceneNow', { scene: ucu.name, events: eventsCount(sceneWeekEvents('ucu', now)), people: people(ucu.people) })}
-        </Text>
       </View>
 
       <View style={[styles.panel, { backgroundColor: c.surface }]}>

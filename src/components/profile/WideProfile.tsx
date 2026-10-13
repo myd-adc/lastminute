@@ -5,7 +5,9 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { Avatar, Gradient } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
-import { getInterest, getScene, goesWithOptions, vibes } from '@/data/mock';
+import { getInterest, goesWithOptions, vibes } from '@/data/mock';
+import { communityMeta } from '@/components/community/text';
+import { myCommunities, verifiedCommunity } from '@/lib/selectors';
 import { LANGS, useT, type Lang } from '@/i18n';
 import { useStore } from '@/store/AppStore';
 import { display, onest, useTheme } from '@/theme';
@@ -49,7 +51,7 @@ export function WideProfile() {
         <View style={[styles.col, styles.colLeft]}>
           <BigProfileCard />
           <StatsCard />
-          <MyScenes />
+          <MyCommunities />
           <WideAccount />
         </View>
         <View style={[styles.col, styles.colRight]}>
@@ -109,6 +111,7 @@ function BigProfileCard() {
     goes && `${goes.emoji} ${goes.label}`,
   ].filter((tag): tag is string => !!tag);
   const meta = [me.affiliation, state.email].filter(Boolean).join(' · ');
+  const verified = verifiedCommunity(state);
   return (
     <View style={[styles.card, { backgroundColor: c.surface }]}>
       <View style={styles.head}>
@@ -118,7 +121,7 @@ function BigProfileCard() {
             <Text style={[display(22, 28), { color: c.text, flexShrink: 1 }]} numberOfLines={1}>
               {me.name}
             </Text>
-            {state.studentEmail && <VerifiedPill label={getScene('ucu').name} />}
+            {verified && <VerifiedPill label={verified.name} />}
           </View>
           {!!meta && <Text style={[onest('regular', 14, 18), { color: c.muted }]}>{meta}</Text>}
         </View>
@@ -149,39 +152,39 @@ function BigProfileCard() {
   );
 }
 
-function MyScenes() {
+function MyCommunities() {
   const { c, scheme } = useTheme();
   const { t } = useT();
   const { state } = useStore();
-  const scene = state.sceneId ? getScene(state.sceneId) : null;
+  const mine = myCommunities(state);
   return (
-    <Section label={t('profile.wide.myScenes')}>
+    <Section label={t('profile.wide.myCommunities')}>
       <Group>
-        {scene && (
-          <View style={[styles.sceneRow, { borderBottomWidth: 1, borderBottomColor: c.line }]}>
-            <Gradient id={scene.gradient} style={styles.sceneDot} />
+        {mine.map((cm) => (
+          <Pressable
+            key={cm.id}
+            accessibilityRole="button"
+            onPress={() => router.push({ pathname: '/community/[id]', params: { id: cm.id } })}
+            style={({ pressed }) => [styles.sceneRow, { borderBottomWidth: 1, borderBottomColor: c.line }, pressed && { backgroundColor: c.surface2 }]}
+          >
+            <Gradient id={cm.gradient} style={styles.sceneDot} />
             <View style={{ flex: 1, gap: 2 }}>
-              <Text style={[onest('semibold', 15, 19), { color: c.text }]}>{scene.name}</Text>
-              <Text style={[onest('regular', 12, 15), { color: c.muted }]}>
-                {scene.requiresStudentEmail && state.studentEmail ? t('profile.wide.studentVerified') : scene.description}
-              </Text>
+              <Text style={[onest('semibold', 15, 19), { color: c.text }]}>{cm.name}</Text>
+              <Text style={[onest('regular', 12, 15), { color: c.muted }]}>{communityMeta(cm, true)}</Text>
             </View>
-            <View style={[styles.primary, { backgroundColor: c.accent }]}>
-              <Text style={[onest('bold', 12, 15), { color: c.onAccent }]}>{t('profile.wide.primary')}</Text>
-            </View>
-          </View>
-        )}
+          </Pressable>
+        ))}
         <Pressable
           accessibilityRole="button"
-          onPress={() => router.push('/preferences')}
+          onPress={() => router.push('/communities')}
           style={({ pressed }) => [styles.sceneRow, pressed && { backgroundColor: c.surface2 }]}
         >
           <View style={[styles.sceneDot, styles.addDot, { borderColor: accentText(c, scheme) }]}>
             <Plus size={16} color={accentText(c, scheme)} strokeWidth={2.5} />
           </View>
           <View style={{ flex: 1, gap: 2 }}>
-            <Text style={[onest('semibold', 15, 19), { color: accentText(c, scheme) }]}>{t('profile.wide.changeScene')}</Text>
-            <Text style={[onest('regular', 12, 15), { color: c.muted }]}>{t('profile.wide.changeSceneSub')}</Text>
+            <Text style={[onest('semibold', 15, 19), { color: accentText(c, scheme) }]}>{t('profile.wide.findCommunity')}</Text>
+            <Text style={[onest('regular', 12, 15), { color: c.muted }]}>{t('profile.wide.findCommunitySub')}</Text>
           </View>
         </Pressable>
       </Group>

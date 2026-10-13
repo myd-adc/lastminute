@@ -1,18 +1,17 @@
 // Domain model. Mirrors the planned backend entities:
-// user, scene, event, attendance, interest (room decision), match, message, photo, report.
+// user, community, event, attendance, interest (room decision), match, message, photo, report.
 import type { GradientId } from '@/theme/palette';
 
-export type SceneId = 'ucu' | 'kulbaba' | 'guest';
-
-export type Scene = {
-  id: SceneId;
-  name: string; // «УКУ», «Бар «Кульбаба»», «Гість Львова»
-  kind: 'campus' | 'venue' | 'guest';
-  emoji?: string;
+// Anyone can start one; open to everyone or only to people with a confirmed e-mail on `emailDomain`.
+export type Community = {
+  id: string;
+  name: string; // «УКУ», «Настолки Львів»
+  description: string;
   gradient: GradientId;
-  people: number;
-  description: string; // subtitle on the scene picker
-  requiresStudentEmail: boolean;
+  emailDomain: string | null; // «ucu.edu.ua»; null = open
+  members: number;
+  eventsThisWeek: number;
+  mine: boolean; // the user created it: adds events, edits settings
 };
 
 export type InterestId =
@@ -34,7 +33,7 @@ export type GoesWith = 'solo' | 'pair' | 'company';
 
 export type Event = {
   id: string;
-  sceneId: SceneId;
+  communityId: string | null; // null = city-wide event added by us
   title: string; // «Open mic: стендап для своїх»
   poster: { lines: string[]; emoji: string; gradient: GradientId }; // big poster word(s) on the feed card
   startsAt: string; // ISO
@@ -50,6 +49,7 @@ export type Event = {
   partner: boolean; // «Майданчик-партнер LastMinute»
   goingCount: number; // total «Я йду», including people who are not listed
   soloCount: number; // how many of them go without company
+  metCount?: number; // live backend: people the user matched with before who are going (count only)
 };
 
 export type User = {
@@ -57,7 +57,6 @@ export type User = {
   name: string;
   age?: number; // not collected by the live backend yet
   gender?: 'f' | 'm';
-  sceneId: SceneId;
   affiliation: string; // «Соціологія, 3 курс»
   talkAbout: string; // «Говори зі мною про…»
   tags: InterestId[];

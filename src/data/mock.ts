@@ -5,7 +5,7 @@ import { isLive } from '@/api/client';
 import type { Lang } from '@/i18n/core';
 import { at } from '@/lib/time';
 
-import type { Attendance, Event, Interest, Message, Photo, Scene, SceneId, User } from './types';
+import type { Attendance, Community, Event, Interest, Message, Photo, User } from './types';
 
 const BASE = Date.now();
 
@@ -40,39 +40,37 @@ const rawGoesWith = [
   { id: 'company', label: l('Компанією', 'With friends'), emoji: '🎉' },
 ] as const;
 
-const rawScenes: Localized<Scene, 'name' | 'description'>[] = [
+const rawCommunities: Localized<Community, 'name' | 'description'>[] = [
   {
     id: 'ucu',
     name: l('УКУ', 'UCU'),
-    kind: 'campus',
+    description: l('Студенти й викладачі Українського католицького університету. Події в кампусі й поруч.', 'Students and staff of the Ukrainian Catholic University. Events on and around campus.'),
     gradient: 'ocean',
-    people: 142,
-    description: l('Студентська пошта підтверджена', 'Student email verified'),
-    requiresStudentEmail: true,
+    emailDomain: 'ucu.edu.ua',
+    members: 142,
+    eventsThisWeek: 6,
+    mine: false,
   },
   {
     id: 'kulbaba',
-    name: l('Бар «Кульбаба»', 'Kulbaba bar'),
-    kind: 'venue',
+    name: l('Бар «Кульбаба»', 'Kulbaba Bar'),
+    description: l('Майданчик із постійною публікою: стендап, квізи, концерти.', 'A venue with regulars: stand-up, quizzes, gigs.'),
     gradient: 'candy',
-    people: 38,
-    description: l('Майданчик · постійна публіка', 'Venue · regular crowd'),
-    requiresStudentEmail: false,
+    emailDomain: null,
+    members: 38,
+    eventsThisWeek: 2,
+    mine: false,
   },
   {
-    id: 'guest',
-    name: l('Гість Львова', 'Visiting Lviv'),
-    kind: 'guest',
-    emoji: '🧳',
+    id: 'boardgames',
+    name: l('Настолки Львів', 'Board games Lviv'),
+    description: l('Щотижневі ігри, новачкам раді. Команди збираємо з тих, хто прийшов сам.', 'Weekly games, newcomers welcome. Teams are put together from people who came alone.'),
     gradient: 'lime',
-    people: 61,
-    description: l(
-      'Гостьовий режим · події, відкриті для всіх, хто в місті кілька днів',
-      'Guest mode · events open to anyone in town for a few days',
-    ),
-    requiresStudentEmail: false,
-  },
-];
+    emailDomain: null,
+    members: 54,
+    eventsThisWeek: 3,
+    mine: false,
+  },];
 
 type RawEvent = Localized<Omit<Event, 'startsAt' | 'endsAt' | 'walk' | 'priceNote'>, 'title' | 'venue' | 'address' | 'description'> & {
   walk?: L;
@@ -85,7 +83,7 @@ type RawEvent = Localized<Omit<Event, 'startsAt' | 'endsAt' | 'walk' | 'priceNot
 const rawEvents: RawEvent[] = [
   {
     id: 'open-mic',
-    sceneId: 'ucu',
+    communityId: 'ucu',
     title: l('Open mic: стендап для своїх', 'Open mic: stand-up among friends'),
     poster: { lines: ['OPEN', 'MIC'], emoji: '🎤', gradient: 'sunset' },
     day: 0,
@@ -108,7 +106,7 @@ const rawEvents: RawEvent[] = [
   },
   {
     id: 'arch-walk',
-    sceneId: 'ucu',
+    communityId: 'ucu',
     title: l('Як читати архітектуру Львова', 'How to read Lviv’s architecture'),
     poster: { lines: ['АРХІ', 'ТЕКТУРА'], emoji: '🏛️', gradient: 'violet' },
     day: 1,
@@ -129,7 +127,7 @@ const rawEvents: RawEvent[] = [
   },
   {
     id: 'salsa',
-    sceneId: 'ucu',
+    communityId: null,
     title: l('Сальса для новачків', 'Salsa for beginners'),
     poster: { lines: ['SALSA'], emoji: '💃', gradient: 'candy' },
     day: 2,
@@ -150,7 +148,7 @@ const rawEvents: RawEvent[] = [
   },
   {
     id: 'jazz',
-    sceneId: 'ucu',
+    communityId: 'kulbaba',
     title: l('Jazz jam session', 'Jazz jam session'),
     poster: { lines: ['JAZZ', 'JAM'], emoji: '🎷', gradient: 'ocean' },
     day: 3,
@@ -170,7 +168,7 @@ const rawEvents: RawEvent[] = [
   },
   {
     id: 'indie-jam',
-    sceneId: 'ucu',
+    communityId: 'ucu',
     title: l('Інді-джем у підвалі', 'Basement indie jam'),
     poster: { lines: ['INDIE', 'JAM'], emoji: '🎸', gradient: 'aurora' },
     day: 4,
@@ -187,7 +185,7 @@ const rawEvents: RawEvent[] = [
   },
   {
     id: 'carcassonne',
-    sceneId: 'ucu',
+    communityId: 'boardgames',
     title: l('Настолки: «Каркасон» турнір', 'Board games: Carcassonne tournament'),
     poster: { lines: ['КАРКА', 'СОН'], emoji: '🎲', gradient: 'lime' },
     day: 5,
@@ -207,7 +205,7 @@ const rawEvents: RawEvent[] = [
   },
   {
     id: 'rooftop-cinema',
-    sceneId: 'ucu',
+    communityId: 'ucu',
     title: l('Кіно на даху', 'Rooftop cinema'),
     poster: { lines: ['КІНО', 'НА ДАХУ'], emoji: '🎬', gradient: 'dusk' },
     day: 6,
@@ -226,10 +224,10 @@ const rawEvents: RawEvent[] = [
     soloCount: 8,
   },
 
-  // Other scenes — shown only under «Усе місто».
+  // Other communities and a city-wide event.
   {
     id: 'kulbaba-quiz',
-    sceneId: 'kulbaba',
+    communityId: 'kulbaba',
     title: l('Квіз про 2000-ні', 'Quiz: the 2000s'),
     poster: { lines: ['QUIZ', '2000'], emoji: '🧠', gradient: 'ember' },
     day: 1,
@@ -249,7 +247,7 @@ const rawEvents: RawEvent[] = [
   },
   {
     id: 'guest-roofs',
-    sceneId: 'guest',
+    communityId: null,
     title: l('Львів дахами: вечірня прогулянка', 'Lviv rooftops: an evening walk'),
     poster: { lines: ['ДАХИ', 'ЛЬВОВА'], emoji: '🌇', gradient: 'sunset' },
     day: 2,
@@ -271,7 +269,7 @@ const rawEvents: RawEvent[] = [
   // Past events the demo user already attended (seeded into their history on onboarding).
   {
     id: 'past-indie',
-    sceneId: 'ucu',
+    communityId: 'ucu',
     title: l('Інді-джем', 'Indie jam'),
     poster: { lines: ['INDIE'], emoji: '🎸', gradient: 'aurora' },
     day: -1,
@@ -288,7 +286,7 @@ const rawEvents: RawEvent[] = [
   },
   {
     id: 'past-film',
-    sceneId: 'ucu',
+    communityId: 'ucu',
     title: l('Кіноклуб: «Тіні забутих предків»', 'Film club: Shadows of Forgotten Ancestors'),
     poster: { lines: ['КІНО', 'КЛУБ'], emoji: '🎞️', gradient: 'dusk' },
     day: -3,
@@ -308,15 +306,15 @@ const rawEvents: RawEvent[] = [
 const DEMO_PAST_EVENT_IDS = ['past-indie', 'past-film'];
 
 const rawUsers: Localized<User, 'name' | 'affiliation' | 'talkAbout'>[] = [
-  { id: 'darynka', name: l('Даринка', 'Darynka'), age: 20, gender: 'f', sceneId: 'ucu', affiliation: l('Соціологія, 3 курс', 'Sociology, 3rd year'), talkAbout: l('чому всі фільми A24 однакові, але я все одно дивлюсь кожен', 'why all A24 films are the same and I still watch every one'), tags: ['indie', 'standup', 'boardgames'], gradient: 'aurora', sharedEvents: 2 },
-  { id: 'ostap', name: l('Остап', 'Ostap'), age: 21, gender: 'm', sceneId: 'ucu', affiliation: l('Історія, 4 курс', 'History, 4th year'), talkAbout: l('де у Львові ще грають живу музику по буднях', 'where else in Lviv there’s live music on weekdays'), tags: ['concerts', 'standup'], gradient: 'candy', sharedEvents: 0 },
-  { id: 'yulia', name: l('Юля', 'Yulia'), age: 19, gender: 'f', sceneId: 'ucu', affiliation: l('Журналістика, 2 курс', 'Journalism, 2nd year'), talkAbout: l('подкасти, які ніхто не слухає, крім мене', 'podcasts nobody listens to except me'), tags: ['books', 'cinema', 'indie'], gradient: 'lime', sharedEvents: 1 },
-  { id: 'marko', name: l('Марко', 'Marko'), age: 22, gender: 'm', sceneId: 'ucu', affiliation: l('Компʼютерні науки, 4 курс', 'Computer science, 4th year'), talkAbout: l('чому настолки кращі за відеоігри', 'why board games beat video games'), tags: ['boardgames', 'indie'], gradient: 'violet', sharedEvents: 1 },
-  { id: 'katya', name: l('Катя', 'Katya'), age: 20, gender: 'f', sceneId: 'ucu', affiliation: l('Психологія, 3 курс', 'Psychology, 3rd year'), talkAbout: l('сни, які я записую вже три роки', 'the dreams I’ve been writing down for three years'), tags: ['lectures', 'books'], gradient: 'ember', sharedEvents: 0 },
-  { id: 'andriy', name: l('Андрій', 'Andriy'), age: 23, gender: 'm', sceneId: 'ucu', affiliation: l('Магістратура, право', 'Master’s, law'), talkAbout: l('стендап-комікі, яких ти ще не знаєш', 'stand-up comedians you don’t know yet'), tags: ['standup', 'parties'], gradient: 'ocean', sharedEvents: 0 },
-  { id: 'sofia', name: l('Софія', 'Sofia'), age: 19, gender: 'f', sceneId: 'ucu', affiliation: l('Філологія, 1 курс', 'Philology, 1st year'), talkAbout: l('вірші, які соромно читати вголос', 'poems too embarrassing to read out loud'), tags: ['books', 'standup'], gradient: 'sunset', sharedEvents: 0 },
-  { id: 'nazar', name: l('Назар', 'Nazar'), age: 21, gender: 'm', sceneId: 'ucu', affiliation: l('Архітектура, 3 курс', 'Architecture, 3rd year'), talkAbout: l('найгірші будівлі Львова (у мене є список)', 'the ugliest buildings in Lviv (I have a list)'), tags: ['exhibitions', 'lectures'], gradient: 'dusk', sharedEvents: 0 },
-  { id: 'iryna', name: l('Ірина', 'Iryna'), age: 20, gender: 'f', sceneId: 'ucu', affiliation: l('Економіка, 2 курс', 'Economics, 2nd year'), talkAbout: l('як я вчу італійську через опери', 'how I learn Italian through opera'), tags: ['concerts', 'dance'], gradient: 'candy', sharedEvents: 0 },
+  { id: 'darynka', name: l('Даринка', 'Darynka'), age: 20, gender: 'f', affiliation: l('Соціологія, 3 курс', 'Sociology, 3rd year'), talkAbout: l('чому всі фільми A24 однакові, але я все одно дивлюсь кожен', 'why all A24 films are the same and I still watch every one'), tags: ['indie', 'standup', 'boardgames'], gradient: 'aurora', sharedEvents: 2 },
+  { id: 'ostap', name: l('Остап', 'Ostap'), age: 21, gender: 'm', affiliation: l('Історія, 4 курс', 'History, 4th year'), talkAbout: l('де у Львові ще грають живу музику по буднях', 'where else in Lviv there’s live music on weekdays'), tags: ['concerts', 'standup'], gradient: 'candy', sharedEvents: 0 },
+  { id: 'yulia', name: l('Юля', 'Yulia'), age: 19, gender: 'f', affiliation: l('Журналістика, 2 курс', 'Journalism, 2nd year'), talkAbout: l('подкасти, які ніхто не слухає, крім мене', 'podcasts nobody listens to except me'), tags: ['books', 'cinema', 'indie'], gradient: 'lime', sharedEvents: 1 },
+  { id: 'marko', name: l('Марко', 'Marko'), age: 22, gender: 'm', affiliation: l('Компʼютерні науки, 4 курс', 'Computer science, 4th year'), talkAbout: l('чому настолки кращі за відеоігри', 'why board games beat video games'), tags: ['boardgames', 'indie'], gradient: 'violet', sharedEvents: 1 },
+  { id: 'katya', name: l('Катя', 'Katya'), age: 20, gender: 'f', affiliation: l('Психологія, 3 курс', 'Psychology, 3rd year'), talkAbout: l('сни, які я записую вже три роки', 'the dreams I’ve been writing down for three years'), tags: ['lectures', 'books'], gradient: 'ember', sharedEvents: 0 },
+  { id: 'andriy', name: l('Андрій', 'Andriy'), age: 23, gender: 'm', affiliation: l('Магістратура, право', 'Master’s, law'), talkAbout: l('стендап-комікі, яких ти ще не знаєш', 'stand-up comedians you don’t know yet'), tags: ['standup', 'parties'], gradient: 'ocean', sharedEvents: 0 },
+  { id: 'sofia', name: l('Софія', 'Sofia'), age: 19, gender: 'f', affiliation: l('Філологія, 1 курс', 'Philology, 1st year'), talkAbout: l('вірші, які соромно читати вголос', 'poems too embarrassing to read out loud'), tags: ['books', 'standup'], gradient: 'sunset', sharedEvents: 0 },
+  { id: 'nazar', name: l('Назар', 'Nazar'), age: 21, gender: 'm', affiliation: l('Архітектура, 3 курс', 'Architecture, 3rd year'), talkAbout: l('найгірші будівлі Львова (у мене є список)', 'the ugliest buildings in Lviv (I have a list)'), tags: ['exhibitions', 'lectures'], gradient: 'dusk', sharedEvents: 0 },
+  { id: 'iryna', name: l('Ірина', 'Iryna'), age: 20, gender: 'f', affiliation: l('Економіка, 2 курс', 'Economics, 2nd year'), talkAbout: l('як я вчу італійську через опери', 'how I learn Italian through opera'), tags: ['concerts', 'dance'], gradient: 'candy', sharedEvents: 0 },
 ];
 
 type RawAttendance = Omit<Attendance, 'replies'> & { replies?: L[] };
@@ -436,7 +434,7 @@ const msgIn = (m: RawMessage, lang: Lang): Message => ({ ...m, text: pickL(m.tex
 
 // Server data (live backend), already shaped like the domain types; text the server stores per language stays as { uk, en }.
 export type RemoteData = {
-  scenes: Localized<Scene, 'name' | 'description'>[];
+  communities: Community[];
   events: Localized<Event, 'title' | 'description'>[];
   users: User[];
   attendances: Attendance[];
@@ -449,10 +447,9 @@ export const isRemoteLoaded = () => remoteLoaded;
 
 function buildRemote(r: RemoteData, lang: Lang) {
   const base = buildDemo(lang);
-  const sceneList = r.scenes.length ? r.scenes : rawScenes;
   return {
     ...base,
-    scenes: sceneList.map((s) => ({ ...s, name: pickL(s.name, lang), description: pickL(s.description, lang) })) as Scene[],
+    communities: r.communities,
     events: r.events.map((e) => ({ ...e, title: pickL(e.title, lang), description: pickL(e.description, lang) })),
     users: r.users,
     attendances: r.attendances,
@@ -472,7 +469,7 @@ function buildDemo(lang: Lang) {
     interests: rawInterests.map((i) => ({ ...i, label: pickL(i.label, lang) })) as Interest[],
     vibes: rawVibes.map((v) => ({ ...v, label: pickL(v.label, lang) })),
     goesWithOptions: rawGoesWith.map((g) => ({ ...g, label: pickL(g.label, lang) })),
-    scenes: rawScenes.map((s) => ({ ...s, name: pickL(s.name, lang), description: pickL(s.description, lang) })) as Scene[],
+    communities: rawCommunities.map((c) => ({ ...c, name: pickL(c.name, lang), description: pickL(c.description, lang) })) as Community[],
     events: rawEvents.map(({ day, start, hours, ...e }) => {
       const startsAt = at(BASE, day, start[0], start[1]);
       return {
@@ -507,7 +504,7 @@ let dataLang: Lang | null = null;
 export let interests: Interest[] = [];
 export let vibes: ReturnType<typeof build>['vibes'] = [];
 export let goesWithOptions: ReturnType<typeof build>['goesWithOptions'] = [];
-export let scenes: Scene[] = [];
+export let communities: Community[] = [];
 export let events: Event[] = [];
 export let users: User[] = [];
 export let attendances: Attendance[] = [];
@@ -520,8 +517,28 @@ export function setDataLanguage(lang: Lang) {
   if (dataLang === lang) return;
   dataLang = lang;
   const d = (cache[lang] ??= build(lang));
-  ({ interests, vibes, goesWithOptions, scenes, events, users, attendances, soloGroups, pastChats, albumPhotos } = d);
+  ({ interests, vibes, goesWithOptions, users, attendances, soloGroups, pastChats, albumPhotos } = d);
   PAST_EVENT_IDS = d.pastEventIds;
+  baseCommunities = d.communities;
+  baseEvents = d.events;
+  merge();
+}
+
+// Demo mode: communities and events the user created live in the store; they are appended to the built lists.
+let baseCommunities: Community[] = [];
+let baseEvents: Event[] = [];
+let localCommunities: Community[] = [];
+let localEvents: Event[] = [];
+function merge() {
+  const local = new Set(localCommunities.map((c) => c.id));
+  communities = [...baseCommunities.filter((c) => !local.has(c.id)), ...localCommunities];
+  events = [...baseEvents, ...localEvents];
+}
+export function setLocalData(nextCommunities: Community[], nextEvents: Event[]) {
+  if (nextCommunities === localCommunities && nextEvents === localEvents) return;
+  localCommunities = nextCommunities;
+  localEvents = nextEvents;
+  merge();
 }
 
 // Swaps the demo data for server data (null = back to demo) and rebuilds the live bindings.
@@ -535,17 +552,10 @@ export function setRemoteData(data: RemoteData | null, loaded = true) {
 }
 
 // The live app never shows the demo people or events, not even before the first sync.
-if (isLive) remote = { scenes: [], events: [], users: [], attendances: [] };
+if (isLive) remote = { communities: [], events: [], users: [], attendances: [] };
 setDataLanguage('uk');
 
-// Falls back to the built-in scene list while the server one has not loaded yet (sign-in screens).
-export const getScene = (id: SceneId): Scene => {
-  const found = scenes.find((s) => s.id === id);
-  if (found) return found;
-  const raw = rawScenes.find((s) => s.id === id)!;
-  const lang = dataLang ?? 'uk';
-  return { ...raw, name: pickL(raw.name, lang), description: pickL(raw.description, lang) };
-};
+export const getCommunity = (id: string | null | undefined) => (id ? communities.find((c) => c.id === id) : undefined);
 export const getEvent = (id: string) => events.find((e) => e.id === id);
 export const getUser = (id: string) => users.find((u) => u.id === id);
 export const getInterest = (id: string) => interests.find((i) => i.id === id);

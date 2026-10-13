@@ -33,7 +33,7 @@ type Props = FeedHandlers & {
   saved: boolean;
   goingN: number;
   soloN: number;
-  scene: string;
+  metN: number; // people the user met before among those going (count only)
   preview: PeoplePreview;
 };
 
@@ -70,8 +70,12 @@ export const FeedPage = memo(function FeedPage(p: Props) {
             <Pressable onPress={open} style={s.who}>
               <AvatarStack people={p.preview.people} size={36} extra={extra} />
               <View style={styles.whoText}>
-                <Text style={[onest('bold', 15, 19), s.text]}>{t('feed.card.goingFrom', { count: p.goingN, scene: p.scene })}</Text>
-                {p.soloN > 0 && <Text style={[onest('medium', 13, 17), s.accent]}>{t('feed.card.soloHint', { count: p.soloN })}</Text>}
+                <Text style={[onest('bold', 15, 19), s.text]}>{t('feed.card.going', { count: p.goingN })}</Text>
+                {p.metN > 0 ? (
+                  <Text style={[onest('medium', 13, 17), s.accent]}>{t('feed.card.met', { count: p.metN })}</Text>
+                ) : (
+                  p.soloN > 0 && <Text style={[onest('medium', 13, 17), s.accent]}>{t('feed.card.soloHint', { count: p.soloN })}</Text>
+                )}
               </View>
             </Pressable>
           </View>

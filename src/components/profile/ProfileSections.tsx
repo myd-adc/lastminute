@@ -4,10 +4,9 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Avatar, Chip, Toggle } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
-import { getScene } from '@/data/mock';
 import { useT } from '@/i18n';
 import { useIsWide } from '@/lib/layout';
-import { pendingSurveys, profileStats } from '@/lib/selectors';
+import { myCommunities, pendingSurveys, profileStats, verifiedCommunity } from '@/lib/selectors';
 import { useNow, useStore } from '@/store/AppStore';
 import { display, onest, type, useTheme, type ThemeMode } from '@/theme';
 
@@ -38,15 +37,14 @@ export function VerifiedPill({ label }: { label: string }) {
   );
 }
 
-const campusName = () => getScene('ucu').name;
-
 // M16 profile card: 14 pt padding, 60 pt avatar, name Onest Bold 17, «Змінити» SemiBold 13 in accent.
 export function ProfileCard() {
   const { c, scheme } = useTheme();
-  const { t } = useT();
+  const { t, lang } = useT();
   const { state } = useStore();
   const me = state.me;
   if (!me) return null;
+  const verified = verifiedCommunity(state);
   return (
     <View style={[styles.profile, { backgroundColor: c.surface }]}>
       <Avatar name={me.name} gradient={me.gradient} photoUri={me.photoUri} size={60} />
@@ -55,10 +53,10 @@ export function ProfileCard() {
           <Text style={[onest('bold', 17, 22), { color: c.text, flexShrink: 1 }]} numberOfLines={1}>
             {me.name}
           </Text>
-          {state.studentEmail && <VerifiedPill label={campusName()} />}
+          {verified && <VerifiedPill label={verified.name} />}
         </View>
         {!!me.affiliation && <Text style={[onest('regular', 13, 17), { color: c.muted }]}>{me.affiliation}</Text>}
-        {!!me.talkAbout && <Text style={[onest('medium', 13, 17), { color: c.text }]}>«{me.talkAbout}»</Text>}
+        {!!me.talkAbout && <Text style={[onest('medium', 13, 17), { color: c.text }]}>{lang === 'uk' ? `«${me.talkAbout}»` : `“${me.talkAbout}”`}</Text>}
       </View>
       <Pressable accessibilityRole="button" hitSlop={10} onPress={() => router.push('/edit-profile')}>
         <Text style={[onest('semibold', 13), { color: accentText(c, scheme) }]}>{t('profile.edit')}</Text>
@@ -80,6 +78,11 @@ export function StatsCard() {
     { key: 'newPeople', n: s.newPeople, label: t('profile.stats.newPeople', { count: s.newPeople }), accent: true },
     { key: 'contacts', n: s.contacts, label: t('profile.stats.contacts', { count: s.contacts }) },
   ];
+  // W09 adds a fourth column; the 350 pt phone strip keeps three.
+  if (wide) {
+    const n = myCommunities(state).length;
+    cols.push({ key: 'communities', n, label: t('profile.stats.communities', { count: n }) });
+  }
   return (
     <View style={[styles.stats, wide && styles.statsWide, { borderColor: c.line }]}>
       {cols.map((col) => (
@@ -156,12 +159,11 @@ export function ConfirmRow({ question, confirmLabel, onConfirm, onCancel }: { qu
 
 export function AccountSection({ confirming, setConfirming }: { confirming: boolean; setConfirming: (v: boolean) => void }) {
   const { t } = useT();
-  const { state, dispatch } = useStore();
-  const scene = state.sceneId ? getScene(state.sceneId) : null;
+  const { dispatch } = useStore();
   return (
     <Section label={t('profile.account.label')}>
       <Group>
-        <Row label={t('profile.account.preferences')} value={scene?.name} chevron onPress={() => router.push('/preferences')} />
+        <Row label={t('profile.account.preferences')} chevron onPress={() => router.push('/preferences')} />
         {confirming ? (
           <ConfirmRow
             question={t('profile.account.logoutQuestion')}
@@ -229,7 +231,7 @@ export function NotificationsSection({ dense }: { dense?: boolean }) {
       <Group dense={dense}>
         {row('soloOnMyEvent', t('profile.notifications.soloOnMyEvent'))}
         {row('albumOpened', t('profile.notifications.albumOpened'))}
-        {row('newSceneEvents', t('profile.notifications.newSceneEvents'), t('profile.notifications.newSceneEventsSub'), true)}
+        {row('newCommunityEvents', t('profile.notifications.newCommunityEvents'), t('profile.notifications.newCommunityEventsSub'), true)}
       </Group>
     </Section>
   );

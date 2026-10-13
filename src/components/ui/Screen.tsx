@@ -16,12 +16,13 @@ type Props = {
   withTabBar?: boolean; // reserve space under content for the floating glass tab bar (phone only)
   keyboard?: boolean; // wrap in KeyboardAvoidingView (forms, chat composers)
   footer?: ReactNode; // pinned bottom area (CTA buttons), stays above the home indicator
+  backdrop?: ReactNode; // drawn under the content, e.g. a frame's glow
   contentStyle?: StyleProp<ViewStyle>;
   padded?: boolean;
 };
 
 // Base screen: theme background, safe-area top, 20 pt side padding (Figma frames use x=20).
-export function Screen({ children, scroll = true, withTabBar, keyboard, footer, contentStyle, padded = true }: Props) {
+export function Screen({ children, scroll = true, withTabBar, keyboard, footer, backdrop, contentStyle, padded = true }: Props) {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const wide = useIsWide();
@@ -43,6 +44,7 @@ export function Screen({ children, scroll = true, withTabBar, keyboard, footer, 
 
   const content = (
     <View style={[styles.flex, { backgroundColor: c.bg }]}>
+      {backdrop}
       {body}
       {footer && <View style={[pad, { paddingTop: 12, paddingBottom: wide ? 32 : footerBottom(insets.bottom), gap: 12 }]}>{footer}</View>}
     </View>
@@ -56,7 +58,7 @@ export function Screen({ children, scroll = true, withTabBar, keyboard, footer, 
   );
 }
 
-export function goBack(fallback: '/' | '/chats' | '/me' | '/scene' = '/') {
+export function goBack(fallback: '/' | '/chats' | '/me' | '/communities' = '/') {
   if (router.canGoBack()) router.back();
   else router.replace(fallback);
 }

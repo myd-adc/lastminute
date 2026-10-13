@@ -5,7 +5,7 @@ import { Linking, Pressable, ScrollView, StyleSheet, useWindowDimensions, View }
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { InfoRow, PeopleStack } from '@/components/feed/DetailsParts';
-import { categoryLabel, mapsUrl, priceLabel, sceneName, shortTitle } from '@/components/feed/format';
+import { categoryLabel, mapsUrl, priceLabel, shortTitle } from '@/components/feed/format';
 import { PosterArt } from '@/components/feed/PosterArt';
 import { shareEvent } from '@/components/feed/share';
 import { useToast } from '@/components/feed/Toast';
@@ -122,7 +122,7 @@ function Body({ event, d, wide }: { event: Event; d: ReturnType<typeof useDetail
       <InfoRow
         icon={wide ? User : Users}
         iconColor={wide ? c.text : c.accentInk}
-        title={t('feed.details.goingFrom', { count: d.goingN, scene: sceneName(event) })}
+        title={t('feed.details.going', { count: d.goingN })}
         sub={peopleSub}
         onPress={d.going ? d.openRoom : undefined}
         right={<PeopleStack people={d.preview} extra={extra} revealed={!!d.going} />}

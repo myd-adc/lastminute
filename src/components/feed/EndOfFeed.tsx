@@ -5,9 +5,9 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View, type StyleP
 import { isLive } from '@/api/client';
 import { Button, Gradient } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
-import { getScene, isRemoteLoaded } from '@/data/mock';
+import { isRemoteLoaded } from '@/data/mock';
 import { useT } from '@/i18n';
-import { goingCount, matchesAt, myUpcoming, sceneEvents } from '@/lib/selectors';
+import { goingCount, matchesAt, myCommunities, myUpcoming } from '@/lib/selectors';
 import { going as goingLabel, whenLabel } from '@/lib/time';
 import { useNow, useStore } from '@/store/AppStore';
 import { display, fonts, onest, type, useTheme } from '@/theme';
@@ -25,11 +25,10 @@ export function EndOfFeed({ header, contentStyle }: Props) {
   const { state, dispatch } = useStore();
   const { t } = useT();
   const now = useNow();
-  const sceneName = state.sceneId ? getScene(state.sceneId).name : null;
   const mine = myUpcoming(state, now);
-  const notify = state.settings.notify.newSceneEvents;
+  const notify = state.settings.notify.newCommunityEvents;
   const skipped = Object.keys(state.skipped).length;
-  const seen = sceneEvents(state, now).length;
+  const inCommunities = myCommunities(state).length > 0;
   const light = scheme === 'light';
 
   // Live backend before the first snapshot: the feed is loading, not finished.
@@ -42,15 +41,19 @@ export function EndOfFeed({ header, contentStyle }: Props) {
     );
   }
 
+  const tab = state.feedTab;
   const copy =
-    state.feedTab === 'saved'
+    tab === 'saved'
       ? { title: t('feed.end.savedTitle'), sub: t('feed.end.savedSub') }
-      : state.feedTab === 'city'
-        ? { title: t('feed.end.cityTitle'), sub: t('feed.end.citySub') }
-        : {
-            title: sceneName ? t('feed.end.sceneTitle', { scene: sceneName }) : t('feed.end.sceneTitleNoScene'),
-            sub: t('feed.end.sceneSub', { count: seen }),
-          };
+      : tab === 'met'
+        ? { title: t('feed.end.metTitle'), sub: t('feed.end.metSub') }
+        : tab === 'communities'
+          ? inCommunities
+            ? { title: t('feed.end.communitiesTitle'), sub: t('feed.end.communitiesSub') }
+            : { title: t('feed.end.communitiesEmptyTitle'), sub: t('feed.end.communitiesEmptySub') }
+          : { title: t('feed.end.forYouTitle'), sub: t('feed.end.forYouSub') };
+  // «Для тебе» and an empty «Спільноти» lead to communities; the other tabs lead back to «Для тебе».
+  const findCommunities = tab === 'forYou' || (tab === 'communities' && !inCommunities);
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: c.bg }} contentContainerStyle={[styles.content, contentStyle]}>
@@ -70,15 +73,15 @@ export function EndOfFeed({ header, contentStyle }: Props) {
       </View>
 
       <View style={styles.buttons}>
-        {state.feedTab === 'city' ? (
-          <Button label={t('feed.end.backToScene')} onPress={() => dispatch({ type: 'setFeedTab', tab: 'scene' })} />
+        {findCommunities ? (
+          <Button label={t('feed.end.findCommunities')} onPress={() => router.navigate('/communities')} />
         ) : (
-          <Button label={t('feed.end.browseCity')} onPress={() => dispatch({ type: 'setFeedTab', tab: 'city' })} />
+          <Button label={t('feed.end.backToForYou')} onPress={() => dispatch({ type: 'setFeedTab', tab: 'forYou' })} />
         )}
         <Button
           variant="secondary"
           label={notify ? t('feed.end.notifyOn') : t('feed.end.notifyOff')}
-          onPress={() => dispatch({ type: 'setNotify', key: 'newSceneEvents', value: !notify })}
+          onPress={() => dispatch({ type: 'setNotify', key: 'newCommunityEvents', value: !notify })}
         />
         {notify && (
           <Text style={[type.footnote, styles.center, { color: c.muted }]}>
@@ -96,9 +99,6 @@ export function EndOfFeed({ header, contentStyle }: Props) {
         <View style={styles.mine}>
           <View style={styles.mineHead}>
             <Text style={[onest('semibold', 15, 19), styles.flex, { color: c.text }]}>{t('feed.end.youreGoing')}</Text>
-            <Pressable accessibilityRole="link" onPress={() => router.navigate('/scene')} hitSlop={8}>
-              <Text style={[onest('semibold', 13, 17), { color: c.accentInk }]}>{t('common.all')}</Text>
-            </Pressable>
           </View>
           {mine.slice(0, 3).map((e) => {
             const matches = matchesAt(state, e.id).length;

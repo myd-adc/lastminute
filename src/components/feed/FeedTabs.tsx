@@ -9,22 +9,23 @@ import { onest, useTheme } from '@/theme';
 type Props = {
   value: FeedTab;
   onChange: (tab: FeedTab) => void;
-  sceneLabel: string; // «My scene · UCU»
   onPoster?: boolean; // M06: inactive tab = text colour at 60 % over the poster; M10/W03: muted
-  wide?: boolean; // W03: 17 pt, 24 pt gaps, 32 pt underline, «Saved» always shown
+  wide?: boolean; // W03: 17 pt, 24 pt gaps, 32 pt underline
   onFilters?: () => void;
 };
 
-// M06/M10/W03 header tabs: «My scene · UCU» / «Whole city» (/ «Saved»), accent underline under the active one.
+// M06/M10/W03 header tabs, TikTok order: «Спільноти» · «Знайомі» · «Для тебе» (+ «Збережені» while it is picked
+// in the filter sheet), accent underline under the active one.
 // Phone row is 32 pt high (Figma y = 58…90, i.e. 8 pt under the status bar).
-export function FeedTabs({ value, onChange, sceneLabel, onPoster, wide, onFilters }: Props) {
+export function FeedTabs({ value, onChange, onPoster, wide, onFilters }: Props) {
   const { c } = useTheme();
   const { t } = useT();
   const size = wide ? 17 : 16;
   const items: { key: FeedTab; label: string }[] = [
-    { key: 'scene', label: sceneLabel },
-    { key: 'city', label: t('feed.tabs.city') },
-    ...(wide || value === 'saved' ? [{ key: 'saved' as const, label: t('feed.tabs.saved') }] : []),
+    { key: 'communities', label: t('feed.tabs.communities') },
+    { key: 'met', label: t('feed.tabs.met') },
+    { key: 'forYou', label: t('feed.tabs.forYou') },
+    ...(value === 'saved' ? [{ key: 'saved' as const, label: t('feed.tabs.saved') }] : []),
   ];
   return (
     <View style={[styles.row, !wide && styles.phoneRow]}>

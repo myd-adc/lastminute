@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { EditLayout } from '@/components/onboarding/EditLayout';
 import { cleanProfile, emptyProfile, isProfileValid, ProfileForm } from '@/components/onboarding/ProfileForm';
 import { goBack } from '@/components/ui';
-import { getScene } from '@/data/mock';
 import { useT } from '@/i18n';
 import { useStore } from '@/store/AppStore';
 
@@ -29,7 +28,6 @@ export default function EditProfileScreen() {
         ...draft,
         interests: state.interests,
         solo: state.goesWith === 'solo',
-        sceneName: state.sceneId ? getScene(state.sceneId).name : undefined,
       }}
     >
       <ProfileForm value={draft} onChange={setDraft} />

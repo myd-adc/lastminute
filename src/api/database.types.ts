@@ -75,6 +75,67 @@ export type Database = {
         };
         Relationships: [];
       };
+      communities: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          description: string;
+          email_domain: string | null;
+          gradient: string;
+          id: string;
+          name: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          description?: string;
+          email_domain?: string | null;
+          gradient?: string;
+          id?: string;
+          name: string;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string | null;
+          description?: string;
+          email_domain?: string | null;
+          gradient?: string;
+          id?: string;
+          name?: string;
+        };
+        Relationships: [];
+      };
+      community_members: {
+        Row: {
+          community_id: string;
+          joined_at: string;
+          user_id: string;
+          verified_email: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          community_id: string;
+          joined_at?: string;
+          user_id: string;
+          verified_email?: string | null;
+        };
+        Update: {
+          community_id?: string;
+          joined_at?: string;
+          user_id?: string;
+          verified_email?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "community_members_community_id_fkey";
+            columns: ["community_id"];
+            isOneToOne: false;
+            referencedRelation: "communities";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       decisions: {
         Row: {
           choice: Database["public"]["Enums"]["decision"];
@@ -113,7 +174,9 @@ export type Database = {
           address: string;
           age_limit: number | null;
           category: string;
+          community_id: string | null;
           created_at: string;
+          created_by: string | null;
           description_en: string;
           description_uk: string;
           ends_at: string;
@@ -122,7 +185,6 @@ export type Database = {
           poster: NonNullable<Json>;
           price: number | null;
           price_note: string | null;
-          scene_id: string;
           starts_at: string;
           ticket_url: string | null;
           title_en: string;
@@ -135,7 +197,9 @@ export type Database = {
           address?: string;
           age_limit?: number | null;
           category: string;
+          community_id?: string | null;
           created_at?: string;
+          created_by?: string | null;
           description_en?: string;
           description_uk?: string;
           ends_at: string;
@@ -144,7 +208,6 @@ export type Database = {
           poster?: NonNullable<Json>;
           price?: number | null;
           price_note?: string | null;
-          scene_id: string;
           starts_at: string;
           ticket_url?: string | null;
           title_en: string;
@@ -156,7 +219,9 @@ export type Database = {
           address?: string;
           age_limit?: number | null;
           category?: string;
+          community_id?: string | null;
           created_at?: string;
+          created_by?: string | null;
           description_en?: string;
           description_uk?: string;
           ends_at?: string;
@@ -165,7 +230,6 @@ export type Database = {
           poster?: NonNullable<Json>;
           price?: number | null;
           price_note?: string | null;
-          scene_id?: string;
           starts_at?: string;
           ticket_url?: string | null;
           title_en?: string;
@@ -175,10 +239,10 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: "events_scene_id_fkey";
-            columns: ["scene_id"];
+            foreignKeyName: "events_community_id_fkey";
+            columns: ["community_id"];
             isOneToOne: false;
-            referencedRelation: "scenes";
+            referencedRelation: "communities";
             referencedColumns: ["id"];
           },
         ];
@@ -264,7 +328,6 @@ export type Database = {
           language: string;
           name: string;
           photo_path: string | null;
-          scene_id: string | null;
           show_shared: boolean;
           show_solo: boolean;
           talk_about: string;
@@ -283,7 +346,6 @@ export type Database = {
           language?: string;
           name: string;
           photo_path?: string | null;
-          scene_id?: string | null;
           show_shared?: boolean;
           show_solo?: boolean;
           talk_about?: string;
@@ -301,22 +363,13 @@ export type Database = {
           language?: string;
           name?: string;
           photo_path?: string | null;
-          scene_id?: string | null;
           show_shared?: boolean;
           show_solo?: boolean;
           talk_about?: string;
           updated_at?: string;
           vibe?: string | null;
         };
-        Relationships: [
-          {
-            foreignKeyName: "profiles_scene_id_fkey";
-            columns: ["scene_id"];
-            isOneToOne: false;
-            referencedRelation: "scenes";
-            referencedColumns: ["id"];
-          },
-        ];
+        Relationships: [];
       };
       reports: {
         Row: {
@@ -357,83 +410,21 @@ export type Database = {
           },
         ];
       };
-      scene_members: {
-        Row: {
-          created_at: string;
-          scene_id: string;
-          user_id: string;
-          verified_at: string | null;
-          verified_email: string | null;
-        };
-        ComputedFields: never;
-        Insert: {
-          created_at?: string;
-          scene_id: string;
-          user_id: string;
-          verified_at?: string | null;
-          verified_email?: string | null;
-        };
-        Update: {
-          created_at?: string;
-          scene_id?: string;
-          user_id?: string;
-          verified_at?: string | null;
-          verified_email?: string | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "scene_members_scene_id_fkey";
-            columns: ["scene_id"];
-            isOneToOne: false;
-            referencedRelation: "scenes";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      scenes: {
-        Row: {
-          created_at: string;
-          description_en: string;
-          description_uk: string;
-          email_domain: string | null;
-          gradient: string;
-          id: string;
-          kind: Database["public"]["Enums"]["scene_kind"];
-          name_en: string;
-          name_uk: string;
-        };
-        ComputedFields: never;
-        Insert: {
-          created_at?: string;
-          description_en?: string;
-          description_uk?: string;
-          email_domain?: string | null;
-          gradient?: string;
-          id: string;
-          kind: Database["public"]["Enums"]["scene_kind"];
-          name_en: string;
-          name_uk: string;
-        };
-        Update: {
-          created_at?: string;
-          description_en?: string;
-          description_uk?: string;
-          email_domain?: string | null;
-          gradient?: string;
-          id?: string;
-          kind?: Database["public"]["Enums"]["scene_kind"];
-          name_en?: string;
-          name_uk?: string;
-        };
-        Relationships: [];
-      };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
-      can_enter_scene: { Args: { p_scene: string; p_user?: string }; Returns: boolean };
+      can_enter_community: { Args: { p_community: string; p_user?: string }; Returns: boolean };
       chat_open: { Args: { p_match: string }; Returns: boolean };
+      community_stats: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          community_id: string;
+          events_this_week: number;
+          members: number;
+        }[];
+      };
       event_stats: {
         Args: { p_event: string };
         Returns: {
@@ -450,14 +441,16 @@ export type Database = {
         }[];
       };
       is_blocked: { Args: { p_a: string; p_b: string }; Returns: boolean };
+      is_community_member: { Args: { p_community: string; p_user?: string }; Returns: boolean };
+      is_community_owner: { Args: { p_community: string; p_user?: string }; Returns: boolean };
       is_going: { Args: { p_event: string; p_user?: string }; Returns: boolean };
       is_match_member: { Args: { p_match: string; p_user?: string }; Returns: boolean };
-      join_scene: { Args: { p_scene: string }; Returns: undefined };
-      scene_stats: {
+      join_community: { Args: { p_community: string }; Returns: undefined };
+      met_events: {
         Args: Record<PropertyKey, never>;
         Returns: {
-          members: number;
-          scene_id: string;
+          event_id: string;
+          met: number;
         }[];
       };
       shares_event: { Args: { p_other: string; p_user?: string }; Returns: boolean };
@@ -466,7 +459,6 @@ export type Database = {
       decision: "go" | "skip";
       going_with: "solo" | "friends";
       report_reason: "messages" | "dating" | "fake" | "unsafe" | "other";
-      scene_kind: "campus" | "venue" | "guest";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -588,7 +580,6 @@ export const Constants = {
       decision: ["go", "skip"],
       going_with: ["solo", "friends"],
       report_reason: ["messages", "dating", "fake", "unsafe", "other"],
-      scene_kind: ["campus", "venue", "guest"],
     },
   },
 } as const;

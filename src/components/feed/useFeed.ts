@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 
-import { attendeesOf, events, getScene, getUser } from '@/data/mock';
+import { attendeesOf, events, getUser } from '@/data/mock';
 import type { Event } from '@/data/types';
 import { t } from '@/i18n/translate';
 import { feedEvents } from '@/lib/selectors';
@@ -15,7 +15,6 @@ export function useFeed(showToast: (msg: string) => void) {
   const { state, dispatch } = useStore();
   const now = useNow();
   const feed = useMemo(() => feedEvents(state, now), [state, now]);
-  const scene = state.sceneId ? getScene(state.sceneId) : null;
 
   // Avatar previews depend only on mock data (rebuilt per language) + blocked users, so identities survive clock ticks.
   const blocked = state.blocked;
@@ -63,5 +62,5 @@ export function useFeed(showToast: (msg: string) => void) {
 
   const setTab = useCallback((tab: FeedTab) => dispatch({ type: 'setFeedTab', tab }), [dispatch]);
 
-  return { state, dispatch, now, feed, scene, previews, handlers, setTab };
+  return { state, dispatch, now, feed, previews, handlers, setTab };
 }

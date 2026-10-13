@@ -12,7 +12,7 @@ import { getEvent } from '@/data/mock';
 import type { Event, Survey, User } from '@/data/types';
 import { useT } from '@/i18n';
 import { useIsWide, footerBottom } from '@/lib/layout';
-import { attendeesFor, expiresAt, matchesAt, nextOnScene } from '@/lib/selectors';
+import { attendeesFor, expiresAt, matchesAt, nextForYou } from '@/lib/selectors';
 import { dayLabel, going, time, weekdayShort } from '@/lib/time';
 import { pairKey, useNow, useStore } from '@/store/AppStore';
 import { display, gradients, onest, type, useTheme } from '@/theme';
@@ -28,7 +28,7 @@ const normalizeHandle = (v: string) => {
   return t.startsWith('@') || t.includes('/') || t.startsWith('+') ? t : `@${t}`;
 };
 
-// M15 «Як пройшло?» — after-event survey, mutual contact exchange and the next event on the scene. W08 on wide web.
+// M15 «Як пройшло?» — after-event survey, mutual contact exchange and the next event for you. W08 on wide web.
 export default function AfterScreen() {
   const { c } = useTheme();
   const { t } = useT();
@@ -54,7 +54,7 @@ export default function AfterScreen() {
   }
 
   const matches = matchesAt(state, event.id);
-  const next = nextOnScene(state, now, event.id)[0];
+  const next = nextForYou(state, now, event.id)[0];
 
   const done = () => {
     dispatch({ type: 'saveSurvey', eventId: event.id, survey: { talked, cameWith } });
@@ -248,7 +248,7 @@ function NextEvent({ event, matches, wide }: { event: Event; matches: User[]; wi
       <Gradient id={event.poster.gradient} style={styles.thumb} />
       <View style={{ flex: 1, gap: 2 }}>
         <Text style={[onest('semibold', wide ? 15 : 14, wide ? 19 : 18), { color: c.text }]} numberOfLines={1}>
-          {t('profile.after.nextOnScene', { title: event.title })}
+          {t('profile.after.nextForYou', { title: event.title })}
         </Text>
         <Text style={[onest('regular', wide ? 13 : 12, wide ? 17 : 15), { color: c.muted }]} numberOfLines={1}>
           {meta}
