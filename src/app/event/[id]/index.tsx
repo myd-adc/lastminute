@@ -15,7 +15,7 @@ import { getEvent, soloGroups } from '@/data/mock';
 import type { Event } from '@/data/types';
 import { useT } from '@/i18n';
 import { t as translate } from '@/i18n/translate';
-import { useIsWide } from '@/lib/layout';
+import { fullWindow, useIsWide } from '@/lib/layout';
 import { acquaintances, attendeesFor, goingCount, soloCount, soloGroupMembers } from '@/lib/selectors';
 import { dayLabel, whenLabel } from '@/lib/time';
 import { useNow, useStore, type Going } from '@/store/AppStore';
@@ -186,7 +186,7 @@ function WideDetails({ event }: { event: Event }) {
   const groupLabel = t('feed.details.joinGroup', { title: shortTitle(event) });
 
   return (
-    <View style={[StyleSheet.absoluteFill, styles.centre]}>
+    <View style={[fullWindow, styles.centre]}>
       <Pressable accessibilityLabel={t('common.close')} style={[StyleSheet.absoluteFill, { backgroundColor: DIM_DIALOG }]} onPress={() => goBack('/')} />
       <View style={[styles.dialog, { width: w, height: h, backgroundColor: c.surface, borderColor: c.line }]}>
         <View style={{ width: posterW, height: h }}>

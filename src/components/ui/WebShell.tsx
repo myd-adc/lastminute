@@ -16,7 +16,7 @@ export const SIDEBAR_WIDTH = 248;
 export function activeTabFor(pathname: string): TabKey {
   if (pathname.startsWith('/communit')) return 'communities';
   if (pathname.startsWith('/chats') || pathname.startsWith('/chat') || pathname.startsWith('/match')) return 'chats';
-  if (pathname.startsWith('/me') || pathname.startsWith('/settings') || pathname.startsWith('/blocked') || pathname.startsWith('/edit-profile') || pathname.startsWith('/preferences')) return 'me';
+  if (pathname.startsWith('/me') || pathname.startsWith('/settings') || pathname.startsWith('/language') || pathname.startsWith('/blocked') || pathname.startsWith('/edit-profile') || pathname.startsWith('/preferences')) return 'me';
   return 'events';
 }
 

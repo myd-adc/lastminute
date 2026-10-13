@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useIsWide } from '@/lib/layout';
+import { fullWindow, useIsWide } from '@/lib/layout';
 import { t } from '@/i18n/translate';
 import { useTheme } from '@/theme';
 
@@ -20,7 +20,7 @@ export function Sheet({ children, footer, onClose = () => goBack(), maxHeight = 
   const insets = useSafeAreaInsets();
   const wide = useIsWide();
   return (
-    <View style={[StyleSheet.absoluteFill, wide && styles.centre]}>
+    <View style={[wide ? fullWindow : StyleSheet.absoluteFill, wide && styles.centre]}>
       <Pressable accessibilityLabel={t('common.close')} style={[StyleSheet.absoluteFill, { backgroundColor: c.scrim }]} onPress={onClose} />
       <View
         style={[

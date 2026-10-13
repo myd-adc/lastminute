@@ -1,4 +1,4 @@
-import { Platform, useWindowDimensions } from 'react-native';
+import { Platform, StyleSheet, useWindowDimensions, type ViewStyle } from 'react-native';
 
 export const WIDE_BREAKPOINT = 1024;
 
@@ -15,3 +15,8 @@ export const tabBarBottom = (bottomInset: number) => Math.max(bottomInset, 34);
 export const tabBarClearance = (bottomInset: number) => TAB_BAR_HEIGHT + tabBarBottom(bottomInset) + 16;
 // Pinned bottom CTAs sit 38 pt above the screen bottom in the frames (34 pt home indicator + 4).
 export const footerBottom = (bottomInset: number) => Math.max(bottomInset, 34) + 4;
+
+// Wide-web overlays (W04 dialog, sheets): routes render inside the WebShell's main column, so absoluteFill would
+// leave the sidebar uncovered. Fixed positioning pins the dim and the dialog to the whole window, as in the frames.
+export const fullWindow: ViewStyle =
+  Platform.OS === 'web' ? ({ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 100 } as unknown as ViewStyle) : StyleSheet.absoluteFill;
