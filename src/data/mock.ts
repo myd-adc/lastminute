@@ -70,7 +70,57 @@ const rawCommunities: Localized<Community, 'name' | 'description'>[] = [
     members: 54,
     eventsThisWeek: 3,
     mine: false,
-  },];
+  },  {
+    id: 'lnu',
+    name: l('ЛНУ ім. Франка', 'Ivan Franko University'),
+    description: l('Студенти й викладачі Львівського університету. Події на факультетах і поруч.', 'Students and staff of Lviv University. Events at the faculties and nearby.'),
+    gradient: 'violet',
+    emailDomain: 'lnu.edu.ua',
+    members: 210,
+    eventsThisWeek: 0,
+    mine: false,
+  },
+  {
+    id: 'lpnu',
+    name: l('Львівська політехніка', 'Lviv Polytechnic'),
+    description: l('Студенти й викладачі Політехніки. Події в корпусах і довкола.', 'Students and staff of the Polytechnic. Events in its buildings and around.'),
+    gradient: 'ember',
+    emailDomain: 'lpnu.ua',
+    members: 187,
+    eventsThisWeek: 0,
+    mine: false,
+  },
+  {
+    id: 'lnmu',
+    name: l('Медуніверситет', 'Medical University'),
+    description: l('Студенти й викладачі Львівського медичного університету імені Данила Галицького.', 'Students and staff of the Danylo Halytsky Lviv National Medical University.'),
+    gradient: 'aurora',
+    emailDomain: 'meduniv.lviv.ua',
+    members: 64,
+    eventsThisWeek: 0,
+    mine: false,
+  },
+  {
+    id: 'nltu',
+    name: l('Лісотехнічний', 'Forestry University'),
+    description: l('Студенти й викладачі Національного лісотехнічного університету України.', 'Students and staff of the Ukrainian National Forestry University.'),
+    gradient: 'lime',
+    emailDomain: 'nltu.edu.ua',
+    members: 31,
+    eventsThisWeek: 0,
+    mine: false,
+  },
+  {
+    id: 'lnam',
+    name: l('Академія мистецтв', 'Academy of Arts'),
+    description: l('Студенти й викладачі Львівської національної академії мистецтв.', 'Students and staff of the Lviv National Academy of Arts.'),
+    gradient: 'sunset',
+    emailDomain: 'lnam.edu.ua',
+    members: 45,
+    eventsThisWeek: 0,
+    mine: false,
+  },
+];
 
 type RawEvent = Localized<Omit<Event, 'startsAt' | 'endsAt' | 'walk' | 'priceNote'>, 'title' | 'venue' | 'address' | 'description'> & {
   walk?: L;
