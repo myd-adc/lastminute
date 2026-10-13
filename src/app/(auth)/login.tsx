@@ -6,7 +6,7 @@ import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import { AuthSplit } from '@/components/onboarding/AuthSplit';
 import { AuthScreen } from '@/components/onboarding/AuthScreen';
 import { Field, FieldLabel, LanguagePill, Logo, useAccentInk } from '@/components/onboarding/kit';
-import { onlyDigits, PHONE_DIGITS, PhoneInput, toE164 } from '@/components/onboarding/PhoneInput';
+import { EmailInput, isEmail, normalizeEmail } from '@/components/onboarding/EmailInput';
 import { QrPlaceholder } from '@/components/onboarding/QrPlaceholder';
 import { Button } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
@@ -20,39 +20,39 @@ import { display, onest, type, useTheme } from '@/theme';
 const APP_STORE = 'https://apps.apple.com/';
 const GOOGLE_PLAY = 'https://play.google.com/store';
 
-// M01 / W01 «Вхід» (sign in): phone number → SMS code, language pill top right.
+// M01 / W01 «Вхід» (sign in): e-mail → code from the letter, language pill top right.
 export default function LoginScreen() {
   const { state, dispatch } = useStore();
   const wide = useIsWide();
-  const [digits, setDigits] = useState(() => onlyDigits(state.phone ?? '').replace(/^380/, ''));
+  const [email, setEmail] = useState(() => state.email ?? '');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { t } = useT();
-  const valid = digits.length === PHONE_DIGITS && !busy;
+  const valid = isEmail(email) && !busy;
 
   const submit = async () => {
     if (!valid) return;
-    const phone = toE164(digits);
+    const address = normalizeEmail(email);
     if (isLive) {
       setBusy(true);
       setError(null);
-      const res = await requestCode(phone);
+      const res = await requestCode(address);
       setBusy(false);
       if (!res.ok) return setError(t('onboarding.errors.send'));
     }
-    dispatch({ type: 'setPhone', phone });
+    dispatch({ type: 'setEmail', email: address });
     router.push('/code');
   };
 
-  if (wide) return <WideLogin digits={digits} setDigits={setDigits} valid={valid} submit={submit} error={error} />;
-  return <MobileLogin digits={digits} setDigits={setDigits} valid={valid} submit={submit} error={error} />;
+  if (wide) return <WideLogin email={email} setEmail={setEmail} valid={valid} submit={submit} error={error} />;
+  return <MobileLogin email={email} setEmail={setEmail} valid={valid} submit={submit} error={error} />;
 }
 
-type FormProps = { digits: string; setDigits: (d: string) => void; valid: boolean; submit: () => void; error: string | null };
+type FormProps = { email: string; setEmail: (v: string) => void; valid: boolean; submit: () => void; error: string | null };
 
 // M01: logo row 14 pt below the safe area, hero at y 268 (≈ 172 pt of free space above it), the form right under the
 // tagline and ≈ 120 pt free below the trust line. The two flexible gaps keep that 172 : 83 split on any screen height.
-function MobileLogin({ digits, setDigits, valid, submit, error }: FormProps) {
+function MobileLogin({ email, setEmail, valid, submit, error }: FormProps) {
   const { c } = useTheme();
   const { t } = useT();
   return (
@@ -65,8 +65,8 @@ function MobileLogin({ digits, setDigits, valid, submit, error }: FormProps) {
       <Text style={[styles.hero, { color: c.text }]}>{t('onboarding.hero')}</Text>
       <Text style={[onest('regular', 16, 22), { color: c.muted, marginTop: 39 }]}>{t('onboarding.tagline')}</Text>
       <View style={styles.form}>
-        <FieldLabel label={t('onboarding.login.phoneLabel')} />
-        <PhoneInput digits={digits} onChange={setDigits} onSubmit={submit} />
+        <FieldLabel label={t('onboarding.login.emailLabel')} />
+        <EmailInput value={email} onChange={setEmail} onSubmit={submit} />
         <Button label={t('onboarding.login.getCode')} disabled={!valid} onPress={submit} />
         {error && <Text style={[type.footnote, { color: c.danger }]}>{error}</Text>}
         <TrustLine text={t('onboarding.login.trust')} />
@@ -77,7 +77,7 @@ function MobileLogin({ digits, setDigits, valid, submit, error }: FormProps) {
 }
 
 // W01 auth panel: «Вхід» form, «або», QR block, trust line (16 pt rhythm).
-function WideLogin({ digits, setDigits, valid, submit, error }: FormProps) {
+function WideLogin({ email, setEmail, valid, submit, error }: FormProps) {
   const { c } = useTheme();
   const { t } = useT();
   return (
@@ -85,8 +85,8 @@ function WideLogin({ digits, setDigits, valid, submit, error }: FormProps) {
       <View style={{ gap: 16 }}>
         <Text style={[display(32, 40), { color: c.text }]}>{t('onboarding.login.title')}</Text>
         <Text style={[onest('regular', 15, 22), { color: c.muted }]}>{t('onboarding.login.wideSubtitle')}</Text>
-        <Field label={t('onboarding.login.phoneLabel')}>
-          <PhoneInput digits={digits} onChange={setDigits} onSubmit={submit} autoFocus size="md" />
+        <Field label={t('onboarding.login.emailLabel')}>
+          <EmailInput value={email} onChange={setEmail} onSubmit={submit} autoFocus size="md" />
         </Field>
         <Button label={t('onboarding.login.getCode')} disabled={!valid} onPress={submit} />
         {error && <Text style={[type.footnote, { color: c.danger }]}>{error}</Text>}

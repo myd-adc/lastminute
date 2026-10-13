@@ -5,7 +5,7 @@ import { deviceLang, type Lang } from '@/i18n/core';
 import type { ThemeMode } from '@/theme';
 import type { GradientId } from '@/theme/palette';
 
-export const STATE_VERSION = 5;
+export const STATE_VERSION = 6;
 
 export type Me = {
   name: string;
@@ -28,9 +28,9 @@ export type Report = { userId: string; eventId?: string; reason: ReportReason; a
 export type State = {
   version: number;
   language: Lang;
-  // M01–M02: phone + SMS code (demo: any 6 digits).
-  phone: string | null;
-  phoneVerified: boolean;
+  // M01–M02: e-mail + code from the letter (demo: any 6 digits).
+  email: string | null;
+  emailVerified: boolean;
   // M03
   me: Me | null;
   // M04
@@ -75,8 +75,8 @@ export const groupChatId = (eventId: string) => `group:${eventId}`;
 export const initialState: State = {
   version: STATE_VERSION,
   language: deviceLang(),
-  phone: null,
-  phoneVerified: false,
+  email: null,
+  emailVerified: false,
   me: null,
   interests: [],
   vibe: null,
@@ -109,8 +109,8 @@ export const initialState: State = {
 };
 
 export type Action =
-  | { type: 'setPhone'; phone: string }
-  | { type: 'verifyPhone' }
+  | { type: 'setEmail'; email: string }
+  | { type: 'verifyEmail' }
   | { type: 'setMe'; me: Me }
   | { type: 'setPreferences'; interests: InterestId[]; vibe: Vibe | null; goesWith: GoesWith | null }
   | { type: 'setScene'; sceneId: SceneId; studentEmail?: string | null }
@@ -167,10 +167,10 @@ const omit = <T extends Record<string, unknown>>(obj: T, key: string): T => {
 
 export function reducer(state: State, action: Action): State {
   switch (action.type) {
-    case 'setPhone':
-      return { ...state, phone: action.phone, phoneVerified: false };
-    case 'verifyPhone':
-      return { ...state, phoneVerified: true };
+    case 'setEmail':
+      return { ...state, email: action.email, emailVerified: false };
+    case 'verifyEmail':
+      return { ...state, emailVerified: true };
     case 'setMe':
       return { ...state, me: action.me };
     case 'setPreferences':
@@ -188,7 +188,7 @@ export function reducer(state: State, action: Action): State {
     }
     case 'restoreAccount': {
       const { type: _, ...account } = action;
-      return { ...state, ...account, phoneVerified: true, onboarded: true };
+      return { ...state, ...account, emailVerified: true, onboarded: true };
     }
     case 'setLanguage':
       return { ...state, language: action.language };

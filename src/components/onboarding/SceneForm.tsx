@@ -26,6 +26,10 @@ export const sceneWeekEvents = (sceneId: SceneId, now: number) =>
 
 export type SceneDraft = { sceneId: SceneId | null; studentEmail: string | null };
 
+// Signing in with the campus address already confirms it, so the campus scene needs no extra step.
+export const knownStudentEmail = (studentEmail: string | null, loginEmail: string | null) =>
+  studentEmail ?? (loginEmail && isStudentEmail(loginEmail) ? loginEmail : null);
+
 export const sceneValid = (d: SceneDraft) => {
   const scene = scenes.find((s) => s.id === d.sceneId);
   return !!scene && (!scene.requiresStudentEmail || !!d.studentEmail);

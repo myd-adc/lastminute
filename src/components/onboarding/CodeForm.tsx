@@ -1,6 +1,6 @@
 import { Clock } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
-import { Platform, StyleSheet, TextInput, View } from 'react-native';
+import { StyleSheet, TextInput, View } from 'react-native';
 
 import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
@@ -13,24 +13,25 @@ const RESEND_SECONDS = 60;
 
 const mmss = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
-// M02 body: six code boxes driven by one hidden number-pad input, resend countdown, «Змінити номер», call-me hint.
+// M02 body: six code boxes driven by one hidden number-pad input, resend countdown, «Змінити пошту», spam hint.
 export function CodeForm({
   code,
   onChange,
   onSubmit,
-  onChangeNumber,
+  onResend,
+  onChangeEmail,
 }: {
   code: string;
   onChange: (code: string) => void;
   onSubmit: () => void;
-  onChangeNumber: () => void;
+  onResend: () => void;
+  onChangeEmail: () => void;
 }) {
   const { c } = useTheme();
   const { t } = useT();
   const input = useRef<TextInput>(null);
   const [focused, setFocused] = useState(true);
   const [left, setLeft] = useState(RESEND_SECONDS);
-  const [calling, setCalling] = useState(false);
 
   useEffect(() => {
     if (left <= 0) return;
@@ -40,6 +41,7 @@ export function CodeForm({
 
   const resend = () => {
     onChange('');
+    onResend();
     setLeft(RESEND_SECONDS);
     input.current?.focus();
   };
@@ -65,7 +67,7 @@ export function CodeForm({
             );
           })}
         </View>
-        {/* Transparent input over the boxes: taps focus it, the system keyboard (or SMS autofill) types into it. */}
+        {/* Transparent input over the boxes: taps focus it, the system keyboard (or one-time-code autofill) types into it. */}
         <TextInput
           ref={input}
           value={code}
@@ -75,7 +77,7 @@ export function CodeForm({
           onSubmitEditing={onSubmit}
           keyboardType="number-pad"
           textContentType="oneTimeCode"
-          autoComplete={Platform.OS === 'android' ? 'sms-otp' : 'one-time-code'}
+          autoComplete="one-time-code"
           maxLength={CODE_LENGTH}
           autoFocus
           caretHidden
@@ -93,17 +95,12 @@ export function CodeForm({
         ) : (
           <TextLink label={t('onboarding.code.resend')} onPress={resend} />
         )}
-        <TextLink label={t('onboarding.code.changeNumber')} onPress={onChangeNumber} />
+        <TextLink label={t('onboarding.code.changeEmail')} onPress={onChangeEmail} />
       </View>
 
       <View style={[styles.info, { backgroundColor: c.surface }]}>
         <Text style={styles.emoji}>📮</Text>
-        <View style={{ flex: 1, gap: 8 }}>
-          <Text style={[onest('regular', 13, 18), { color: c.muted }]}>
-            {calling ? t('onboarding.code.calling') : t('onboarding.code.callHint')}
-          </Text>
-          {left <= 0 && !calling && <TextLink label={t('onboarding.code.callMe')} onPress={() => setCalling(true)} />}
-        </View>
+        <Text style={[onest('regular', 13, 18), { color: c.muted, flex: 1 }]}>{t('onboarding.code.spamHint')}</Text>
       </View>
     </View>
   );

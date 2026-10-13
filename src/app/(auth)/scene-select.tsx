@@ -4,7 +4,7 @@ import { View } from 'react-native';
 
 import { OnboardingFrame } from '@/components/onboarding/OnboardingFrame';
 import { emptyProfile } from '@/components/onboarding/ProfileForm';
-import { NotifyCard, SceneForm, sceneValid, type SceneDraft } from '@/components/onboarding/SceneForm';
+import { knownStudentEmail, NotifyCard, SceneForm, sceneValid, type SceneDraft } from '@/components/onboarding/SceneForm';
 import { Text } from '@/components/ui/Text';
 import { scenes } from '@/data/mock';
 import { useT } from '@/i18n';
@@ -18,7 +18,7 @@ export default function SceneSelectScreen() {
   const { state, dispatch } = useStore();
   const { t } = useT();
   const { c } = useTheme();
-  const [draft, setDraft] = useState<SceneDraft>({ sceneId: state.sceneId ?? 'ucu', studentEmail: state.studentEmail });
+  const [draft, setDraft] = useState<SceneDraft>({ sceneId: state.sceneId ?? 'ucu', studentEmail: knownStudentEmail(state.studentEmail, state.email) });
   const [notify, setNotify] = useState(state.settings.notify.soloOnMyEvent);
   const [fallbackMe] = useState(emptyProfile);
   const [saveError, setSaveError] = useState<string | null>(null);

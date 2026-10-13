@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { accentText, maskPhone } from '@/components/profile/names';
+import { accentText } from '@/components/profile/names';
 import {
   AppearanceSection,
   ConfirmRow,
@@ -38,7 +38,7 @@ export default function SettingsScreen() {
 
       <Section label={t('profile.account.label')}>
         <Group dense>
-          <Row label={t('profile.settings.phone')} value={maskPhone(state.phone)} chevron />
+          <Row label={t('profile.settings.email')} value={state.email ?? t('profile.emailNotSet')} />
           <Row
             label={t('profile.settings.studentEmail')}
             sub={t('profile.settings.studentEmailSub')}

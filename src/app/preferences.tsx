@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { EditLayout } from '@/components/onboarding/EditLayout';
 import { MIN_INTERESTS, pickableInterests, PreferencesForm, preferencesValid, type PreferencesDraft } from '@/components/onboarding/PreferencesForm';
-import { SceneForm, sceneValid, type SceneDraft } from '@/components/onboarding/SceneForm';
+import { knownStudentEmail, SceneForm, sceneValid, type SceneDraft } from '@/components/onboarding/SceneForm';
 import { goBack } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { scenes } from '@/data/mock';
@@ -20,7 +20,7 @@ export default function PreferencesScreen() {
     vibe: state.vibe,
     goesWith: state.goesWith,
   }));
-  const [scene, setScene] = useState<SceneDraft>({ sceneId: state.sceneId, studentEmail: state.studentEmail });
+  const [scene, setScene] = useState<SceneDraft>({ sceneId: state.sceneId, studentEmail: knownStudentEmail(state.studentEmail, state.email) });
   const valid = preferencesValid(prefs) && sceneValid(scene);
 
   const save = () => {

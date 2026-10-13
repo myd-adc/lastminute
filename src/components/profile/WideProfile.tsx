@@ -10,7 +10,7 @@ import { LANGS, useT, type Lang } from '@/i18n';
 import { useStore } from '@/store/AppStore';
 import { display, onest, useTheme } from '@/theme';
 
-import { accentText, maskPhone } from './names';
+import { accentText } from './names';
 import {
   AppearanceSection,
   ConfirmRow,
@@ -34,7 +34,7 @@ export function WideProfile() {
         <Text style={[display(30, 38), { color: c.text }]}>{t('common.tabs.profile')}</Text>
         <View style={styles.titleActions}>
           <LangSwitch />
-          {/* Not in W09: compact entry to the full settings (phone, student email, version). */}
+          {/* Not in W09: compact entry to the full settings (email, student email, version). */}
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={t('profile.settingsTitle')}
@@ -108,7 +108,7 @@ function BigProfileCard() {
     vibe && `${vibe.emoji} ${vibe.label}`,
     goes && `${goes.emoji} ${goes.label}`,
   ].filter((tag): tag is string => !!tag);
-  const meta = [me.affiliation, state.phone && maskPhone(state.phone)].filter(Boolean).join(' · ');
+  const meta = [me.affiliation, state.email].filter(Boolean).join(' · ');
   return (
     <View style={[styles.card, { backgroundColor: c.surface }]}>
       <View style={styles.head}>

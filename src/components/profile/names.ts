@@ -44,14 +44,5 @@ export function pronouns(user: Pick<User, 'gender'> | undefined, lang: Lang = ge
 // Accent text has to stay readable on the light background: Figma uses a deep olive there (color/accent-text #4F6B00).
 export const accentText = (c: Palette, scheme: Scheme) => (scheme === 'light' ? '#4F6B00' : c.accent);
 
-// «+380 67 ••• 45 67» from the stored phone digits.
-export function maskPhone(phone: string | null): string {
-  if (!phone) return t('profile.phoneNotSet');
-  const digits = phone.replace(/\D/g, '');
-  const local = digits.startsWith('380') ? digits.slice(3) : digits.replace(/^0/, '');
-  if (local.length < 9) return phone;
-  return `+380 ${local.slice(0, 2)} ••• ${local.slice(5, 7)} ${local.slice(7, 9)}`;
-}
-
 // «Open mic: стендап для своїх» → «Open mic».
 export const shortTitle = (title: string) => title.split(':')[0].trim();

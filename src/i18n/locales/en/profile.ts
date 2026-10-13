@@ -4,7 +4,7 @@ import type { profile as Uk } from '../uk/profile';
 export const profile: Translation<typeof Uk> = {
   settingsTitle: 'Settings',
   edit: 'Edit',
-  phoneNotSet: 'Not set',
+  emailNotSet: 'Not set',
   stats: {
     events: { one: 'event', other: 'events' },
     newPeople: { one: 'new person', other: 'new people' },
@@ -70,7 +70,7 @@ export const profile: Translation<typeof Uk> = {
     languageSwitch: 'Interface language',
   },
   settings: {
-    phone: 'Phone number',
+    email: 'Email',
     studentEmail: 'Student email',
     studentEmailSub: 'Unlocks student scenes',
     add: 'Add',

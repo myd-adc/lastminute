@@ -6,19 +6,18 @@ import { Pressable, View } from 'react-native';
 import { AuthSplit } from '@/components/onboarding/AuthSplit';
 import { CODE_LENGTH, CodeForm } from '@/components/onboarding/CodeForm';
 import { AuthScreen } from '@/components/onboarding/AuthScreen';
-import { formatE164 } from '@/components/onboarding/PhoneInput';
 import { Button } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
 import { useIsWide } from '@/lib/layout';
-import { verifyCode } from '@/api/auth';
+import { requestCode, verifyCode } from '@/api/auth';
 import { isLive } from '@/api/client';
 import { useStore } from '@/store/AppStore';
 import { display, onest, useTheme } from '@/theme';
 
 const back = () => (router.canGoBack() ? router.back() : router.replace('/login'));
 
-// M02 «Введи код з SMS». Demo backend: any 6 digits are accepted.
+// M02 «Введи код з листа». Demo backend: any 6 digits are accepted.
 export default function CodeScreen() {
   const { c } = useTheme();
   const { t } = useT();
@@ -29,15 +28,15 @@ export default function CodeScreen() {
   const [error, setError] = useState<string | null>(null);
   const complete = code.length === CODE_LENGTH && !busy;
 
-  if (!state.phone) return <Redirect href="/login" />;
-  const phone = state.phone;
+  if (!state.email) return <Redirect href="/login" />;
+  const email = state.email;
 
   const submit = async () => {
     if (!complete) return;
     if (isLive) {
       setBusy(true);
       setError(null);
-      const res = await verifyCode(phone, code);
+      const res = await verifyCode(email, code);
       setBusy(false);
       if (!res.ok) return setError(t('onboarding.errors.code'));
       if (res.data) {
@@ -47,23 +46,29 @@ export default function CodeScreen() {
         return;
       }
     }
-    dispatch({ type: 'verifyPhone' });
+    dispatch({ type: 'verifyEmail' });
     router.push('/profile-setup');
   };
 
-  // M02: title Unbounded 28 / 1.15, subtitle 15 / 1.4 with the number in the text colour, 10 pt apart.
+  // A fresh code replaces the previous one; demo mode has nothing to resend.
+  const resend = () => {
+    setError(null);
+    if (isLive) requestCode(email).then((r) => !r.ok && setError(t('onboarding.errors.send')));
+  };
+
+  // M02: title Unbounded 28 / 1.15, subtitle 15 / 1.4 with the address in the text colour, 10 pt apart.
   const heading = (
     <View style={{ gap: 10 }}>
       <Text style={[wide ? display(32, 40) : display(28, 32), { color: c.text }]}>{t('onboarding.code.title')}</Text>
       <Text style={[onest('regular', 15, 21), { color: c.muted }]}>
         {t('onboarding.code.sentTo')}
-        <Text style={{ color: c.text }}>{formatE164(state.phone)}</Text>
+        <Text style={{ color: c.text }}>{email}</Text>
       </Text>
     </View>
   );
   const form = (
     <View style={{ gap: 10 }}>
-      <CodeForm code={code} onChange={setCode} onSubmit={submit} onChangeNumber={back} />
+      <CodeForm code={code} onChange={setCode} onSubmit={submit} onResend={resend} onChangeEmail={back} />
       {error && <Text style={[onest('medium', 13), { color: c.danger }]}>{error}</Text>}
     </View>
   );

@@ -3,7 +3,7 @@
 export const profile = {
   settingsTitle: 'Налаштування',
   edit: 'Змінити',
-  phoneNotSet: 'Не вказано',
+  emailNotSet: 'Не вказано',
   stats: {
     events: { one: 'подія', few: 'події', many: 'подій' },
     newPeople: { one: 'новий знайомий', few: 'нових знайомих', many: 'нових знайомих' },
@@ -69,7 +69,7 @@ export const profile = {
     languageSwitch: 'Мова інтерфейсу',
   },
   settings: {
-    phone: 'Номер телефону',
+    email: 'Пошта',
     studentEmail: 'Студентська пошта',
     studentEmailSub: 'Відкриває студентські сцени',
     add: 'Додати',

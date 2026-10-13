@@ -11,9 +11,9 @@ const fail = (error: { message?: string } | null | undefined, fallback: string):
   error: error?.message ?? fallback,
 });
 
-// Sends the login code. Sandbox: test_otp numbers in supabase/config.toml get a fixed code and no SMS.
-export async function requestCode(phone: string): Promise<AuthResult> {
-  const { error } = await supabase.auth.signInWithOtp({ phone });
+// Mails the 6-digit sign-in code; a new address becomes a new account.
+export async function requestCode(email: string): Promise<AuthResult> {
+  const { error } = await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
   return error ? fail(error, 'otp_failed') : { ok: true, data: undefined };
 }
 
@@ -27,8 +27,8 @@ export type ExistingAccount = {
 };
 
 // Verifies the code and returns the saved profile for returning users (null = new account → onboarding).
-export async function verifyCode(phone: string, token: string): Promise<AuthResult<ExistingAccount | null>> {
-  const { data, error } = await supabase.auth.verifyOtp({ phone, token, type: 'sms' });
+export async function verifyCode(email: string, token: string): Promise<AuthResult<ExistingAccount | null>> {
+  const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'email' });
   if (error || !data.user) return fail(error, 'verify_failed');
   return { ok: true, data: await loadAccount(data.user.id) };
 }
@@ -81,8 +81,8 @@ export async function saveProfile(state: State): Promise<AuthResult> {
   return { ok: true, data: undefined };
 }
 
-// Student e-mail check for campus scenes: Auth mails a code to the new address, the confirmed address is what
-// join_scene trusts on the server.
+// Campus scene for someone who signed in with another address: Auth mails a code to the campus one and, once
+// confirmed, it replaces the sign-in address. join_scene trusts only that confirmed address.
 export async function requestStudentEmailCode(email: string): Promise<AuthResult> {
   const { error } = await supabase.auth.updateUser({ email });
   if (!error) return { ok: true, data: undefined };
