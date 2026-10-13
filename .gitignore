@@ -45,3 +45,6 @@ yarn-error.*
 
 # Design reference screenshots exported from Figma
 design/
+
+# Local brag output
+brag-output/
