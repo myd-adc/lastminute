@@ -1,5 +1,5 @@
-import { createContext, useContext, useMemo, type ReactNode } from 'react';
-import { useColorScheme } from 'react-native';
+import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'react';
+import { Platform, useColorScheme } from 'react-native';
 
 import { dark, light, type Palette } from './palette';
 
@@ -17,6 +17,11 @@ export function ThemeProvider({ mode, children }: { mode: ThemeMode; children: R
   const system = useColorScheme();
   const scheme: Scheme = mode === 'system' ? (system === 'light' ? 'light' : 'dark') : mode;
   const value = useMemo(() => ({ c: scheme === 'light' ? light : dark, scheme }), [scheme]);
+  useEffect(() => {
+    if (Platform.OS !== 'web') return;
+    const link = document.getElementById('favicon');
+    if (link instanceof HTMLLinkElement) link.href = `/favicon-${scheme}.svg`;
+  }, [scheme]);
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
