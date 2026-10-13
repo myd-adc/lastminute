@@ -3,7 +3,7 @@ import { Image, Platform, StyleSheet, Text as RNText, type ImageStyle, type Text
 
 import { emojiAssets } from './emoji/assets';
 
-// Drop-in for react-native's Text: emoji from the bundled Fluent set render as images, so they look the same on
+// Drop-in for react-native's Text: emoji from the bundled Apple set render as images, so they look the same on
 // iOS, Android and web instead of following each platform's emoji font. Anything outside the set stays a glyph.
 const EMOJI = /([\u{1F1E6}-\u{1F1FF}]{2}|[©®←-⯿\u{1F000}-\u{1FAFF}]️?(?:‍[☀-➿\u{1F000}-\u{1FAFF}]️?)*)/u;
 const SPLIT = new RegExp(EMOJI.source, 'gu');

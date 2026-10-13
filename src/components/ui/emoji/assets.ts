@@ -1,4 +1,5 @@
-// Generated from Microsoft Fluent Emoji 3D (MIT, see assets/emoji/LICENSE). Keys are emoji without U+FE0F.
+// 160 px bitmaps from Apple Color Emoji (Apple's artwork, not licensed for Android/web: a stopgap until we pick
+// a set we may redistribute). Keys are emoji without U+FE0F.
 // To add one: drop <codepoints>.png into assets/emoji and list it here. Text-style symbols (↗ ▶ ⏱) stay glyphs.
 export const emojiAssets: Record<string, number> = {
   '⏰': require('../../../../assets/emoji/23f0.png'),
