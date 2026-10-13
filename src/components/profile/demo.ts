@@ -8,14 +8,15 @@ export type DemoMode = 'now' | 'live' | 'after';
 const LIVE_AFTER_START = 30 * 60 * 1000;
 const AFTER_END = HOUR;
 
-// The event the demo clock jumps to: the next one the user is going to (by real time), else «Open mic».
+// The event the demo clock jumps to: the next one the user is going to (by real time), else «Open mic»,
+// else the next upcoming event. Undefined while backend data is empty or has none of these.
 // Uses the real clock, not the demo one, so the target stays the same while the offset is applied.
-export function demoTarget(state: State): Event {
+export function demoTarget(state: State): Event | undefined {
   const real = Date.now();
-  const next = events
-    .filter((e) => state.going[e.id] && !PAST_EVENT_IDS.includes(e.id) && Date.parse(e.endsAt) > real)
-    .sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0];
-  return next ?? getEvent('open-mic')!;
+  const upcoming = events
+    .filter((e) => !PAST_EVENT_IDS.includes(e.id) && Date.parse(e.endsAt) > real)
+    .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
+  return upcoming.find((e) => state.going[e.id]) ?? getEvent('open-mic') ?? upcoming[0];
 }
 
 export function demoOffsetFor(mode: DemoMode, target: Event): number {
@@ -25,8 +26,9 @@ export function demoOffsetFor(mode: DemoMode, target: Event): number {
 }
 
 // Which chip is active: derived from where the demo clock currently stands relative to the target event.
-export function demoMode(state: State, target: Event): DemoMode | null {
+export function demoMode(state: State, target: Event | undefined): DemoMode | null {
   if (state.demoOffsetMs === 0) return 'now';
+  if (!target) return null;
   const now = Date.now() + state.demoOffsetMs;
   const start = Date.parse(target.startsAt);
   const end = Date.parse(target.endsAt);

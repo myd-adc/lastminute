@@ -250,14 +250,16 @@ export function DemoSection({ dense }: { dense?: boolean }) {
   const survey = pendingSurveys(state, now)[0];
   return (
     <Section label={t('profile.demo.label')}>
-      <Group style={styles.demo}>
-        <View style={styles.chips}>
-          {demoChips.map((d) => (
-            <Chip key={d.key} label={d.label} selected={mode === d.key} onPress={() => dispatch({ type: 'setDemoOffset', ms: demoOffsetFor(d.key, target) })} />
-          ))}
-        </View>
-        <Text style={[type.footnote, { color: c.muted }]}>{t('profile.demo.hint', { title: target.title })}</Text>
-      </Group>
+      {target && (
+        <Group style={styles.demo}>
+          <View style={styles.chips}>
+            {demoChips.map((d) => (
+              <Chip key={d.key} label={d.label} selected={mode === d.key} onPress={() => dispatch({ type: 'setDemoOffset', ms: demoOffsetFor(d.key, target) })} />
+            ))}
+          </View>
+          <Text style={[type.footnote, { color: c.muted }]}>{t('profile.demo.hint', { title: target.title })}</Text>
+        </Group>
+      )}
       <Group dense={dense}>
         {survey && (
           <Row label={t('profile.demo.openSurvey')} sub={survey.title} chevron onPress={() => router.push({ pathname: '/event/[id]/after', params: { id: survey.id } })} />
