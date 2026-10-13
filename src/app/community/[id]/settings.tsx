@@ -33,6 +33,7 @@ function Settings({ community }: { community: Community }) {
     name: community.name,
     description: community.description,
     gradient: community.gradient,
+    photoUri: community.photoUri,
     access: community.emailDomain ? 'domain' : 'open',
     domain: community.emailDomain ?? '',
   });

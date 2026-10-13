@@ -66,7 +66,7 @@ export function RoomMatchesPanel({
                   onPress={() => onSelect(u.id)}
                   style={({ hovered }: { hovered?: boolean }) => [styles.row, (on || hovered) && { backgroundColor: c.surface2 }]}
                 >
-                  <Face name={u.name} gradient={u.gradient} size={44} fontSize={16} font="display" />
+                  <Face name={u.name} gradient={u.gradient} photoUri={u.photoUri} size={44} fontSize={16} font="display" />
                   <View style={{ flex: 1, gap: 1 }}>
                     <Text style={[onest('bold', 16, 20), { color: c.text }]} numberOfLines={1}>
                       {u.name}

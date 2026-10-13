@@ -79,7 +79,7 @@ export function ChatConversation({ eventId, userId, variant }: { eventId: string
             <ChevronLeft size={26} color={c.text} strokeWidth={2} />
           </Pressable>
         )}
-        <Avatar name={user.name} gradient={user.gradient} size={panel ? 44 : 40} ring={!panel} />
+        <Avatar name={user.name} gradient={user.gradient} photoUri={user.photoUri} size={panel ? 44 : 40} ring={!panel} />
         <View style={[s.flex, { minWidth: 0, gap: panel ? 2 : 1 }]}>
           <Text style={[onest('bold', panel ? 17 : 16), { color: c.text }]} numberOfLines={1}>
             {panel ? nameAge(user) : user.name}

@@ -252,8 +252,8 @@ function mirror(me: string, action: Action, next: State): Promise<unknown> | und
     case 'leaveCommunity':
       return api.leaveCommunity(me, action.communityId);
     case 'updateCommunity': {
-      const { name, description, gradient, emailDomain } = action.patch;
-      return api.updateCommunity(action.communityId, { name, description, gradient, emailDomain });
+      const { name, description, gradient, emailDomain, photoUri } = action.patch;
+      return api.updateCommunity(action.communityId, { name, description, gradient, emailDomain, ...('photoUri' in action.patch && { photoUri }) });
     }
     case 'deleteCommunity':
       return api.deleteCommunity(action.communityId);

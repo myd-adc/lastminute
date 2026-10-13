@@ -3,9 +3,10 @@ import { Globe, Plus, Settings } from 'lucide-react-native';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
-import { Avatar, Gradient } from '@/components/ui';
+import { Avatar } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { getInterest, goesWithOptions, vibes } from '@/data/mock';
+import { CommunityAvatar } from '@/components/community/CommunityAvatar';
 import { communityMeta } from '@/components/community/text';
 import { myCommunities, verifiedCommunity } from '@/lib/selectors';
 import { LANGS, useT, type Lang } from '@/i18n';
@@ -167,7 +168,7 @@ function MyCommunities() {
             onPress={() => router.push({ pathname: '/community/[id]', params: { id: cm.id } })}
             style={({ pressed }) => [styles.sceneRow, { borderBottomWidth: 1, borderBottomColor: c.line }, pressed && { backgroundColor: c.surface2 }]}
           >
-            <Gradient id={cm.gradient} style={styles.sceneDot} />
+            <CommunityAvatar community={cm} size={32} />
             <View style={{ flex: 1, gap: 2 }}>
               <Text style={[onest('semibold', 15, 19), { color: c.text }]}>{cm.name}</Text>
               <Text style={[onest('regular', 12, 15), { color: c.muted }]}>{communityMeta(cm, true)}</Text>

@@ -7,9 +7,14 @@ import { dmChatId, pairKey, type Going, type State } from '@/store/state';
 import type { GradientId } from '@/theme/palette';
 
 import { supabase, type Tables } from './client';
+import { AVATARS, avatarUploads, COVERS, isPicked, publicUrl, removeImage, signedUrls, uploadImage } from './storage';
 
 // Server-owned slices of the store, replaced wholesale on every sync.
-export type Synced = Pick<State, 'going' | 'decisions' | 'messages' | 'closedChats' | 'blocked' | 'memberships'> & { syncedAt: string };
+// myPhoto: a fresh signed URL for the user's own photo (null = none, undefined = an upload is in flight, keep it).
+export type Synced = Pick<State, 'going' | 'decisions' | 'messages' | 'closedChats' | 'blocked' | 'memberships'> & {
+  syncedAt: string;
+  myPhoto?: string | null;
+};
 export type Snapshot = { remote: RemoteData; synced: Synced };
 
 const HISTORY_MS = 30 * DAY; // past events kept for chats, «Минулі події» and shared-event counts
@@ -99,6 +104,9 @@ export async function fetchSnapshot(me: string): Promise<Snapshot> {
     if (m.closed_by) closedChats[chatId] = true;
   }
 
+  const photos = await signedUrls(AVATARS, profiles.flatMap((p) => (p.photo_path ? [p.photo_path] : [])));
+  const photoOf = (p: (typeof profiles)[number]) => (p.photo_path ? photos.get(p.photo_path) : undefined);
+
   for (const p of profiles) {
     if (p.id === me) continue;
     const shared = attendances.filter((a) => a.user_id === p.id && pastIds.has(a.event_id) && myEventIds.has(a.event_id)).length;
@@ -110,6 +118,7 @@ export async function fetchSnapshot(me: string): Promise<Snapshot> {
       talkAbout: p.talk_about,
       tags: p.interests as InterestId[],
       gradient: p.gradient as GradientId,
+      photoUri: photoOf(p),
       sharedEvents: p.show_shared ? shared : 0,
     });
   }
@@ -150,6 +159,7 @@ export async function fetchSnapshot(me: string): Promise<Snapshot> {
     name: c.name,
     description: c.description,
     gradient: c.gradient as GradientId,
+    photoUri: c.photo_path ? publicUrl(COVERS, c.photo_path) : undefined,
     emailDomain: c.email_domain,
     members: statsBy.get(c.id)?.members ?? 0,
     eventsThisWeek: statsBy.get(c.id)?.events_this_week ?? 0,
@@ -164,7 +174,16 @@ export async function fetchSnapshot(me: string): Promise<Snapshot> {
       users: [...knownUsers.values()],
       attendances: others,
     },
-    synced: { going, decisions: myDecisions, messages: threads, closedChats, blocked, memberships, syncedAt: new Date().toISOString() },
+    synced: {
+      going,
+      decisions: myDecisions,
+      messages: threads,
+      closedChats,
+      blocked,
+      memberships,
+      myPhoto: avatarUploads.pending ? undefined : ((meProfile && photoOf(meProfile)) ?? null),
+      syncedAt: new Date().toISOString(),
+    },
   };
 }
 
@@ -212,7 +231,19 @@ export const report = (me: string, r: State['reports'][number]) =>
 
 // ── Communities ────────────────────────────────────────────────────────
 
-export type CommunityDraft = Pick<Community, 'name' | 'description' | 'gradient' | 'emailDomain'>;
+// photoUri: a freshly picked local image is uploaded; a key present with undefined removes the cover.
+export type CommunityDraft = Pick<Community, 'name' | 'description' | 'gradient' | 'emailDomain' | 'photoUri'>;
+
+// Uploads or removes the cover as the draft asks; the previous file is deleted best-effort.
+async function syncCover(communityId: string, d: Partial<CommunityDraft>, previous: string | null) {
+  if (!('photoUri' in d)) return;
+  const uri = d.photoUri;
+  if (uri ? !isPicked(uri) : !previous) return; // unchanged server cover, or nothing to remove
+  const path = uri ? await uploadImage(COVERS, `communities/${communityId}`, uri) : null;
+  ok(await supabase.from('communities').update({ photo_path: path }).eq('id', communityId));
+  await removeImage(COVERS, previous);
+}
+
 export type EventDraft = Pick<Event, 'communityId' | 'title' | 'description' | 'startsAt' | 'endsAt' | 'venue' | 'address' | 'price' | 'category' | 'poster'>;
 
 // Open communities are joined directly; a domain-only one goes through join_community(), which checks the address.
@@ -231,12 +262,14 @@ export async function createCommunity(me: string, d: CommunityDraft): Promise<st
     .select('id')
     .single();
   if (error) throw new Error(error.message);
+  await syncCover(data.id, d, null);
   return data.id;
 }
 
-export const updateCommunity = (communityId: string, d: Partial<CommunityDraft>) =>
-  write(
-    supabase
+export async function updateCommunity(communityId: string, d: Partial<CommunityDraft>) {
+  const { data: current } = await supabase.from('communities').select('photo_path').eq('id', communityId).maybeSingle();
+  ok(
+    await supabase
       .from('communities')
       .update({
         ...(d.name !== undefined && { name: d.name }),
@@ -246,8 +279,15 @@ export const updateCommunity = (communityId: string, d: Partial<CommunityDraft>)
       })
       .eq('id', communityId),
   );
+  await syncCover(communityId, d, current?.photo_path ?? null);
+}
 
-export const deleteCommunity = (communityId: string) => write(supabase.from('communities').delete().eq('id', communityId));
+export async function deleteCommunity(communityId: string) {
+  // The file first: storage checks ownership through the community row.
+  const { data: current } = await supabase.from('communities').select('photo_path').eq('id', communityId).maybeSingle();
+  await removeImage(COVERS, current?.photo_path);
+  ok(await supabase.from('communities').delete().eq('id', communityId));
+}
 
 // Events created in the app are single-language: the same text goes into both language columns.
 export async function createEvent(me: string, d: EventDraft): Promise<string> {

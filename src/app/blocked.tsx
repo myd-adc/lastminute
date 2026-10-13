@@ -39,7 +39,7 @@ export default function BlockedScreen() {
           <View style={[styles.list, { backgroundColor: c.surface }]}>
             {people.map((u, i) => (
               <View key={u.id} style={[styles.row, i < people.length - 1 && { borderBottomWidth: 1, borderBottomColor: c.line }]}>
-                <Avatar name={u.name} gradient={u.gradient} size={44} />
+                <Avatar name={u.name} gradient={u.gradient} photoUri={u.photoUri} size={44} />
                 <View style={{ flex: 1, gap: 2 }}>
                   <Text style={[type.bodyStrong, { color: c.text }]}>{u.name}</Text>
                   <Text style={[type.footnote, { color: c.muted }]} numberOfLines={1}>

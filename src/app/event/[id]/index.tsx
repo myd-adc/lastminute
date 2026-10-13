@@ -219,7 +219,7 @@ function WideDetails({ event }: { event: Event }) {
                   <Text style={[onest('medium', 14, 18), styles.flex, { color: c.text }]}>
                     {members.length ? `${groupLabel} · ${t('feed.details.alreadyThere', { count: members.length })}` : `${groupLabel} · ${t('feed.details.firstInGroup')}`}
                   </Text>
-                  {members.length > 0 && <AvatarStack people={members.slice(0, 4).map((u) => ({ name: u.name, gradient: u.gradient }))} size={24} />}
+                  {members.length > 0 && <AvatarStack people={members.slice(0, 4).map((u) => ({ name: u.name, gradient: u.gradient, photoUri: u.photoUri }))} size={24} />}
                 </Pressable>
               )}
             </View>

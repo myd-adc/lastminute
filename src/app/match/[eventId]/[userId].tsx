@@ -85,7 +85,7 @@ export default function MatchScreen() {
             <Face name={me.name} gradient={me.gradient} photoUri={me.photoUri} size={FACE} fontSize={49} font="display" borderWidth={5} borderColor={c.bg} style={{ transform: [{ rotate: '6deg' }] }} />
           </View>
           <View style={styles.faceBox}>
-            <Face name={user.name} gradient={user.gradient} size={FACE} fontSize={49} font="display" borderWidth={5} borderColor={c.bg} style={{ transform: [{ rotate: '-6deg' }] }} />
+            <Face name={user.name} gradient={user.gradient} photoUri={user.photoUri} size={FACE} fontSize={49} font="display" borderWidth={5} borderColor={c.bg} style={{ transform: [{ rotate: '-6deg' }] }} />
           </View>
           <Text style={styles.wave}>👋</Text>
         </View>

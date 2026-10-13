@@ -84,6 +84,7 @@ export type Database = {
           gradient: string;
           id: string;
           name: string;
+          photo_path: string | null;
         };
         ComputedFields: never;
         Insert: {
@@ -94,6 +95,7 @@ export type Database = {
           gradient?: string;
           id?: string;
           name: string;
+          photo_path?: string | null;
         };
         Update: {
           created_at?: string;
@@ -103,6 +105,7 @@ export type Database = {
           gradient?: string;
           id?: string;
           name?: string;
+          photo_path?: string | null;
         };
         Relationships: [];
       };

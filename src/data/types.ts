@@ -8,6 +8,7 @@ export type Community = {
   name: string; // «УКУ», «Настолки Львів»
   description: string;
   gradient: GradientId;
+  photoUri?: string; // cover photo; without one the initial sits on the gradient
   emailDomain: string | null; // «ucu.edu.ua»; null = open
   members: number;
   eventsThisWeek: number;
@@ -61,6 +62,7 @@ export type User = {
   talkAbout: string; // «Говори зі мною про…»
   tags: InterestId[];
   gradient: GradientId;
+  photoUri?: string; // signed URL from the private bucket (live) — only for people the user may see
   sharedEvents: number; // «Були разом на N подіях» with the current user
 };
 

@@ -120,7 +120,7 @@ function GoingView({ event }: { event: Event }) {
           {g.with === 'solo' && (
             <View style={[styles.group, { backgroundColor: c.surface, borderColor: c.accent }]}>
               <View style={styles.groupHead}>
-                {members.length > 0 && <AvatarStack people={members.slice(0, 4).map((u) => ({ name: u.name, gradient: u.gradient }))} size={30} />}
+                {members.length > 0 && <AvatarStack people={members.slice(0, 4).map((u) => ({ name: u.name, gradient: u.gradient, photoUri: u.photoUri }))} size={30} />}
                 <View style={styles.groupText}>
                   <Text style={[onest('bold', 15, 19), { color: c.text }]}>{t('feed.going.groupTitle', { title })}</Text>
                   <Text style={[onest('regular', 12, 15), { color: c.muted }]}>

@@ -1,4 +1,3 @@
-import * as ImagePicker from 'expo-image-picker';
 import { Camera, Check, ChevronDown } from 'lucide-react-native';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, View } from 'react-native';
@@ -6,6 +5,7 @@ import { KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, View } fr
 import { Avatar, Button, Sheet } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
+import { pickSquareImage } from '@/lib/pickSquareImage';
 import type { Me } from '@/store/AppStore';
 import { gradientIds, onest, type, useTheme } from '@/theme';
 
@@ -42,8 +42,8 @@ export function ProfileForm({ value, onChange }: { value: ProfileDraft; onChange
   const set = (patch: Partial<ProfileDraft>) => onChange({ ...value, ...patch });
 
   const pickPhoto = async () => {
-    const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsEditing: true, aspect: [1, 1], quality: 0.8 });
-    if (!res.canceled && res.assets[0]) set({ photoUri: res.assets[0].uri });
+    const uri = await pickSquareImage();
+    if (uri) set({ photoUri: uri });
   };
 
   // M03: 12 pt between blocks, 8 pt between a label and its input, 54 pt inputs.

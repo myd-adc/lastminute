@@ -77,7 +77,7 @@ export default function ReportScreen() {
     <Sheet footer={<Button label={t('profile.report.send')} onPress={submit} disabled={!canSend} />}>
       <View style={styles.body}>
         <View style={styles.head}>
-          <Avatar name={user.name} gradient={user.gradient} size={44} />
+          <Avatar name={user.name} gradient={user.gradient} photoUri={user.photoUri} size={44} />
           <View style={{ flex: 1, gap: 2 }}>
             <Text style={[onest('bold', 18, 23), { color: c.text }]}>{t('profile.report.title', { name })}</Text>
             <Text style={[onest('regular', 13, 17.5), { color: c.muted }]}>{t('profile.report.anon', p)}</Text>

@@ -189,7 +189,7 @@ function ContactCard({
   return (
     <View style={[styles.card, { backgroundColor: wide ? c.bg : c.surface, borderColor: c.line, padding: wide ? 18 : 16 }]}>
       <View style={styles.cardHead}>
-        <Avatar name={user.name} gradient={user.gradient} size={44} />
+        <Avatar name={user.name} gradient={user.gradient} photoUri={user.photoUri} size={44} />
         <View style={{ flex: 1, gap: 2 }}>
           <Text style={[onest('bold', wide ? 16 : 15, wide ? 20 : 19), { color: c.text }]}>{t('profile.after.contactTitle', { name: instrumental(user.name, lang) })}</Text>
           <Text style={[onest('regular', 13, 17), { color: accent }]}>

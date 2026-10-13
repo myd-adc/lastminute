@@ -1,5 +1,5 @@
 import { MoreHorizontal } from 'lucide-react-native';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
 
 import { Gradient, Pill } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
@@ -24,7 +24,7 @@ type Props = {
 
 export const sharedLabel = (n: number) => translate('room.card.shared', { count: n });
 
-// M09 person card: gradient photo with a huge initial, pills, name, scene · affiliation, tags, «Говори зі мною про».
+// M09 person card: the photo (or a gradient with a huge initial), pills, name, scene · affiliation, tags, «Говори зі мною про».
 // Figma M09: photo 240 / initial 150 / pills inset 14 / body 16·19; W05: 250 / 160 / 16 / 18·20.
 export function PersonCard({ attendee, width, height, showShared, expanded, onMore, onPress, wide }: Props) {
   const { c } = useTheme();
@@ -44,19 +44,23 @@ export function PersonCard({ attendee, width, height, showShared, expanded, onMo
       style={[styles.card, { width, height, backgroundColor: c.surface, borderColor: c.line }]}
     >
       <Gradient id={user.gradient} style={[styles.photo, { height: photoH }]}>
-        <Text
-          style={[
-            styles.initial,
-            {
-              color: c.text,
-              fontSize: initialSize,
-              lineHeight: Math.round(initialSize * 1.24),
-              transform: [{ translateY: -Math.round((photoH * m.lift) / m.photo) }],
-            },
-          ]}
-        >
-          {user.name.charAt(0).toUpperCase()}
-        </Text>
+        {user.photoUri ? (
+          <Image source={{ uri: user.photoUri }} style={StyleSheet.absoluteFill} accessibilityIgnoresInvertColors />
+        ) : (
+          <Text
+            style={[
+              styles.initial,
+              {
+                color: c.text,
+                fontSize: initialSize,
+                lineHeight: Math.round(initialSize * 1.24),
+                transform: [{ translateY: -Math.round((photoH * m.lift) / m.photo) }],
+              },
+            ]}
+          >
+            {user.name.charAt(0).toUpperCase()}
+          </Text>
+        )}
         {attendance.solo && <Pill label={soloLabel(user)} tone="bg" style={[styles.abs, { top: m.inset, left: m.inset }]} />}
         {shared && <Pill label={sharedLabel(user.sharedEvents)} tone="accent" style={[styles.abs, { bottom: m.inset, left: m.inset }]} />}
         {onMore && (
@@ -80,22 +84,20 @@ export function PersonCard({ attendee, width, height, showShared, expanded, onMo
             ))}
           </View>
         )}
-        <View style={[styles.talk, { backgroundColor: c.bg }]}>
-          <Text style={[onest('medium', 12, 15), { color: c.muted }]}>{t('room.card.talkAbout')}</Text>
-          <Text style={[onest('semibold', 15, 20), { color: c.text }]} numberOfLines={expanded ? undefined : 3}>
-            {user.talkAbout}
-          </Text>
-        </View>
+        {!!user.talkAbout.trim() && (
+          <View style={[styles.talk, { backgroundColor: c.bg }]}>
+            <Text style={[onest('medium', 12, 15), { color: c.muted }]}>{t('room.card.talkAbout')}</Text>
+            <Text style={[onest('semibold', 15, 20), { color: c.text }]} numberOfLines={expanded ? undefined : 3}>
+              {user.talkAbout}
+            </Text>
+          </View>
+        )}
         {expanded && (
           <View style={{ gap: 4 }}>
             <Text style={[onest('regular', 13, 18), { color: c.muted }]}>
               {attendance.solo ? t(byGender(user, 'room.card.soloDetailF', 'room.card.soloDetailM')) : t('room.card.withFriends')}
             </Text>
-            {shared && (
-              <Text style={[onest('regular', 13, 18), { color: c.muted }]}>
-                {t('room.card.sharedLong', { count: user.sharedEvents })}
-              </Text>
-            )}
+            {shared && <Text style={[onest('regular', 13, 18), { color: c.muted }]}>{t('room.card.sharedLong', { count: user.sharedEvents })}</Text>}
           </View>
         )}
       </View>

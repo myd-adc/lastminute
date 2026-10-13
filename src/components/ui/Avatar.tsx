@@ -37,7 +37,7 @@ export function AvatarStack({
   size = 32,
   extra = 0,
 }: {
-  people: { name: string; gradient: GradientId }[];
+  people: { name: string; gradient: GradientId; photoUri?: string }[];
   size?: number;
   extra?: number;
 }) {
@@ -47,7 +47,7 @@ export function AvatarStack({
     <View style={styles.row}>
       {people.map((p, i) => (
         <View key={i} style={i > 0 && { marginLeft: overlap }}>
-          <Avatar name={p.name} gradient={p.gradient} size={size} ring />
+          <Avatar name={p.name} gradient={p.gradient} photoUri={p.photoUri} size={size} ring />
         </View>
       ))}
       {extra > 0 && (

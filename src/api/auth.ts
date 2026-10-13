@@ -3,6 +3,7 @@ import type { Me, State } from '@/store/state';
 import type { GradientId } from '@/theme/palette';
 
 import { supabase } from './client';
+import { AVATARS, avatarUploads, isPicked, removeImage, signedUrls, uploadImage } from './storage';
 
 export type AuthResult<T = void> = { ok: true; data: T } | { ok: false; error: string };
 
@@ -35,7 +36,13 @@ export async function loadAccount(userId: string): Promise<ExistingAccount | nul
   const { data: p } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle();
   if (!p) return null;
   return {
-    me: { name: p.name, affiliation: p.affiliation, talkAbout: p.talk_about, gradient: p.gradient as GradientId, photoUri: p.photo_path ?? undefined },
+    me: {
+      name: p.name,
+      affiliation: p.affiliation,
+      talkAbout: p.talk_about,
+      gradient: p.gradient as GradientId,
+      photoUri: p.photo_path ? (await signedUrls(AVATARS, [p.photo_path])).get(p.photo_path) : undefined,
+    },
     interests: p.interests as InterestId[],
     vibe: (p.vibe as Vibe | null) ?? null,
     goesWith: (p.goes_with as GoesWith | null) ?? null,
@@ -47,6 +54,21 @@ export async function saveProfile(state: State): Promise<AuthResult> {
   const { data: auth } = await supabase.auth.getUser();
   const userId = auth.user?.id;
   if (!userId || !state.me) return { ok: false, error: 'not_signed_in' };
+  // A picked photo is uploaded; a server URL means unchanged; none removes it.
+  const { data: current } = await supabase.from('profiles').select('photo_path').eq('id', userId).maybeSingle();
+  const previous = current?.photo_path ?? null;
+  const uri = state.me.photoUri;
+  let photo_path = uri ? previous : null;
+  if (uri && isPicked(uri)) {
+    avatarUploads.pending++;
+    try {
+      photo_path = await uploadImage(AVATARS, userId, uri);
+    } catch (e) {
+      return fail(e as { message: string }, 'save_failed');
+    } finally {
+      avatarUploads.pending--;
+    }
+  }
   const { error } = await supabase.from('profiles').upsert({
     id: userId,
     name: state.me.name,
@@ -59,8 +81,10 @@ export async function saveProfile(state: State): Promise<AuthResult> {
     show_solo: state.settings.showSolo,
     show_shared: state.settings.showSharedEvents,
     language: state.language,
+    photo_path,
   });
   if (error) return fail(error, 'save_failed');
+  if (previous && previous !== photo_path) await removeImage(AVATARS, previous);
   return { ok: true, data: undefined };
 }
 

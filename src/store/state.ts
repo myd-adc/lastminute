@@ -304,8 +304,12 @@ export function reducer(state: State, action: Action): State {
       return { ...state, demoOffsetMs: action.ms };
     case 'hydrate':
       return action.state;
-    case 'sync':
-      return { ...state, ...action.synced };
+    case 'sync': {
+      // The server is the source of truth for the user's own photo too (a fresh signed URL each sync).
+      const { myPhoto, ...synced } = action.synced;
+      const me = state.me && myPhoto !== undefined ? { ...state.me, photoUri: myPhoto ?? undefined } : state.me;
+      return { ...state, ...synced, me };
+    }
     case 'logout':
       return { ...initialState, language: state.language, settings: { ...initialState.settings, theme: state.settings.theme } };
   }

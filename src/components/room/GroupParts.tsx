@@ -160,7 +160,7 @@ function MemberRow({ event, user, confirmed }: { event: Event; user: User; confi
   };
   return (
     <View style={styles.member}>
-      <Face name={user.name} gradient={user.gradient} size={40} fontSize={16} />
+      <Face name={user.name} gradient={user.gradient} photoUri={user.photoUri} size={40} fontSize={16} />
       <View style={{ flex: 1, gap: 2 }}>
         <Text style={[onest('semibold', 15, 19), { color: c.text }]}>{user.name}</Text>
         <Text style={[onest('regular', 12, 15), { color: confirmed ? accentText : c.muted }]} numberOfLines={1}>

@@ -65,7 +65,7 @@ export function ChatRow({
         {isGroup ? (
           <AvatarStack people={members} size={compact ? 26 : 30} />
         ) : (
-          chat.user && <Avatar name={chat.user.name} gradient={chat.user.gradient} size={avatar} />
+          chat.user && <Avatar name={chat.user.name} gradient={chat.user.gradient} photoUri={chat.user.photoUri} size={avatar} />
         )}
       </View>
       <View style={styles.body}>

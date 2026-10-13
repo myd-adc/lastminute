@@ -4,11 +4,12 @@ import { useState, type ReactNode } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { EventRow } from '@/components/community/EventRow';
+import { CommunityAvatar } from '@/components/community/CommunityAvatar';
 import { communityCounts } from '@/components/community/text';
 import { useDomainJoin } from '@/components/community/DomainJoin';
 import { PageHead } from '@/components/community/PageHead';
 import { Glow, glows } from '@/components/profile/Glow';
-import { Button, Gradient, goBack, Pill, Screen } from '@/components/ui';
+import { Button, goBack, Pill, Screen } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { getCommunity } from '@/data/mock';
 import type { Community } from '@/data/types';
@@ -104,9 +105,7 @@ function CommunityPage({ community }: { community: Community }) {
       />
 
       <View style={styles.head}>
-        <Gradient id={community.gradient} style={styles.avatar}>
-          <Text style={[onest('bold', 34), styles.initial]}>{community.name.trim()[0]?.toUpperCase()}</Text>
-        </Gradient>
+        <CommunityAvatar community={community} size={88} />
         <View style={{ flex: 1, gap: 4 }}>
           <Text style={[onest('semibold', 15, 19), { color: c.text }]}>{communityCounts(community)}</Text>
           <Text style={[onest('regular', 13, 17.5), { color: c.muted }]}>{access}</Text>
@@ -141,7 +140,5 @@ const styles = StyleSheet.create({
   wide: { maxWidth: 720, width: '100%', alignSelf: 'center' },
   top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: 40 },
   head: { flexDirection: 'row', alignItems: 'center', gap: 16 },
-  avatar: { width: 88, height: 88, borderRadius: 44, alignItems: 'center', justifyContent: 'center' },
-  initial: { color: '#fff' },
   pill: { alignSelf: 'flex-start', marginTop: 2 },
 });
