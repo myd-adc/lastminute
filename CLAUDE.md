@@ -2,7 +2,7 @@
 
 # LastMinute
 
-Event-first social app for students in Lviv: swipe through events of your scene → mark «Я йду» → only then see who else is going, swipe people in the event room, and go together after a mutual «Піти разом». Not a dating feed, not a ticket shop. UI in Ukrainian and English (see `.claude/rules/i18n.md`).
+Event-first social app: swipe through events of the city and your communities → mark «Я йду» → only then see who else is going, swipe people in the event room, and go together after a mutual «Піти разом». Not a dating feed, not a ticket shop. UI in Ukrainian and English (see `.claude/rules/i18n.md`).
 
 One Expo Router codebase ships iOS, Android and web. The web build is also the demo people open from a QR code.
 
@@ -25,7 +25,7 @@ npx expo export --platform web   # production web build into dist/
 - **Symmetry.** Who is going is hidden until the user marks «Я йду» (blurred/locked); the user is visible only to people going to the same event.
 - **Consent.** DMs open only after a mutual «Піти разом» (match). The other person learns about it only if both pressed it.
 - **24 h.** Chats and the event album live until the event ends + 24 h (`expiresAt(event)` in `src/lib/selectors.ts`); after that only contacts both sides chose to leave survive.
-- **Scene first.** The feed shows the user's scene by default; «Усе місто» is an explicit tab.
+- **Communities.** Anyone can start a community, open or limited to a confirmed e-mail domain; only its creator adds events. A domain-only community's events are visible to members only. The feed tabs are «Спільноти · Знайомі · Для тебе»; «Знайомі» shows a count of people you matched with, never who.
 - **Safety.** Every person card / chat offers report + block; blocked people disappear everywhere.
 - **Out of scope for v1:** likes/followers, exact geolocation, ticket sales, real SMS/e-mail delivery (demo accepts any code).
 

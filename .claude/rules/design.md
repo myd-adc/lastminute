@@ -6,14 +6,15 @@ paths:
 
 # Design source
 
-Figma file `Lrh1ztjszMiPRnHucllhNl`, page **«v4 · EN»** (node `93:500`) is the main design. Frames: `M01…M17` (mobile, 390×844) and `W01…W09` (web, 1440×900), each in Dark and «· Light». Sign-in is e-mail + 6-digit code (M01, M02, W01).
+Figma file `Lrh1ztjszMiPRnHucllhNl`, page **«v4 · EN»** (node `93:500`) is the main design. Frames: `M01…M22` (mobile, 390×844) and `W01…W09` (web, 1440×900), each in Dark and «· Light». Sign-in is e-mail + 6-digit code (M01, M02, W01).
 
 - Read a frame with the Figma MCP (`get_design_context` with its node id, then `get_screenshot`) before building it.
 - Translate to React Native styles — never Tailwind, never absolute-position the whole screen.
 
 ## Route → frame map
 
-- `(auth)/` onboarding, guarded by `Stack.Protected` until `state.onboarded`: `login` (M01/W01, e-mail) → `code` (M02, code from the letter) → `profile-setup` (M03) → `interests` (M04) → `scene-select` (M05). W02 is the wide-web version of M03–M05.
-- `(tabs)/` `index` = feed (M06/M10/W03), `scene`, `chats` (M12/W06), `me` (M16/W09). Phone shows `GlassTabBar`; wide web shows `WebShell` sidebar instead.
+- `(auth)/` onboarding, guarded by `Stack.Protected` until `state.onboarded`: `login` (M01/W01, e-mail) → `code` (M02, code from the letter) → `profile-setup` (M03) → `interests` (M04, last step). W02 is the wide-web version of M03–M04.
+- `(tabs)/` `index` = feed (M06/M10/W03), `communities` (M18), `chats` (M12/W06), `me` (M16/W09). Phone shows `GlassTabBar`; wide web shows `WebShell` sidebar instead.
 - `event/[id]/index` (M07 details, transparent overlay), `going` (M08), `room` (M09/W05), `group` (M08b/W05b), `album` (M14/W07), `after` (M15/W08).
+- `community/[id]/index` (M19 join, M19b creator view), `community/new` (M20), `community/[id]/new-event` (M21), `community/[id]/settings` (M22). No wide-web frames yet: they reuse the phone layout in a 640–720 pt column.
 - `match/[eventId]/[userId]` (M11), `chat/[eventId]/[userId]` (M13), `report/[userId]` (M17 overlay), `settings` (M16b), `blocked`, `rules`, `edit-profile`, `preferences`.
