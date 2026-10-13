@@ -96,14 +96,14 @@ export function chatState(state: State, event: Event, userId: string | null, now
   return 'open';
 }
 
-// Thread = seeded demo messages (localized, from mock data) + messages written in this session (stored in state).
+// Thread = seeded demo messages (localized, from mock data), then messages written in this session (stored in state)
+// in the order they were sent. Not re-sorted by time: a seeded timestamp must never push new messages above it.
 export function messagesOf(state: State, chatId: string): Message[] {
   const own = state.messages[chatId] ?? [];
   const seeded = chatId.startsWith('group:')
     ? (soloGroups[chatId.slice('group:'.length)]?.messages ?? [])
     : (pastChats.find((c) => dmChatId(c.eventId, c.userId) === chatId)?.messages ?? []);
-  if (!seeded.length) return own;
-  return [...seeded, ...own].sort((a, b) => a.at.localeCompare(b.at));
+  return seeded.length ? [...seeded, ...own] : own;
 }
 
 export function chatList(state: State, now: number): ChatSummary[] {

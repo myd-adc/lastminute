@@ -363,6 +363,9 @@ const rawAttendances: RawAttendance[] = [
 type RawMessage = Omit<Message, 'text'> & { text: L };
 const msg = (id: string, from: string, text: L, atIso: string): RawMessage => ({ id, from, text, at: atIso });
 
+// The group chat is already going when the app opens: its seeded messages are minutes old, never in the future.
+const minsAgo = (m: number) => new Date(BASE - m * 60_000).toISOString();
+
 type RawGroup = { meetPlace: L; meetTime: string; confirmed: string[]; opensAt: string; messages: RawMessage[] };
 
 const rawSoloGroups: Record<string, RawGroup> = {
@@ -372,10 +375,10 @@ const rawSoloGroups: Record<string, RawGroup> = {
     confirmed: ['ostap', 'yulia', 'marko', 'katya'],
     opensAt: '17:00',
     messages: [
-      msg('g1', 'ostap', l('Хто вже був у «Кульбабі»? Там є де сісти?', 'Has anyone been to Kulbaba? Are there seats?'), at(BASE, 0, 18, 20)),
-      msg('g2', 'yulia', l('Була. Займайте диван біля сцени 🛋️', 'I have. Grab the sofa by the stage 🛋️'), at(BASE, 0, 18, 22)),
-      msg('g3', 'me', l('Тоді біля бару о 19:45 і заходимо разом?', 'So, by the bar at 19:45 and we go in together?'), at(BASE, 0, 18, 23)),
-      msg('g4', 'marko', l('Я +, буду в чорній кепці 🧢', 'I’m in, I’ll be in a black cap 🧢'), at(BASE, 0, 18, 25)),
+      msg('g1', 'ostap', l('Хто вже був у «Кульбабі»? Там є де сісти?', 'Has anyone been to Kulbaba? Are there seats?'), minsAgo(25)),
+      msg('g2', 'yulia', l('Була. Займайте диван біля сцени 🛋️', 'I have. Grab the sofa by the stage 🛋️'), minsAgo(23)),
+      msg('g3', 'me', l('Тоді біля бару о 19:45 і заходимо разом?', 'So, by the bar at 19:45 and we go in together?'), minsAgo(22)),
+      msg('g4', 'marko', l('Я +, буду в чорній кепці 🧢', 'I’m in, I’ll be in a black cap 🧢'), minsAgo(20)),
     ],
   },
 };
