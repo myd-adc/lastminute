@@ -20,4 +20,4 @@ paths:
 - Use `style.pointerEvents`, not the `pointerEvents` prop (deprecated on web).
 - `Alert.alert` with buttons does nothing on web — build inline confirmations or sheets.
 - Don't assign `ref.current` during render (lint rule `react-hooks/refs`); do it in an effect.
-- GitHub Pages serves the site under `/lastminute`; `app.config.ts` reads `EXPO_BASE_URL` (CI only). Never hard-code the prefix.
+- The site is served from the domain root (lastminute.software); `app.config.ts` reads `EXPO_BASE_URL` only for sub-path hosting. Never hard-code a path prefix.

@@ -1,6 +1,6 @@
 # Git and deploy
 
-- Push to `main` → `.github/workflows/deploy-web.yml` publishes the web export to https://myd-adc.github.io/lastminute/ (`404.html` = `index.html` for deep links).
+- Push to `main` → `.github/workflows/deploy-web.yml` publishes the web export to https://lastminute.software/ (custom domain, set in the repo's Pages settings; `404.html` = `index.html` for deep links).
 - Remote: `git@github-personal:myd-adc/lastminute.git`. Author email: `malugamikola@gmail.com` (repo-local config).
 - Never add `Co-Authored-By` or any Claude/AI attribution to commits or PR descriptions.
 - Commit or push only when asked. Rewrite pushed history (`--amend`, rebase + force push) only on explicit request, always with `git push --force-with-lease`.

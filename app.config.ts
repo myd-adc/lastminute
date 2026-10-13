@@ -1,6 +1,6 @@
 import type { ConfigContext, ExpoConfig } from 'expo/config';
 
-// GitHub Pages serves the web build under /<repo>; CI sets EXPO_BASE_URL, local dev stays at /.
+// Web is served from the domain root. Set EXPO_BASE_URL only to host the build under a sub-path.
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...(config as ExpoConfig),
   experiments: {

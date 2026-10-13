@@ -24,9 +24,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # Served from the root of the custom domain (lastminute.software), so no base path.
       - run: npx expo export --platform web
-        env:
-          EXPO_BASE_URL: /${{ github.event.repository.name }}
       # SPA fallback: deep links such as /event/<id> from a QR code load the app instead of a 404 page.
       - run: cp dist/index.html dist/404.html && touch dist/.nojekyll
       - uses: actions/upload-pages-artifact@v4
