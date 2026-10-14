@@ -1,13 +1,13 @@
 import { router } from 'expo-router';
 import { ShieldCheck } from 'lucide-react-native';
 import { useState } from 'react';
-import { Linking, Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { AuthSplit } from '@/components/onboarding/AuthSplit';
 import { AuthScreen } from '@/components/onboarding/AuthScreen';
 import { Field, FieldLabel, LanguagePill, Logo, useAccentInk } from '@/components/onboarding/kit';
 import { EmailInput, isEmail, normalizeEmail } from '@/components/onboarding/EmailInput';
-import { QrPlaceholder } from '@/components/onboarding/QrPlaceholder';
+import { QrCard } from '@/components/onboarding/QrCard';
 import { Button } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
@@ -16,9 +16,6 @@ import { requestCode } from '@/api/auth';
 import { isLive } from '@/api/client';
 import { useStore } from '@/store/AppStore';
 import { display, onest, type, useTheme } from '@/theme';
-
-const APP_STORE = 'https://apps.apple.com/';
-const GOOGLE_PLAY = 'https://play.google.com/store';
 
 // M01 / W01 «Вхід» (sign in): e-mail → code from the letter, language pill top right.
 export default function LoginScreen() {
@@ -95,33 +92,10 @@ function WideLogin({ email, setEmail, valid, submit, error }: FormProps) {
           <Text style={[onest('medium', 13), { color: c.muted }]}>{t('onboarding.login.or')}</Text>
           <View style={[styles.orLine, { backgroundColor: c.line }]} />
         </View>
-        <View style={[styles.qrCard, { backgroundColor: c.bg }]}>
-          <QrPlaceholder size={132} />
-          <View style={{ flex: 1, gap: 8 }}>
-            <Text style={[onest('bold', 16), { color: c.text }]}>{t('onboarding.login.phoneBetter')}</Text>
-            <Text style={[onest('regular', 13, 18), { color: c.muted }]}>{t('onboarding.login.phoneBetterText')}</Text>
-            <View style={styles.stores}>
-              <StorePill label="App Store" url={APP_STORE} />
-              <StorePill label="▶ Google Play" url={GOOGLE_PLAY} />
-            </View>
-          </View>
-        </View>
+        <QrCard />
         <TrustLine text={t('onboarding.login.trustShort')} />
       </View>
     </AuthSplit>
-  );
-}
-
-function StorePill({ label, url }: { label: string; url: string }) {
-  const { c } = useTheme();
-  return (
-    <Pressable
-      accessibilityRole="link"
-      onPress={() => Linking.openURL(url)}
-      style={({ pressed }) => [styles.store, { backgroundColor: c.surface2 }, pressed && { opacity: 0.8 }]}
-    >
-      <Text style={[onest('semibold', 13), { color: c.text }]}>{label}</Text>
-    </Pressable>
   );
 }
 
@@ -145,7 +119,4 @@ const styles = StyleSheet.create({
   trust: { flexDirection: 'row', gap: 10, alignItems: 'flex-start' },
   orRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   orLine: { flex: 1, height: 1 },
-  qrCard: { flexDirection: 'row', alignItems: 'center', gap: 20, padding: 20, borderRadius: 20 },
-  stores: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  store: { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 14 },
 });
