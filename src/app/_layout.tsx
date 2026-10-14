@@ -4,8 +4,9 @@ import { useFonts } from 'expo-font';
 import { Stack, usePathname } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Platform, View } from 'react-native';
+import { SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { WebShell, webScreenFade } from '@/components/ui';
 import { useIsWide } from '@/lib/layout';
@@ -64,6 +65,9 @@ function Navigator() {
   const wide = useIsWide();
   const pathname = usePathname();
   const inShell = wide && state.onboarded && !pathname.startsWith('/match');
+  // A browser has no status bar, so a zero top inset would pin headers to the window edge.
+  const raw = useSafeAreaInsets();
+  const insets = useMemo(() => (Platform.OS === 'web' ? { ...raw, top: Math.max(raw.top, 16) } : raw), [raw]);
 
   const stack = (
     <Stack
@@ -86,9 +90,11 @@ function Navigator() {
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <StatusBar style={scheme === 'light' ? 'dark' : 'light'} />
-      {inShell ? <WebShell>{stack}</WebShell> : stack}
-    </View>
+    <SafeAreaInsetsContext.Provider value={insets}>
+      <View style={{ flex: 1, backgroundColor: c.bg }}>
+        <StatusBar style={scheme === 'light' ? 'dark' : 'light'} />
+        {inShell ? <WebShell>{stack}</WebShell> : stack}
+      </View>
+    </SafeAreaInsetsContext.Provider>
   );
 }
