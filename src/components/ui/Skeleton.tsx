@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { AccessibilityInfo, Animated, Easing, type StyleProp, type ViewStyle } from 'react-native';
 
 import { useT } from '@/i18n';
+import { ND } from '@/lib/motion';
 import { useTheme } from '@/theme';
 
 const Pulse = createContext<Animated.Value | null>(null);
@@ -20,8 +21,8 @@ export function Skeleton({ children, style }: { children: ReactNode; style?: Sty
         const ease = Easing.inOut(Easing.quad);
         loop = Animated.loop(
           Animated.sequence([
-            Animated.timing(value, { toValue: 0.45, duration: 700, easing: ease, useNativeDriver: true }),
-            Animated.timing(value, { toValue: 1, duration: 700, easing: ease, useNativeDriver: true }),
+            Animated.timing(value, { toValue: 0.45, duration: 700, easing: ease, useNativeDriver: ND }),
+            Animated.timing(value, { toValue: 1, duration: 700, easing: ease, useNativeDriver: ND }),
           ]),
         );
         loop.start();

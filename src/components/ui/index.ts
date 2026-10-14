@@ -1,6 +1,7 @@
 export { Avatar, AvatarStack } from './Avatar';
 export { Button, type ButtonVariant } from './Button';
 export { Chip, Pill } from './Chip';
+export { FadeIn, webScreenFade } from './FadeIn';
 export { Checkbox, List, ListRow, Radio, Segmented, Toggle } from './Controls';
 export { GlassTabBar, tabs, type TabKey } from './GlassTabBar';
 export { Gradient } from './Gradient';

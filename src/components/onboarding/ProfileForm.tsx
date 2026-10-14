@@ -1,6 +1,6 @@
 import { Camera, Check, ChevronDown } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
-import { KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Avatar, Button, Sheet } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
@@ -234,37 +234,33 @@ function AffiliationSheet({
     onClose();
   };
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <Sheet onClose={onClose} maxHeight="80%">
-          <Text style={[type.title2, { color: c.text }]}>{t('onboarding.profile.affiliation')}</Text>
-          <View style={[styles.list, { backgroundColor: c.surface2 }]}>
-            {AFFILIATIONS.map((key) => t(`onboarding.profile.affiliations.${key}`)).map((a, i) => (
-              <Pressable
-                key={a}
-                onPress={() => pick(a)}
-                style={({ pressed }) => [styles.option, i > 0 && { borderTopWidth: 1, borderTopColor: c.line }, pressed && { opacity: 0.7 }]}
-              >
-                <Text style={[onest('medium', 16), { color: c.text, flex: 1 }]}>{a}</Text>
-                {value === a && <Check size={18} color={c.text} strokeWidth={2.5} />}
-              </Pressable>
-            ))}
-          </View>
-          <Field label={t('onboarding.profile.affiliationCustom')}>
-            <TextField
-              value={custom}
-              onChangeText={setCustom}
-              placeholder={t('onboarding.profile.affiliationCustomPlaceholder')}
-              maxLength={40}
-              returnKeyType="done"
-              onSubmitEditing={() => custom.trim() && pick(custom.trim())}
-            />
-          </Field>
-          <Button label={t('common.done')} disabled={!custom.trim()} onPress={() => pick(custom.trim())} />
-          {!!value && <Button label={t('onboarding.profile.affiliationNone')} variant="ghost" onPress={() => pick('')} />}
-        </Sheet>
-      </KeyboardAvoidingView>
-    </Modal>
+    <Sheet visible={visible} onClose={onClose} maxHeight="80%">
+      <Text style={[type.title2, { color: c.text }]}>{t('onboarding.profile.affiliation')}</Text>
+      <View style={[styles.list, { backgroundColor: c.surface2 }]}>
+        {AFFILIATIONS.map((key) => t(`onboarding.profile.affiliations.${key}`)).map((a, i) => (
+          <Pressable
+            key={a}
+            onPress={() => pick(a)}
+            style={({ pressed }) => [styles.option, i > 0 && { borderTopWidth: 1, borderTopColor: c.line }, pressed && { opacity: 0.7 }]}
+          >
+            <Text style={[onest('medium', 16), { color: c.text, flex: 1 }]}>{a}</Text>
+            {value === a && <Check size={18} color={c.text} strokeWidth={2.5} />}
+          </Pressable>
+        ))}
+      </View>
+      <Field label={t('onboarding.profile.affiliationCustom')}>
+        <TextField
+          value={custom}
+          onChangeText={setCustom}
+          placeholder={t('onboarding.profile.affiliationCustomPlaceholder')}
+          maxLength={40}
+          returnKeyType="done"
+          onSubmitEditing={() => custom.trim() && pick(custom.trim())}
+        />
+      </Field>
+      <Button label={t('common.done')} disabled={!custom.trim()} onPress={() => pick(custom.trim())} />
+      {!!value && <Button label={t('onboarding.profile.affiliationNone')} variant="ghost" onPress={() => pick('')} />}
+    </Sheet>
   );
 }
 

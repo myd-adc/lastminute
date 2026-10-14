@@ -1,7 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { Check, ExternalLink, MapPin, Send, Ticket, User, Users, X } from 'lucide-react-native';
 import { useState } from 'react';
-import { Linking, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Animated, Linking, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { InfoRow, PeopleStack } from '@/components/feed/DetailsParts';
@@ -16,6 +16,7 @@ import type { Event } from '@/data/types';
 import { useT } from '@/i18n';
 import { t as translate } from '@/i18n/translate';
 import { fullWindow, useIsWide } from '@/lib/layout';
+import { pop, slideUp, useOverlayMotion } from '@/lib/motion';
 import { acquaintances, attendeesFor, goingCount, soloCount, soloGroupMembers } from '@/lib/selectors';
 import { dayLabel, whenLabel } from '@/lib/time';
 import { useNow, useStore, type Going } from '@/store/AppStore';
@@ -143,11 +144,15 @@ function MobileDetails({ event }: { event: Event }) {
   const { t } = useT();
   const insets = useSafeAreaInsets();
   const d = useDetails(event);
-  const close = () => goBack('/');
+  const { height } = useWindowDimensions();
+  const { progress, exit } = useOverlayMotion();
+  const close = () => exit(() => goBack('/'));
   return (
     <>
-      <Pressable accessibilityLabel={t('common.close')} style={[StyleSheet.absoluteFill, { backgroundColor: DIM_SHEET }]} onPress={close} />
-      <View style={[styles.sheet, { top: insets.top + 94, backgroundColor: c.surface }]}>
+      <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: DIM_SHEET, opacity: progress }]}>
+        <Pressable accessibilityLabel={t('common.close')} style={StyleSheet.absoluteFill} onPress={close} />
+      </Animated.View>
+      <Animated.View style={[styles.sheet, { top: insets.top + 94, backgroundColor: c.surface }, slideUp(progress, height - insets.top - 94)]}>
         <View style={[styles.handle, { backgroundColor: c.line }]} />
         <ScrollView style={styles.flex} contentContainerStyle={styles.sheetContent} bounces={false}>
           <Body event={event} d={d} />
@@ -161,7 +166,7 @@ function MobileDetails({ event }: { event: Event }) {
             <Button label={t('common.imGoing')} onPress={() => d.go()} style={styles.flex} />
           )}
         </View>
-      </View>
+      </Animated.View>
       {d.toast.node}
     </>
   );
@@ -184,11 +189,15 @@ function WideDetails({ event }: { event: Event }) {
   const setWith = (v: Going['with']) => (d.going ? d.dispatch({ type: 'setGoing', eventId: event.id, patch: { with: v } }) : setWithChoice(v));
   const setJoin = (v: boolean) => (d.going ? d.dispatch({ type: 'setGoing', eventId: event.id, patch: { joinSoloGroup: v } }) : setJoinChoice(v));
   const groupLabel = t('feed.details.joinGroup', { title: shortTitle(event) });
+  const { progress, exit } = useOverlayMotion();
+  const close = () => exit(() => goBack('/'));
 
   return (
     <View style={[fullWindow, styles.centre]}>
-      <Pressable accessibilityLabel={t('common.close')} style={[StyleSheet.absoluteFill, { backgroundColor: DIM_DIALOG }]} onPress={() => goBack('/')} />
-      <View style={[styles.dialog, { width: w, height: h, backgroundColor: c.surface, borderColor: c.line }]}>
+      <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: DIM_DIALOG, opacity: progress }]}>
+        <Pressable accessibilityLabel={t('common.close')} style={StyleSheet.absoluteFill} onPress={close} />
+      </Animated.View>
+      <Animated.View style={[styles.dialog, { width: w, height: h, backgroundColor: c.surface, borderColor: c.line }, pop(progress)]}>
         <View style={{ width: posterW, height: h }}>
           <PosterArt event={event} width={posterW} height={h} variant="dialog" />
           <View style={styles.posterPills}>
@@ -234,10 +243,10 @@ function WideDetails({ event }: { event: Event }) {
             </View>
           </View>
         </View>
-        <Pressable accessibilityRole="button" accessibilityLabel={t('common.close')} onPress={() => goBack('/')} style={[styles.close, { backgroundColor: c.surface2 }]}>
+        <Pressable accessibilityRole="button" accessibilityLabel={t('common.close')} onPress={close} style={[styles.close, { backgroundColor: c.surface2 }]}>
           <X size={18} color={c.text} strokeWidth={2} />
         </Pressable>
-      </View>
+      </Animated.View>
       {d.toast.node}
     </View>
   );

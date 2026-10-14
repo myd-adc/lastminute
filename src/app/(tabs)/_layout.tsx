@@ -18,7 +18,7 @@ export default function TabsLayout() {
   return (
     <Tabs
       tabBar={() => (wide ? null : <GlassTabBar active={active} unread={unread} />)}
-      screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: c.bg } }}
+      screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: c.bg }, animation: 'fade' }}
     >
       <Tabs.Screen name="index" options={{ title: 'Події' }} />
       <Tabs.Screen name="communities" options={{ title: 'Спільноти' }} />

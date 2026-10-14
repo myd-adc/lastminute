@@ -50,7 +50,7 @@ export default function ReportScreen() {
 
   if (!user) {
     return (
-      <Sheet footer={<Button label={t('common.close')} variant="secondary" onPress={() => goBack('/chats')} />}>
+      <Sheet onClose={() => goBack('/chats')} footer={(close) => <Button label={t('common.close')} variant="secondary" onPress={close} />}>
         <Text style={[type.headline, { color: c.text }]}>{t('profile.report.notFound')}</Text>
       </Sheet>
     );

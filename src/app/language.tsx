@@ -16,7 +16,7 @@ export default function LanguageScreen() {
   const close = () => goBack('/me');
 
   return (
-    <Sheet onClose={close} footer={<Button label={t('common.done')} onPress={close} />}>
+    <Sheet onClose={close} footer={(done) => <Button label={t('common.done')} onPress={done} />}>
       <View style={styles.body}>
         <View style={{ gap: 2 }}>
           <Text style={[onest('bold', 18, 23), { color: c.text }]}>{t('profile.language.title')}</Text>

@@ -7,7 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { Platform, View } from 'react-native';
 
-import { WebShell } from '@/components/ui';
+import { WebShell, webScreenFade } from '@/components/ui';
 import { useIsWide } from '@/lib/layout';
 import { AppStoreProvider, useStore } from '@/store/AppStore';
 import { ThemeProvider, useTheme } from '@/theme';
@@ -54,7 +54,9 @@ function Themed() {
   );
 }
 
-const overlay = { presentation: 'transparentModal', animation: 'fade', contentStyle: { backgroundColor: 'transparent' } } as const;
+// Overlays animate their own scrim and sheet (Sheet, event details), so the navigator adds nothing.
+const overlay = { presentation: 'transparentModal', animation: 'none', contentStyle: { backgroundColor: 'transparent' } } as const;
+const fadeScreens = webScreenFade(['event/[id]/index', 'report/[userId]', 'language']);
 
 function Navigator() {
   const { state } = useStore();
@@ -64,7 +66,10 @@ function Navigator() {
   const inShell = wide && state.onboarded && !pathname.startsWith('/match');
 
   const stack = (
-    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: c.bg }, animation: wide ? 'none' : 'default' }}>
+    <Stack
+      screenLayout={fadeScreens}
+      screenOptions={{ headerShown: false, contentStyle: { backgroundColor: c.bg }, animation: wide ? 'none' : 'default' }}
+    >
       {/* Onboarding is reachable only until it is completed; afterwards the app is. */}
       <Stack.Protected guard={!state.onboarded}>
         <Stack.Screen name="(auth)" />
