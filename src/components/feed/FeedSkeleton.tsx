@@ -31,9 +31,9 @@ export function MobileFeedSkeleton({ header }: { header: ReactNode }) {
             <Bone h={56} r={18} />
           </View>
           <View style={styles.rail}>
-            <Bone w={52} h={52} r={26} />
-            <Bone w={52} h={52} r={26} />
-            <Bone w={52} h={52} r={26} />
+            <Bone w={44} h={44} r={22} />
+            <Bone w={44} h={44} r={22} />
+            <Bone w={44} h={44} r={22} />
           </View>
         </View>
         <View style={[styles.row, { marginTop: 18 }]}>
@@ -102,8 +102,8 @@ const styles = StyleSheet.create({
   mobile: { paddingHorizontal: 20 },
   header: { position: 'absolute', left: 20, right: 20 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  bottom: { flexDirection: 'row', alignItems: 'flex-end', gap: 26 },
-  rail: { gap: 32, marginBottom: 76 },
+  bottom: { flexDirection: 'row', gap: 14 },
+  rail: { width: 52, alignItems: 'center', justifyContent: 'space-between', gap: 12 },
   wideRoot: { flex: 1, flexDirection: 'row' },
   centre: { paddingTop: 32, paddingBottom: 24 },
   tabs: { alignSelf: 'flex-start', marginLeft: 42 },

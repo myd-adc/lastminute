@@ -68,7 +68,7 @@ export const FeedPage = memo(function FeedPage(p: Props) {
               </Text>
             </Pressable>
             <Pressable onPress={open} style={s.who}>
-              <AvatarStack people={p.preview.people} size={36} extra={extra} />
+              {p.preview.people.length > 0 && <AvatarStack people={p.preview.people} size={36} extra={extra} />}
               <View style={styles.whoText}>
                 <Text style={[onest('bold', 15, 19), s.text]}>{t('feed.card.going', { count: p.goingN })}</Text>
                 {p.metN > 0 ? (
@@ -80,9 +80,9 @@ export const FeedPage = memo(function FeedPage(p: Props) {
             </Pressable>
           </View>
           <View style={styles.rail}>
-            <RailButton tone="poster" icon={Bookmark} active={p.saved} label={p.saved ? t('common.saved') : t('common.save')} onPress={() => p.onSave(e.id)} />
-            <RailButton tone="poster" icon={Send} label={t('feed.share')} onPress={() => p.onShare(e)} />
-            <RailButton tone="poster" icon={Users} label={String(p.goingN)} accessibilityLabel={goingLabel(p.goingN)} onPress={open} />
+            <RailButton tone="poster" size={44} icon={Bookmark} active={p.saved} label={p.saved ? t('common.saved') : t('common.save')} onPress={() => p.onSave(e.id)} />
+            <RailButton tone="poster" size={44} icon={Send} label={t('feed.share')} onPress={() => p.onShare(e)} />
+            <RailButton tone="poster" size={44} icon={Users} label={String(p.goingN)} accessibilityLabel={goingLabel(p.goingN)} onPress={open} />
           </View>
         </View>
 
@@ -115,14 +115,14 @@ const makeStyles = (c: Palette, scheme: Scheme) =>
   });
 
 const styles = StyleSheet.create({
-  content: { position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 20, gap: 18, pointerEvents: 'box-none' },
-  // Info column (292 pt) + 52 pt rail at x = 318; the rail ends 57 pt above the info block.
-  mid: { flexDirection: 'row', alignItems: 'flex-end', gap: 6 },
-  info: { flex: 1, gap: 12 },
+  content: { position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 20, gap: 16, pointerEvents: 'box-none' },
+  // Info column (292 pt) + 52 pt rail (44 pt circles) at x = 318; the rail spans the info block, top of the pills to the bottom of «хто йде».
+  mid: { flexDirection: 'row', gap: 6 },
+  info: { flex: 1, gap: 12, justifyContent: 'flex-end' },
   infoTop: { gap: 12 },
   pills: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   whoText: { flex: 1, gap: 2 },
-  rail: { width: 52, alignItems: 'center', gap: 18, marginBottom: 57 },
+  rail: { width: 52, alignItems: 'center', justifyContent: 'space-between', gap: 12 },
   actions: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   go: { flex: 1 },
 });

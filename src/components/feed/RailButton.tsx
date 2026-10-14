@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '@/components/ui/Text';
 import { onest, useTheme } from '@/theme';
 
-// Feed rail button (M06 right rail, W03 save/share): 48 pt circle, 12 pt semibold caption 4 pt below.
+// Feed rail button (M06 right rail: 44 pt circle, W03 save/share: 48 pt), 12 pt semibold caption 4 pt below.
 // `tone`: «poster» = translucent over the poster art (M06), «surface» = surface2 on the page (W03).
 export function RailButton({
   icon: Icon,
@@ -12,6 +12,7 @@ export function RailButton({
   onPress,
   active,
   tone,
+  size = 48,
   accessibilityLabel,
 }: {
   icon: LucideIcon;
@@ -19,6 +20,7 @@ export function RailButton({
   onPress: () => void;
   active?: boolean;
   tone: 'poster' | 'surface';
+  size?: number;
   accessibilityLabel?: string;
 }) {
   const { c, scheme } = useTheme();
@@ -31,9 +33,9 @@ export function RailButton({
         accessibilityLabel={accessibilityLabel ?? label}
         onPress={onPress}
         hitSlop={6}
-        style={({ pressed }) => [styles.circle, { backgroundColor: bg }, pressed && { opacity: 0.8 }]}
+        style={({ pressed }) => [styles.circle, { width: size, height: size, borderRadius: size / 2, backgroundColor: bg }, pressed && { opacity: 0.8 }]}
       >
-        <Icon size={20} color={active ? c.onAccent : c.text} strokeWidth={2} />
+        <Icon size={size < 48 ? 18 : 20} color={active ? c.onAccent : c.text} strokeWidth={2} />
       </Pressable>
       {label ? <Text style={[onest('semibold', 12, 15), { color: poster ? c.text : c.muted }]}>{label}</Text> : null}
     </View>
@@ -42,5 +44,5 @@ export function RailButton({
 
 const styles = StyleSheet.create({
   wrap: { alignItems: 'center', gap: 4 },
-  circle: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },
+  circle: { alignItems: 'center', justifyContent: 'center' },
 });
