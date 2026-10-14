@@ -9,6 +9,7 @@ import { Platform, View } from 'react-native';
 import { SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { WebShell, webScreenFade } from '@/components/ui';
+import { EmojiPreload } from '@/components/ui/emoji/EmojiPreload';
 import { useIsWide } from '@/lib/layout';
 import { AppStoreProvider, useStore } from '@/store/AppStore';
 import { ThemeProvider, useTheme } from '@/theme';
@@ -94,6 +95,7 @@ function Navigator() {
       <View style={{ flex: 1, backgroundColor: c.bg }}>
         <StatusBar style={scheme === 'light' ? 'dark' : 'light'} />
         {inShell ? <WebShell>{stack}</WebShell> : stack}
+        <EmojiPreload />
       </View>
     </SafeAreaInsetsContext.Provider>
   );
