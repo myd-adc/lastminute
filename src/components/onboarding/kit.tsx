@@ -47,7 +47,8 @@ export function LanguagePill({ style }: { style?: StyleProp<ViewStyle> }) {
 }
 
 // Round sun / moon pill next to the language pill: flips between dark and light (leaves «system» behind).
-export function ThemeToggle() {
+// `plain` drops the pill for headers where the language is plain text too (W00).
+export function ThemeToggle({ plain }: { plain?: boolean }) {
   const { c, scheme } = useTheme();
   const { t } = useT();
   const { dispatch } = useStore();
@@ -58,9 +59,9 @@ export function ThemeToggle() {
       accessibilityLabel={t(scheme === 'dark' ? 'onboarding.theme.toLight' : 'onboarding.theme.toDark')}
       hitSlop={8}
       onPress={() => dispatch({ type: 'setTheme', theme: scheme === 'dark' ? 'light' : 'dark' })}
-      style={({ pressed }) => [styles.themeBtn, { backgroundColor: c.surface, borderColor: c.line }, pressed && { opacity: 0.8 }]}
+      style={({ pressed }) => [plain ? styles.themePlain : [styles.themeBtn, { backgroundColor: c.surface, borderColor: c.line }], pressed && { opacity: 0.8 }]}
     >
-      <Icon size={16} color={c.text} strokeWidth={2} />
+      {({ hovered }) => <Icon size={plain ? 18 : 16} color={plain && !hovered ? c.muted : c.text} strokeWidth={2} />}
     </Pressable>
   );
 }
@@ -175,6 +176,7 @@ const styles = StyleSheet.create({
   logoDot: { width: 10, height: 10, borderRadius: 5 },
   lang: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 32, paddingHorizontal: 10, borderRadius: 16, borderWidth: 1 },
   themeBtn: { width: 32, height: 32, borderRadius: 16, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  themePlain: { width: 28, height: 28, alignItems: 'center', justifyContent: 'center' },
   labelRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
   field: { gap: 8 },
   box: { minHeight: 54, borderRadius: 16, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, gap: 10 },

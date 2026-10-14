@@ -5,11 +5,12 @@ import { Image, Linking, Pressable, StyleSheet, View } from 'react-native';
 
 import { partnerMail } from '@/components/onboarding/AuthSplit';
 import { HeroBlobs } from '@/components/onboarding/HeroBlobs';
-import { LanguagePill, Logo, ThemeToggle } from '@/components/onboarding/kit';
+import { Logo, ThemeToggle } from '@/components/onboarding/kit';
 import { QrCard } from '@/components/onboarding/QrCard';
 import { Button } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
+import { useStore } from '@/store/AppStore';
 import { display, onest, useTheme, type Scheme } from '@/theme';
 
 // W00 landing (Figma «W00 landing» / «· Light»): what LastMinute is, before the W01 sign-in.
@@ -54,6 +55,9 @@ const EXAMPLES = ['university', 'company', 'running', 'games'] as const;
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
+// 28 + 42 (pill) + 28 + 3 for the Figma nav frame.
+const NAV_HEIGHT = 98;
+
 // Figma phone shell: 265 × 574 at radius 30, drop shadow 0 30 60 rgba(0,0,0,.45).
 const phone = { position: 'absolute', borderRadius: 30, boxShadow: '0 30px 60px rgba(0,0,0,0.45)' } as const;
 
@@ -61,7 +65,8 @@ type Section = 'how' | 'safety' | 'communities' | 'venues';
 
 export function Landing() {
   const { c, scheme } = useTheme();
-  const { t } = useT();
+  const { t, lang } = useT();
+  const { dispatch } = useStore();
   const reduce = !!useReducedMotion();
   const scroller = useRef<HTMLDivElement>(null);
   const how = useRef<HTMLDivElement>(null);
@@ -80,6 +85,7 @@ export function Landing() {
   const roomRotate = useTransform(scrollY, range, reduce ? [0, 0] : [0, -3]);
   const copyY = useTransform(scrollY, [0, 600], reduce ? [0, 0] : [0, 90]);
   const copyOpacity = useTransform(scrollY, [0, 500], reduce ? [1, 1] : [1, 0.15]);
+  const navBacking = useTransform(scrollY, [0, 48], [0, 1]);
 
   const go = (s: Section) =>
     ({ how, safety, communities, venues })[s].current?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
@@ -88,7 +94,9 @@ export function Landing() {
 
   return (
     <div ref={scroller} style={{ height: '100%', overflowY: 'auto', overflowX: 'hidden', backgroundColor: c.bg }}>
-      <div style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: `${c.bg}D9`, backdropFilter: 'blur(16px)' }}>
+      {/* Transparent over the hero as in Figma; the blurred backing fades in once the page scrolls. */}
+      <div style={{ position: 'sticky', top: 0, zIndex: 10 }}>
+        <motion.div style={{ position: 'absolute', inset: 0, backgroundColor: `${c.bg}D9`, backdropFilter: 'blur(16px)', opacity: navBacking }} />
         <View style={[styles.wrap, styles.nav]}>
           <Logo />
           <View style={styles.navLinks}>
@@ -99,10 +107,17 @@ export function Landing() {
             ))}
           </View>
           <View style={styles.navActions}>
-            <ThemeToggle />
-            <LanguagePill />
-            <Button label={t('onboarding.landing.signIn')} variant="ghost" size="md" onPress={signIn} />
-            <Button label={t('onboarding.landing.getStarted')} size="md" onPress={start} />
+            <ThemeToggle plain />
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('onboarding.language.a11y')}
+              hitSlop={8}
+              onPress={() => dispatch({ type: 'setLanguage', language: lang === 'uk' ? 'en' : 'uk' })}
+            >
+              {({ hovered }) => <Text style={[onest('semibold', 14), { color: hovered ? c.text : c.muted }]}>{t('onboarding.language.short')}</Text>}
+            </Pressable>
+            <Pill label={t('onboarding.landing.signIn')} kind="outline" onPress={signIn} />
+            <Pill label={t('onboarding.landing.getStarted')} onPress={start} />
           </View>
         </View>
       </div>
@@ -242,6 +257,24 @@ function Communities({ root, shot, reduce }: { root: RefObject<HTMLDivElement | 
   );
 }
 
+// Figma W00 nav pill: 11 × 20 padding, Onest Bold 16 (smaller than the app Button).
+function Pill({ label, kind = 'primary', onPress }: { label: string; kind?: 'primary' | 'outline'; onPress: () => void }) {
+  const { c } = useTheme();
+  return (
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      style={({ pressed, hovered }) => [
+        styles.pill,
+        kind === 'primary' ? { backgroundColor: c.accent } : { borderWidth: 1.5, borderColor: hovered ? c.muted : c.line },
+        pressed && { opacity: 0.85 },
+      ]}
+    >
+      <Text style={[onest('bold', 16, 20), { color: kind === 'primary' ? c.onAccent : c.text }]}>{label}</Text>
+    </Pressable>
+  );
+}
+
 function Title({ text }: { text: string }) {
   const { c } = useTheme();
   return <Text style={[display(44, 52), { color: c.text, maxWidth: 820 }]}>{text}</Text>;
@@ -275,11 +308,13 @@ function FooterLink({ label, onPress }: { label: string; onPress: () => void }) 
 const styles = StyleSheet.create({
   // The page scrolls in a plain div, so centre with auto margins rather than alignSelf.
   wrap: { width: '100%', maxWidth: 1296, marginHorizontal: 'auto', paddingHorizontal: 48 },
-  nav: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 20 },
+  nav: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 28 },
   navLinks: { flexDirection: 'row', gap: 32 },
   navActions: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  hero: { position: 'relative', overflow: 'hidden' },
-  heroRow: { flexDirection: 'row', alignItems: 'center', gap: 64, paddingTop: 72, paddingBottom: 112 },
+  pill: { paddingHorizontal: 20, paddingVertical: 11, borderRadius: 999 },
+  // Pulled up under the sticky nav (NAV_HEIGHT) so the glows start at the top of the page, as in Figma.
+  hero: { position: 'relative', overflow: 'hidden', marginTop: -NAV_HEIGHT },
+  heroRow: { flexDirection: 'row', alignItems: 'center', gap: 64, paddingTop: NAV_HEIGHT + 72, paddingBottom: 112 },
   ctas: { flexDirection: 'row', gap: 12, marginTop: 36 },
   stage: { width: 520, height: 640 },
   heroShot: { width: 265, height: 574, borderRadius: 30 },
