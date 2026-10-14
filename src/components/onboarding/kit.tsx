@@ -1,4 +1,4 @@
-import { ChevronDown, Globe } from 'lucide-react-native';
+import { ChevronDown, Globe, Moon, Sun } from 'lucide-react-native';
 import { forwardRef, useState, type ReactNode } from 'react';
 import { Pressable, StyleSheet, TextInput, View, type StyleProp, type TextInputProps, type ViewStyle } from 'react-native';
 
@@ -42,6 +42,25 @@ export function LanguagePill({ style }: { style?: StyleProp<ViewStyle> }) {
       <Globe size={16} color={c.text} strokeWidth={2} />
       <Text style={[onest('semibold', 13), { color: c.text }]}>{t('onboarding.language.short')}</Text>
       <ChevronDown size={14} color={c.muted} strokeWidth={2} />
+    </Pressable>
+  );
+}
+
+// Round sun / moon pill next to the language pill: flips between dark and light (leaves «system» behind).
+export function ThemeToggle() {
+  const { c, scheme } = useTheme();
+  const { t } = useT();
+  const { dispatch } = useStore();
+  const Icon = scheme === 'dark' ? Sun : Moon;
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={t(scheme === 'dark' ? 'onboarding.theme.toLight' : 'onboarding.theme.toDark')}
+      hitSlop={8}
+      onPress={() => dispatch({ type: 'setTheme', theme: scheme === 'dark' ? 'light' : 'dark' })}
+      style={({ pressed }) => [styles.themeBtn, { backgroundColor: c.surface, borderColor: c.line }, pressed && { opacity: 0.8 }]}
+    >
+      <Icon size={16} color={c.text} strokeWidth={2} />
     </Pressable>
   );
 }
@@ -155,6 +174,7 @@ const styles = StyleSheet.create({
   logo: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   logoDot: { width: 10, height: 10, borderRadius: 5 },
   lang: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 32, paddingHorizontal: 10, borderRadius: 16, borderWidth: 1 },
+  themeBtn: { width: 32, height: 32, borderRadius: 16, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   labelRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
   field: { gap: 8 },
   box: { minHeight: 54, borderRadius: 16, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, gap: 10 },

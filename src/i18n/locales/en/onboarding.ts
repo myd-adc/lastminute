@@ -6,6 +6,7 @@ export const onboarding: Translation<typeof Uk> = {
     short: 'EN',
     a11y: 'Language: English. Tap to switch to Ukrainian',
   },
+  theme: { toLight: 'Switch to light theme', toDark: 'Switch to dark theme' },
   hero: 'Don’t go alone.\nGo with people\nwho are\nalready going.',
   tagline: 'Events in the city and your communities — and the people who are going too.',
   wide: {

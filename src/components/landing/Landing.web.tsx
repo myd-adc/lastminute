@@ -5,7 +5,7 @@ import { Image, Linking, Pressable, StyleSheet, View } from 'react-native';
 
 import { partnerMail } from '@/components/onboarding/AuthSplit';
 import { HeroBlobs } from '@/components/onboarding/HeroBlobs';
-import { LanguagePill, Logo } from '@/components/onboarding/kit';
+import { LanguagePill, Logo, ThemeToggle } from '@/components/onboarding/kit';
 import { QrCard } from '@/components/onboarding/QrCard';
 import { Button } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
@@ -98,6 +98,7 @@ export function Landing() {
             ))}
           </View>
           <View style={styles.navActions}>
+            <ThemeToggle />
             <LanguagePill />
             <Button label={t('onboarding.landing.signIn')} variant="ghost" size="md" onPress={start} />
             <Button label={t('onboarding.landing.getStarted')} size="md" onPress={start} />
