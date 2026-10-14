@@ -285,7 +285,8 @@ const styles = StyleSheet.create({
   steps: { flexDirection: 'row', gap: 24 },
   stepCard: { flex: 1, borderRadius: 28, borderWidth: 1, paddingTop: 28, paddingHorizontal: 28, gap: 14, overflow: 'hidden' },
   badge: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
-  stepShot: { width: '100%', aspectRatio: 328 / 380, marginTop: 6, overflow: 'hidden' },
+  // Pinned to the card bottom so the three phones line up whatever the text length above them.
+  stepShot: { width: '100%', aspectRatio: 328 / 380, marginTop: 'auto', paddingTop: 6, overflow: 'hidden' },
   fill: { width: '100%', height: '100%' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 24 },
   cell: { flexBasis: '30%', flexGrow: 1, minWidth: 0 },
