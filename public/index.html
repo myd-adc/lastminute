@@ -41,24 +41,30 @@
         justify-content: center;
         gap: 28px;
         overflow: hidden;
-        background: #0b0b10;
+        /* Glows are gradients, not blurred circles: iOS Safari runs out of layer memory on filter: blur
+           while the bundle parses and paints the logo and dots over black tiles. */
+        background:
+          radial-gradient(circle 48vmax at 10vmax 12vmax, rgba(255, 61, 139, 0.5), rgba(255, 61, 139, 0) 100%),
+          radial-gradient(circle 42vmax at calc(100% - 9vmax) 35vmax, rgba(124, 92, 255, 0.5), rgba(124, 92, 255, 0) 100%),
+          radial-gradient(circle 30vmax at 27vmax calc(100% - 3vmax), rgba(61, 124, 255, 0.3), rgba(61, 124, 255, 0) 100%),
+          #0b0b10;
         transition: opacity 0.3s ease;
       }
       #boot.gone { opacity: 0; pointer-events: none; }
-      #boot .glow { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.55; }
-      #boot .g1 { width: 60vmax; height: 60vmax; left: -20vmax; top: -18vmax; background: #ff3d8b; }
-      #boot .g2 { width: 50vmax; height: 50vmax; right: -16vmax; top: 10vmax; background: #7c5cff; }
-      #boot .g3 { width: 34vmax; height: 34vmax; left: 10vmax; bottom: -14vmax; background: #3d7cff; opacity: 0.35; }
-      #boot img { position: relative; width: min(250px, 64vw); height: auto; }
+      #boot img { width: min(250px, 64vw); height: auto; }
       #boot .light { display: none; }
-      #boot .dots { position: relative; display: flex; gap: 8px; }
+      #boot .dots { display: flex; gap: 8px; }
       #boot .dots i { width: 8px; height: 8px; border-radius: 50%; background: #d7ff3b; opacity: 0.35; animation: boot-pulse 1.2s ease-in-out infinite; }
       #boot .dots i:nth-child(2) { animation-delay: 0.2s; }
       #boot .dots i:nth-child(3) { animation-delay: 0.4s; }
       @keyframes boot-pulse { 0%, 100% { opacity: 0.35; transform: scale(1); } 40% { opacity: 1; transform: scale(1.15); } }
-      html[data-boot="light"] #boot { background: #f6f5f1; }
-      html[data-boot="light"] #boot .glow { opacity: 0.45; }
-      html[data-boot="light"] #boot .g3 { background: #d7ff3b; }
+      html[data-boot="light"] #boot {
+        background:
+          radial-gradient(circle 48vmax at 10vmax 12vmax, rgba(255, 61, 139, 0.4), rgba(255, 61, 139, 0) 100%),
+          radial-gradient(circle 42vmax at calc(100% - 9vmax) 35vmax, rgba(124, 92, 255, 0.4), rgba(124, 92, 255, 0) 100%),
+          radial-gradient(circle 30vmax at 27vmax calc(100% - 3vmax), rgba(215, 255, 59, 0.4), rgba(215, 255, 59, 0) 100%),
+          #f6f5f1;
+      }
       html[data-boot="light"] #boot .dark { display: none; }
       html[data-boot="light"] #boot .light { display: block; }
       @media (min-width: 1024px) { #boot img { width: 350px; } #boot { gap: 32px; } }
@@ -80,9 +86,6 @@
       You need to enable JavaScript to run this app.
     </noscript>
     <div id="boot" aria-hidden="true">
-      <div class="glow g1"></div>
-      <div class="glow g2"></div>
-      <div class="glow g3"></div>
       <img class="dark" src="/splash-logo-dark.png" alt="" />
       <img class="light" src="/splash-logo-light.png" alt="" />
       <div class="dots"><i></i><i></i><i></i></div>
