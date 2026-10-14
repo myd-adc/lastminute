@@ -2,13 +2,27 @@ import { Onest_400Regular, Onest_500Medium, Onest_600SemiBold, Onest_700Bold } f
 import { Unbounded_600SemiBold, Unbounded_700Bold } from '@expo-google-fonts/unbounded';
 import { useFonts } from 'expo-font';
 import { Stack, usePathname } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { View } from 'react-native';
+import { useEffect } from 'react';
+import { Platform, View } from 'react-native';
 
 import { WebShell } from '@/components/ui';
 import { useIsWide } from '@/lib/layout';
 import { AppStoreProvider, useStore } from '@/store/AppStore';
 import { ThemeProvider, useTheme } from '@/theme';
+
+// M00: the native splash (expo-splash-screen) and, on web, #boot in public/index.html stay up until the fonts
+// and the saved state are in; Themed hides both on its first real render.
+if (Platform.OS !== 'web') SplashScreen.preventAutoHideAsync().catch(() => {});
+
+function hideSplash() {
+  if (Platform.OS !== 'web') return SplashScreen.hide();
+  const boot = document.getElementById('boot');
+  if (!boot) return;
+  boot.classList.add('gone');
+  setTimeout(() => boot.remove(), 320);
+}
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -29,6 +43,9 @@ export default function RootLayout() {
 
 function Themed() {
   const { state, hydrated } = useStore();
+  useEffect(() => {
+    if (hydrated) hideSplash();
+  }, [hydrated]);
   if (!hydrated) return null;
   return (
     <ThemeProvider mode={state.settings.theme}>

@@ -5,6 +5,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { CardDeck, type Choice, type DeckHandle } from '@/components/room/CardDeck';
+import { RoomSkeleton } from '@/components/skeletons/ListSkeletons';
 import { RoomMatchesPanel } from '@/components/room/RoomMatchesPanel';
 import { KeyboardHints, RoomActions, RoomDone, RoomFootnote, RoomLocked, RoomTabs } from '@/components/room/RoomParts';
 import { venueShort } from '@/components/room/text';
@@ -23,7 +24,8 @@ export default function RoomScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const event = id ? getEvent(id) : undefined;
   const wide = useIsWide();
-  if (!event) return <NotFound />;
+  const { loading } = useStore();
+  if (!event) return loading ? <RoomSkeleton /> : <NotFound />;
   return wide ? <RoomWide event={event} /> : <RoomMobile event={event} />;
 }
 

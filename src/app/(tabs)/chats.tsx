@@ -14,6 +14,7 @@ import { chatList, type ChatSummary } from '@/lib/selectors';
 import { dayLabel } from '@/lib/time';
 import { useNow, useStore } from '@/store/AppStore';
 import { display, onest, type Palette, useStyles, useTheme } from '@/theme';
+import { ChatRowsSkeleton } from '@/components/skeletons/ListSkeletons';
 
 export default function ChatsScreen() {
   const wide = useIsWide();
@@ -25,7 +26,7 @@ function ChatsList() {
   const { c } = useTheme();
   const { t } = useT();
   const s = useStyles(makeStyles);
-  const { state } = useStore();
+  const { state, loading } = useStore();
   const now = useNow();
   const [searching, setSearching] = useState(false);
   const [query, setQuery] = useState('');
@@ -75,7 +76,11 @@ function ChatsList() {
         </View>
       )}
 
-      {all.length === 0 ? (
+      {loading ? (
+        <View style={{ marginTop: 12 }}>
+          <ChatRowsSkeleton />
+        </View>
+      ) : all.length === 0 ? (
         <View style={s.empty}>
           <View style={s.emptyIcon}>
             <MessageSquare size={30} color={c.muted} />

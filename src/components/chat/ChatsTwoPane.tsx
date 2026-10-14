@@ -9,6 +9,7 @@ import { chatList, isPast, type ChatSummary } from '@/lib/selectors';
 import { dayLabel } from '@/lib/time';
 import { useNow, useStore } from '@/store/AppStore';
 import { display, onest, type Palette, useStyles, useTheme } from '@/theme';
+import { ChatRowsSkeleton } from '@/components/skeletons/ListSkeletons';
 
 import { ChatConversation } from './ChatConversation';
 import { ChatRow } from './ChatRow';
@@ -21,7 +22,7 @@ export function ChatsTwoPane({ initialChatId }: { initialChatId?: string }) {
   const { c } = useTheme();
   const { t } = useT();
   const s = useStyles(makeStyles);
-  const { state } = useStore();
+  const { state, loading } = useStore();
   const now = useNow();
   const all = useMemo(() => chatList(state, now), [state, now]);
   const [query, setQuery] = useState('');
@@ -82,6 +83,7 @@ export function ChatsTwoPane({ initialChatId }: { initialChatId?: string }) {
           })}
         </View>
         <ScrollView style={s.flex} contentContainerStyle={{ gap: 8, paddingBottom: 24 }}>
+          {loading && <ChatRowsSkeleton />}
           {upcoming.map((g) => (
             <Fragment key={g.event.id}>
               <Text style={s.section}>
@@ -96,7 +98,7 @@ export function ChatsTwoPane({ initialChatId }: { initialChatId?: string }) {
               {rows(past)}
             </>
           )}
-          {visible.length === 0 && (
+          {visible.length === 0 && !loading && (
             <Text style={[onest('regular', 13, 18), { color: c.muted, paddingTop: 12 }]}>
               {query ? t('chat.notFound') : tab === 'active' ? t('chat.noActive') : t('chat.archiveEmpty')}
             </Text>

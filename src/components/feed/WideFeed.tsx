@@ -10,9 +10,11 @@ import { useT } from '@/i18n';
 import { acquaintances, attendeesFor, goingCount, nameAge, nextForYou, soloCount } from '@/lib/selectors';
 import { going as goingLabel, whenLabel } from '@/lib/time';
 import { display, fonts, onest, useTheme } from '@/theme';
+import { useStore } from '@/store/AppStore';
 
 import { DateTile } from './DateTile';
 import { EndOfFeed } from './EndOfFeed';
+import { WideFeedSkeleton } from './FeedSkeleton';
 import { FeedTabs } from './FeedTabs';
 import { priceLabel } from './format';
 import { posterPillBg } from './FeedPage';
@@ -30,6 +32,7 @@ export function WideFeed() {
   const { height: winH } = useWindowDimensions();
   const toast = useToast(40);
   const { state, now, feed, previews, handlers, setTab } = useFeed(toast.show);
+  const { loading } = useStore();
   const [index, setIndex] = useState(0);
   const i = Math.min(index, Math.max(0, feed.length - 1));
   const event: Event | undefined = feed[i];
@@ -93,6 +96,8 @@ export function WideFeed() {
       wide
     />
   );
+
+  if (loading) return <WideFeedSkeleton tabs={tabs} cardW={cardW} cardH={cardH} panelW={PANEL} />;
 
   if (!event) {
     return (

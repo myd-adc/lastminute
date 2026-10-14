@@ -8,9 +8,11 @@ import { tabBarClearance } from '@/lib/layout';
 import { goingCount, metCount, soloCount } from '@/lib/selectors';
 import { whenLabel } from '@/lib/time';
 import { useTheme } from '@/theme';
+import { useStore } from '@/store/AppStore';
 
 import { EndOfFeed } from './EndOfFeed';
 import { FeedPage } from './FeedPage';
+import { MobileFeedSkeleton } from './FeedSkeleton';
 import { FeedTabs } from './FeedTabs';
 import { FilterSheet } from './FilterSheet';
 import { useToast } from './Toast';
@@ -23,6 +25,7 @@ export function MobileFeed() {
   const clearance = tabBarClearance(insets.bottom);
   const toast = useToast(clearance + 8);
   const { state, dispatch, now, feed, previews, handlers, setTab } = useFeed(toast.show);
+  const { loading } = useStore();
   const [size, setSize] = useState({ w: 0, h: 0 });
   const [filters, setFilters] = useState(false);
   const listRef = useRef<FlatList<Event>>(null);
@@ -112,6 +115,8 @@ export function MobileFeed() {
       {...handlers}
     />
   );
+
+  if (loading) return <MobileFeedSkeleton header={header(false)} />;
 
   return (
     <View style={[styles.root, { backgroundColor: c.bg }]} onLayout={onLayout}>

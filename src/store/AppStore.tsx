@@ -23,6 +23,8 @@ type Store = {
   state: State;
   dispatch: (action: Action) => void;
   hydrated: boolean;
+  // Live: signed in but no server data yet (first sync without a cached snapshot) — screens show skeletons.
+  loading: boolean;
   // Sends a message as the user. Demo: in a DM the other side answers with their next scripted reply.
   sendMessage: (chatId: string, text: string) => void;
   // Room swipe; resolves to whether it completed a match (live: once the server confirms it).
@@ -40,6 +42,7 @@ const StoreContext = createContext<Store | null>(null);
 export function AppStoreProvider({ children }: { children: ReactNode }) {
   const [state, baseDispatch] = useReducer(reducer, initialState);
   const [hydrated, setHydrated] = useState(false);
+  const [remoteReady, setRemoteReady] = useState(false);
   const stateRef = useRef(state);
   useEffect(() => {
     stateRef.current = state;
@@ -74,7 +77,10 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
         if (!raw) return;
         const saved = JSON.parse(raw) as State;
         if (saved.version !== STATE_VERSION) return;
-        if (isLive && remote && saved.onboarded) setRemoteData(JSON.parse(remote));
+        if (isLive && remote && saved.onboarded) {
+          setRemoteData(JSON.parse(remote));
+          setRemoteReady(true);
+        }
         dispatch({ type: 'hydrate', state: { ...initialState, ...saved } });
       })
       .catch(() => {})
@@ -98,11 +104,16 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       syncRef.current = api.startSync(uid, {
         onSnapshot: (snap) => {
           setRemoteData(snap.remote);
+          setRemoteReady(true);
           AsyncStorage.setItem(REMOTE_KEY, JSON.stringify(snap.remote)).catch(() => {});
           baseDispatch({ type: 'sync', synced: snap.synced });
         },
         onSignedOut: () => baseDispatch({ type: 'logout' }),
-        onError: (e) => __DEV__ && console.warn('[sync]', e),
+        onError: (e) => {
+          // A failed first sync still ends the skeletons: the screens fall back to their empty states.
+          setRemoteReady(true);
+          if (__DEV__) console.warn('[sync]', e);
+        },
       });
     });
     return () => {
@@ -111,6 +122,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       syncRef.current = null;
       meRef.current = null;
       setRemoteData(EMPTY_REMOTE, false);
+      setRemoteReady(false);
       AsyncStorage.removeItem(REMOTE_KEY).catch(() => {});
     };
   }, [hydrated, state.onboarded]);
@@ -223,8 +235,8 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   );
 
   const value = useMemo(
-    () => ({ state, dispatch, hydrated, sendMessage, decide, createCommunity, addEvent, joinCommunity }),
-    [state, dispatch, hydrated, sendMessage, decide, createCommunity, addEvent, joinCommunity],
+    () => ({ state, dispatch, hydrated, loading: isLive && state.onboarded && !remoteReady, sendMessage, decide, createCommunity, addEvent, joinCommunity }),
+    [state, dispatch, hydrated, remoteReady, sendMessage, decide, createCommunity, addEvent, joinCommunity],
   );
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

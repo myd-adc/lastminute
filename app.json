@@ -37,6 +37,18 @@
           "photosPermission": "LastMinute показує твоє фото лише учасникам тієї ж події та в альбомі події.",
           "cameraPermission": "Камера потрібна, щоб додати фото в альбом події."
         }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-logo-light.png",
+          "imageWidth": 220,
+          "backgroundColor": "#F6F5F1",
+          "dark": {
+            "image": "./assets/splash-logo-dark.png",
+            "backgroundColor": "#0B0B10"
+          }
+        }
       ]
     ],
     "scheme": "lastminute",

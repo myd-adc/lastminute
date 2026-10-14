@@ -9,6 +9,7 @@ export const common = {
   next: 'Далі',
   done: 'Готово',
   confirm: 'Підтвердити',
+  loading: 'Завантаження',
   more: 'Більше дій',
   imGoing: '👋 Я йду',
   youreGoing: 'Ти йдеш ✓',

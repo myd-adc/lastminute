@@ -29,6 +29,49 @@
         flex: 1;
       }
     </style>
+    <!-- M00 / W00s splash, shown before the bundle runs; RootLayout fades it out once fonts and saved state are in. -->
+    <style id="boot-style">
+      #boot {
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 28px;
+        overflow: hidden;
+        background: #0b0b10;
+        transition: opacity 0.3s ease;
+      }
+      #boot.gone { opacity: 0; pointer-events: none; }
+      #boot .glow { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.55; }
+      #boot .g1 { width: 60vmax; height: 60vmax; left: -20vmax; top: -18vmax; background: #ff3d8b; }
+      #boot .g2 { width: 50vmax; height: 50vmax; right: -16vmax; top: 10vmax; background: #7c5cff; }
+      #boot .g3 { width: 34vmax; height: 34vmax; left: 10vmax; bottom: -14vmax; background: #3d7cff; opacity: 0.35; }
+      #boot img { position: relative; width: min(250px, 64vw); height: auto; }
+      #boot .light { display: none; }
+      #boot .dots { position: relative; display: flex; gap: 8px; }
+      #boot .dots i { width: 8px; height: 8px; border-radius: 50%; background: #d7ff3b; opacity: 0.35; animation: boot-pulse 1.2s ease-in-out infinite; }
+      #boot .dots i:nth-child(2) { animation-delay: 0.2s; }
+      #boot .dots i:nth-child(3) { animation-delay: 0.4s; }
+      @keyframes boot-pulse { 0%, 100% { opacity: 0.35; transform: scale(1); } 40% { opacity: 1; transform: scale(1.15); } }
+      html[data-boot="light"] #boot { background: #f6f5f1; }
+      html[data-boot="light"] #boot .glow { opacity: 0.45; }
+      html[data-boot="light"] #boot .g3 { background: #d7ff3b; }
+      html[data-boot="light"] #boot .dark { display: none; }
+      html[data-boot="light"] #boot .light { display: block; }
+      @media (min-width: 1024px) { #boot img { width: 350px; } #boot { gap: 32px; } }
+      @media (prefers-reduced-motion: reduce) { #boot .dots i { animation: none; opacity: 0.7; } }
+    </style>
+    <script>
+      // The saved theme picks the splash colours (the app defaults to dark); «system» follows the OS.
+      try {
+        var mode = (JSON.parse(localStorage.getItem('lastminute:state') || '{}').settings || {}).theme || 'dark';
+        var light = mode === 'light' || (mode === 'system' && matchMedia('(prefers-color-scheme: light)').matches);
+        if (light) document.documentElement.setAttribute('data-boot', 'light');
+      } catch (e) {}
+    </script>
   </head>
 
   <body>
@@ -36,6 +79,14 @@
     <noscript>
       You need to enable JavaScript to run this app.
     </noscript>
+    <div id="boot" aria-hidden="true">
+      <div class="glow g1"></div>
+      <div class="glow g2"></div>
+      <div class="glow g3"></div>
+      <img class="dark" src="/splash-logo-dark.png" alt="" />
+      <img class="light" src="/splash-logo-light.png" alt="" />
+      <div class="dots"><i></i><i></i><i></i></div>
+    </div>
     <!-- The root element for your Expo app. -->
     <div id="root"></div>
   </body>

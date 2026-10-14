@@ -11,6 +11,7 @@ export const common: Translation<typeof Uk> = {
   next: 'Next',
   done: 'Done',
   confirm: 'Confirm',
+  loading: 'Loading',
   more: 'More actions',
   imGoing: '👋 I’m going',
   youreGoing: 'You’re going ✓',
