@@ -83,7 +83,8 @@ export function Landing() {
 
   const go = (s: Section) =>
     ({ how, safety, communities, venues })[s].current?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
-  const start = () => router.push('/login');
+  const signIn = () => router.push('/login');
+  const start = () => router.push('/signup');
 
   return (
     <div ref={scroller} style={{ height: '100%', overflowY: 'auto', overflowX: 'hidden', backgroundColor: c.bg }}>
@@ -100,7 +101,7 @@ export function Landing() {
           <View style={styles.navActions}>
             <ThemeToggle />
             <LanguagePill />
-            <Button label={t('onboarding.landing.signIn')} variant="ghost" size="md" onPress={start} />
+            <Button label={t('onboarding.landing.signIn')} variant="ghost" size="md" onPress={signIn} />
             <Button label={t('onboarding.landing.getStarted')} size="md" onPress={start} />
           </View>
         </View>

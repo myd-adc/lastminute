@@ -1,4 +1,4 @@
-import { Redirect, router } from 'expo-router';
+import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
@@ -10,19 +10,20 @@ import { Button } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
 import { useIsWide } from '@/lib/layout';
-import { requestCode, verifyCode } from '@/api/auth';
+import { resendCode, verifyCode, type CodeMode } from '@/api/auth';
 import { isLive } from '@/api/client';
 import { useStore } from '@/store/AppStore';
 import { display, onest, useTheme } from '@/theme';
 
 const back = () => (router.canGoBack() ? router.back() : router.replace('/login'));
 
-// M02 «Введи код з листа». Demo backend: any 6 digits are accepted.
+// M02 «Введи код з листа»: confirms the address after sign-up, or opens the reset (M02b). Demo: any 6 digits pass.
 export default function CodeScreen() {
   const { c } = useTheme();
   const { t } = useT();
   const { state, dispatch } = useStore();
   const wide = useIsWide();
+  const mode: CodeMode = useLocalSearchParams<{ mode?: string }>().mode === 'reset' ? 'reset' : 'signup';
   const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,9 +37,10 @@ export default function CodeScreen() {
     if (isLive) {
       setBusy(true);
       setError(null);
-      const res = await verifyCode(email, code);
+      const res = await verifyCode(email, code, mode);
       setBusy(false);
       if (!res.ok) return setError(t('onboarding.errors.code'));
+      if (mode === 'reset') return router.replace('/new-password');
       if (res.data) {
         // Returning user: restore the saved profile and skip onboarding (the guard switches to the app).
         dispatch({ type: 'restoreAccount', ...res.data });
@@ -46,6 +48,7 @@ export default function CodeScreen() {
         return;
       }
     }
+    if (mode === 'reset') return router.replace('/new-password');
     dispatch({ type: 'verifyEmail' });
     router.push('/profile-setup');
   };
@@ -53,7 +56,7 @@ export default function CodeScreen() {
   // A fresh code replaces the previous one; demo mode has nothing to resend.
   const resend = () => {
     setError(null);
-    if (isLive) requestCode(email).then((r) => !r.ok && setError(t('onboarding.errors.send')));
+    if (isLive) resendCode(email, mode).then((r) => !r.ok && setError(t('onboarding.errors.send')));
   };
 
   // M02: title Unbounded 28 / 1.15, subtitle 15 / 1.4 with the address in the text colour, 10 pt apart.

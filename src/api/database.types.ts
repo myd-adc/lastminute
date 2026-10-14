@@ -452,6 +452,7 @@ export type Database = {
       is_going: { Args: { p_event: string; p_user?: string }; Returns: boolean };
       is_match_member: { Args: { p_match: string; p_user?: string }; Returns: boolean };
       join_community: { Args: { p_community: string }; Returns: undefined };
+      login_email: { Args: { p_login: string; p_password: string }; Returns: string | null };
       met_events: {
         Args: Record<PropertyKey, never>;
         Returns: {

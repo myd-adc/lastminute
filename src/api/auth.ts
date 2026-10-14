@@ -12,11 +12,52 @@ const fail = (error: { message?: string } | null | undefined, fallback: string):
   error: error?.message ?? fallback,
 });
 
-// Mails the 6-digit sign-in code; a new address becomes a new account.
-export async function requestCode(email: string): Promise<AuthResult> {
-  const { error } = await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
+export const PASSWORD_MIN = 8; // auth.minimum_password_length in supabase/config.toml
+
+// Sign-up: the account is created with its password, and Auth mails a 6-digit code to confirm the address.
+// An address that is already registered comes back as a user without identities (Auth hides who exists).
+export async function signUp(email: string, password: string): Promise<AuthResult> {
+  const { data, error } = await supabase.auth.signUp({ email, password });
+  if (error) return fail(error, /registered|exists/i.test(error.message) ? 'exists' : 'signup_failed');
+  if (data.user && data.user.identities?.length === 0) return { ok: false, error: 'exists' };
+  return { ok: true, data: undefined };
+}
+
+// Sign-in with @username or e-mail. A username is traded for the address by login_email(), which answers only
+// when the password matches; then Auth checks the password again and opens the session.
+export async function signIn(login: string, password: string): Promise<AuthResult<{ email: string; account: ExistingAccount | null }>> {
+  // «@taras.k» is a username too: only an «@» after the first character makes it an address.
+  let email = login.trim().toLowerCase().replace(/^@/, '');
+  if (!email.includes('@')) {
+    const { data, error } = await supabase.rpc('login_email', { p_login: email, p_password: password });
+    if (error) return { ok: false, error: /too many/i.test(error.message) ? 'too_many' : 'signin_failed' };
+    if (!data) return { ok: false, error: 'invalid' };
+    email = data;
+  }
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) return { ok: false, error: /confirm/i.test(error.message) ? 'unconfirmed' : /invalid/i.test(error.message) ? 'invalid' : 'signin_failed' };
+  return { ok: true, data: { email, account: await loadAccount(data.user.id) } };
+}
+
+// The 6-digit code again: confirmation for sign-up, recovery for «Забув пароль?».
+export async function resendCode(email: string, mode: CodeMode): Promise<AuthResult> {
+  const { error } = mode === 'signup' ? await supabase.auth.resend({ type: 'signup', email }) : await supabase.auth.resetPasswordForEmail(email);
   return error ? fail(error, 'otp_failed') : { ok: true, data: undefined };
 }
+
+// «Забув пароль?»: mails a recovery code. Also how accounts made before passwords get one.
+export async function requestReset(email: string): Promise<AuthResult> {
+  const { error } = await supabase.auth.resetPasswordForEmail(email);
+  return error ? fail(error, 'otp_failed') : { ok: true, data: undefined };
+}
+
+export async function setPassword(password: string): Promise<AuthResult<ExistingAccount | null>> {
+  const { data, error } = await supabase.auth.updateUser({ password });
+  if (error || !data.user) return fail(error, 'password_failed');
+  return { ok: true, data: await loadAccount(data.user.id) };
+}
+
+export type CodeMode = 'signup' | 'reset';
 
 export type ExistingAccount = {
   me: Me;
@@ -26,8 +67,9 @@ export type ExistingAccount = {
 };
 
 // Verifies the code and returns the saved profile for returning users (null = new account → onboarding).
-export async function verifyCode(email: string, token: string): Promise<AuthResult<ExistingAccount | null>> {
-  const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'email' });
+// The recovery code signs the user in, so the next screen can set the new password.
+export async function verifyCode(email: string, token: string, mode: CodeMode): Promise<AuthResult<ExistingAccount | null>> {
+  const { data, error } = await supabase.auth.verifyOtp({ email, token, type: mode === 'reset' ? 'recovery' : 'email' });
   if (error || !data.user) return fail(error, 'verify_failed');
   return { ok: true, data: await loadAccount(data.user.id) };
 }
