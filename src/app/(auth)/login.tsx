@@ -11,7 +11,7 @@ import { useT } from '@/i18n';
 import { useIsWide } from '@/lib/layout';
 import { useStore } from '@/store/AppStore';
 
-// M01 / W01 «Вхід»: @username or e-mail + password; «Забув пароль?» and the switch to sign-up.
+// M01 / W01 "Sign in": @username or e-mail + password; "Forgot your password?" and the switch to sign-up.
 export default function LoginScreen() {
   const { state, dispatch } = useStore();
   const { t } = useT();

@@ -7,7 +7,7 @@ import { useT } from '@/i18n';
 import { suggestUsername } from '@/lib/username';
 import { useStore } from '@/store/AppStore';
 
-// M03 «Як тебе показувати іншим?» — onboarding step 1 of 3.
+// M03 "How should others see you?" — onboarding step 1 of 3.
 export default function ProfileSetupScreen() {
   const { state, dispatch } = useStore();
   const { t } = useT();

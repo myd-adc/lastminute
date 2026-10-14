@@ -240,7 +240,7 @@ otp_expiry = 3600
 subject = "LastMinute: код {{ .Token }}"
 content_path = "./supabase/templates/email_change.html"
 
-# Sign-up confirms the address with a 6-digit code; «Забув пароль?» mails a recovery code. Sign-in itself is a password.
+# Sign-up confirms the address with a 6-digit code; "Forgot your password?" mails a recovery code. Sign-in itself is a password.
 [auth.email.template.confirmation]
 subject = "LastMinute: код {{ .Token }}"
 content_path = "./supabase/templates/confirmation.html"

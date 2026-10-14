@@ -14,7 +14,7 @@ import { onest, type, useTheme } from '@/theme';
 
 const reasons: ReportReason[] = ['messages', 'dating', 'fake', 'unsafe', 'other'];
 
-// M17 «Скарга»: anonymous report with an optional block, as a bottom sheet over the chat.
+// M17 "Report": anonymous report with an optional block, as a bottom sheet over the chat.
 export default function ReportScreen() {
   const { c } = useTheme();
   const { t, lang } = useT();

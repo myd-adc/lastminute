@@ -9,7 +9,7 @@ import { Button } from '@/components/ui';
 import { useT } from '@/i18n';
 import { useStore } from '@/store/AppStore';
 
-// M02b «Придумай новий пароль»: reached with the session the recovery code opened.
+// M02b "Set a new password": reached with the session the recovery code opened.
 export default function NewPasswordScreen() {
   const { dispatch } = useStore();
   const { t } = useT();

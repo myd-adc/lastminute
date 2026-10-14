@@ -7,7 +7,7 @@ import { useT } from '@/i18n';
 import { useStore } from '@/store/AppStore';
 import { display, onest, useTheme, type Palette, type Scheme } from '@/theme';
 
-// Accent-coloured text (links, «підтверджено»): lime on dark, the deep-olive `accentInk` on light (Figma color/accent-text).
+// Accent-coloured text (links, "confirmed"): lime on dark, the deep-olive `accentInk` on light (Figma color/accent-text).
 export const accentInk = (c: Palette, scheme: Scheme) => (scheme === 'light' ? c.accentInk : c.accent);
 
 export function useAccentInk() {
@@ -66,7 +66,7 @@ export function ThemeToggle({ plain }: { plain?: boolean }) {
   );
 }
 
-// Field label row: «Говори зі мною про» ……… «31 / 80» (Onest Medium 13, muted).
+// Field label row: "Talk to me about" ……… "31 / 80" (Onest Medium 13, muted).
 export function FieldLabel({ label, right }: { label: string; right?: ReactNode }) {
   const { c } = useTheme();
   return (
@@ -87,7 +87,7 @@ export function Field({ label, right, children }: { label: string; right?: React
   );
 }
 
-// Surface box that turns its border accent while focused — the Figma input («Ім’я», phone, e-mail).
+// Surface box that turns its border accent while focused — the Figma input ("Name", phone, e-mail).
 export function InputBox({ focused, children, style }: { focused: boolean; children: ReactNode; style?: StyleProp<ViewStyle> }) {
   const { c } = useTheme();
   return (
@@ -147,7 +147,7 @@ export function StepBar({ step, total = 2 }: { step: number; total?: number }) {
   );
 }
 
-// Small outlined suggestion chip («найкращий концерт у Львові»).
+// Small outlined suggestion chip ("the best gig in town").
 export function IdeaChip({ label, onPress }: { label: string; onPress: () => void }) {
   const { c } = useTheme();
   return (

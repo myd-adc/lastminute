@@ -7,7 +7,7 @@ import { Bone, Skeleton } from '@/components/ui/Skeleton';
 import { useT } from '@/i18n';
 import { useTheme } from '@/theme';
 
-// M12s: a section caption and five rows of avatar + two lines under the real «Чати» title.
+// M12s: a section caption and five rows of avatar + two lines under the real "Chats" title.
 export function ChatRowsSkeleton({ rows = 5 }: { rows?: number }) {
   return (
     <Skeleton style={{ gap: 24 }}>

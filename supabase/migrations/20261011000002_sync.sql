@@ -12,7 +12,7 @@ language sql stable security definer set search_path = public as $$
   group by a.event_id;
 $$;
 
--- «142 людини» on the scene picker: verified members of campus scenes, all members elsewhere.
+-- "142 people" on the scene picker: verified members of campus scenes, all members elsewhere.
 create or replace function public.scene_stats()
 returns table (scene_id text, members integer)
 language sql stable security definer set search_path = public as $$

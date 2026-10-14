@@ -15,7 +15,7 @@ const rules = [
   { emoji: '🛡️', key: 'safety' },
 ] as const;
 
-// «Правила спільноти» — short and friendly, linked from the profile, settings and the report sheet.
+// "Community rules" — short and friendly, linked from the profile, settings and the report sheet.
 export default function RulesScreen() {
   const { c } = useTheme();
   const { t } = useT();

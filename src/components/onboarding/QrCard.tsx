@@ -9,7 +9,7 @@ import { QrPlaceholder } from './QrPlaceholder';
 const APP_STORE = 'https://apps.apple.com/';
 const GOOGLE_PLAY = 'https://play.google.com/store';
 
-// W01 «Краще з телефону» block: QR, one line on why, store pills.
+// W01 "Better on your phone" block: QR, one line on why, store pills.
 export function QrCard({ style }: { style?: StyleProp<ViewStyle> }) {
   const { c } = useTheme();
   const { t } = useT();

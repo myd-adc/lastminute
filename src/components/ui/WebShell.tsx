@@ -20,7 +20,7 @@ export function activeTabFor(pathname: string): TabKey {
   return 'events';
 }
 
-// «Веб» frames (W03): 248 pt sidebar — logo, 42 pt nav rows, the interests card at the bottom — around the routed page.
+// Figma web frames (W03): 248 pt sidebar — logo, 42 pt nav rows, the interests card at the bottom — around the routed page.
 export function WebShell({ children }: { children: ReactNode }) {
   const { c } = useTheme();
   const { state } = useStore();

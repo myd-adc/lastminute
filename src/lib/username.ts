@@ -30,7 +30,7 @@ const shape = (s: string) =>
     .slice(0, USERNAME_MAX)
     .replace(/[._]+$/, '');
 
-// «olya.k@ucu.edu.ua» → «olya.k»; otherwise the name: «Тарас Коваль» → «taras_koval».
+// "olya.k@ucu.edu.ua" → "olya.k"; otherwise the transliterated name: "Taras Koval" → "taras_koval".
 export function suggestUsername(name: string, email?: string | null): string {
   const local = email?.split('@')[0]?.toLowerCase() ?? '';
   const fromEmail = shape(local);
@@ -40,6 +40,6 @@ export function suggestUsername(name: string, email?: string | null): string {
   return fromName.length >= USERNAME_MIN ? fromName : fromName ? `${fromName}_${fromName.length}${fromName.length}` : '';
 }
 
-// «@taras.k · Філософія, 4 курс»: the handle first, then whatever else is set.
+// "@taras.k · Philosophy, 4th year": the handle first, then whatever else is set.
 export const withHandle = (username: string | undefined, ...rest: (string | null | undefined)[]) =>
   [username && `@${username}`, ...rest.map((r) => r?.trim())].filter(Boolean).join(' · ');

@@ -5,7 +5,7 @@ import { Text } from '@/components/ui/Text';
 import { countdown } from '@/lib/time';
 import { onest, useTheme } from '@/theme';
 
-// «⏱ 27 год» — accent-outlined countdown pill. `sm` = M08b/W05b group headers, `md` = W05 match rows.
+// "⏱ 27 h" — accent-outlined countdown pill. `sm` = M08b/W05b group headers, `md` = W05 match rows.
 export function TimerPill({ ms, size = 'md' }: { ms: number; size?: 'sm' | 'md' }) {
   const { c, scheme } = useTheme();
   const fg = c.accentInk;

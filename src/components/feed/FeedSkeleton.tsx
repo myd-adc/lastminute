@@ -6,7 +6,7 @@ import { Bone, Skeleton } from '@/components/ui/Skeleton';
 import { tabBarClearance } from '@/lib/layout';
 import { useTheme } from '@/theme';
 
-// M06s: the real tabs over a flat surface; bones where the poster words, pills, title, «хто йде» and actions go.
+// M06s: the real tabs over a flat surface; bones where the poster words, pills, title, "who's going" and actions go.
 export function MobileFeedSkeleton({ header }: { header: ReactNode }) {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
@@ -46,7 +46,7 @@ export function MobileFeedSkeleton({ header }: { header: ReactNode }) {
   );
 }
 
-// W03s: the real tabs; a bone card where the poster goes and bones for «Хто йде» and «Далі для тебе» on the right.
+// W03s: the real tabs; a bone card where the poster goes and bones for "Who's going" and "Next for you" on the right.
 export function WideFeedSkeleton({ tabs, cardW, cardH, panelW }: { tabs: ReactNode; cardW: number; cardH: number; panelW: number }) {
   const { c } = useTheme();
   const k = cardH / 720;

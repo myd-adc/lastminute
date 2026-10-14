@@ -39,13 +39,13 @@ export async function signIn(login: string, password: string): Promise<AuthResul
   return { ok: true, data: { email, account: await loadAccount(data.user.id) } };
 }
 
-// The 6-digit code again: confirmation for sign-up, recovery for «Забув пароль?».
+// The 6-digit code again: confirmation for sign-up, recovery for "Forgot your password?".
 export async function resendCode(email: string, mode: CodeMode): Promise<AuthResult> {
   const { error } = mode === 'signup' ? await supabase.auth.resend({ type: 'signup', email }) : await supabase.auth.resetPasswordForEmail(email);
   return error ? fail(error, 'otp_failed') : { ok: true, data: undefined };
 }
 
-// «Забув пароль?»: mails a recovery code. Also how accounts made before passwords get one.
+// "Forgot your password?": mails a recovery code. Also how accounts made before passwords get one.
 export async function requestReset(email: string): Promise<AuthResult> {
   const { error } = await supabase.auth.resetPasswordForEmail(email);
   return error ? fail(error, 'otp_failed') : { ok: true, data: undefined };

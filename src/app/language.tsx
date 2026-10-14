@@ -6,8 +6,8 @@ import { LANGS, useT } from '@/i18n';
 import { useStore } from '@/store/AppStore';
 import { onest, useTheme } from '@/theme';
 
-// M16c «Мова» / «Language»: bottom sheet over M16b Settings (a centred dialog on wide web), styled like the M17
-// sheet — Onest Bold 18 title, bg-coloured radio group (radius 18, 16×13 rows), 56 pt «Готово».
+// M16c "Language": bottom sheet over M16b Settings (a centred dialog on wide web), styled like the M17
+// sheet — Onest Bold 18 title, bg-coloured radio group (radius 18, 16×13 rows), 56 pt "Done".
 // The language applies immediately; the whole app re-renders.
 export default function LanguageScreen() {
   const { c } = useTheme();

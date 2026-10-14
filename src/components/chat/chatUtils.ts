@@ -5,7 +5,7 @@ import { isPast, type ChatSummary } from '@/lib/selectors';
 import { dayDiff, dayLabel } from '@/lib/time';
 import type { Palette, Scheme } from '@/theme';
 
-// «Open mic: стендап для своїх» → «Open mic» (the part before the colon), used in chat headers and rows.
+// "Open mic: stand-up among friends" → "Open mic" (the part before the colon), used in chat headers and rows.
 export const eventShort = (e: Event) => e.title.split(':')[0].trim();
 
 // Lime text is unreadable on light surfaces: Figma uses the ink colour there and keeps lime only as a fill.
@@ -15,7 +15,7 @@ export const accentInk = (c: Palette, scheme: Scheme) => (scheme === 'light' ? c
 // Gender key for she/he phrases in the `chat.contact.*` dictionaries.
 export const genderKey = (u: User | undefined): 'f' | 'm' => (u?.gender === 'm' ? 'm' : 'f');
 
-// «Самі на Open mic» / «Solo at Open mic» — the solo group's display name.
+// "Solo at Open mic" — the solo group's display name.
 export const groupName = (e: Event) => t('chat.groupName', { event: eventShort(e) });
 
 // Day word inside a sentence: «зникне завтра о…», «gone tomorrow at…» (English keeps weekday capitals).
@@ -37,7 +37,7 @@ export function accusative(name: string) {
   return name;
 }
 
-// Chat list sections: one «Сьогодні · Open mic · Бар «Кульбаба»» group per upcoming event, then past events.
+// Chat list sections: one "Today · Open mic · Kulbaba bar" group per upcoming event, then past events.
 export function chatSections(list: ChatSummary[], now: number) {
   const upcoming: { event: Event; chats: ChatSummary[] }[] = [];
   const past: ChatSummary[] = [];

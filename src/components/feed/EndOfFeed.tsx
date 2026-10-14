@@ -52,7 +52,7 @@ export function EndOfFeed({ header, contentStyle }: Props) {
             ? { title: t('feed.end.communitiesTitle'), sub: t('feed.end.communitiesSub') }
             : { title: t('feed.end.communitiesEmptyTitle'), sub: t('feed.end.communitiesEmptySub') }
           : { title: t('feed.end.forYouTitle'), sub: t('feed.end.forYouSub') };
-  // «Для тебе» and an empty «Спільноти» lead to communities; the other tabs lead back to «Для тебе».
+  // "For you" and an empty "Communities" lead to communities; the other tabs lead back to "For you".
   const findCommunities = tab === 'forYou' || (tab === 'communities' && !inCommunities);
 
   return (

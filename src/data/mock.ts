@@ -1,4 +1,4 @@
-// In-memory demo data in Ukrainian and English. Dates are relative to app start so «Сьогодні · 20:00» stays true.
+// In-memory demo data in Ukrainian and English. Dates are relative to app start so "Today · 20:00" stays true.
 // Text fields are written as { uk, en } pairs and resolved by `setDataLanguage` (called by the store provider);
 // the exported arrays are live bindings, so always read them at use time (not into module-level constants).
 import { isLive } from '@/api/client';

@@ -17,7 +17,7 @@ type Props = {
   width: number;
   height: number;
   showShared: boolean;
-  expanded?: boolean; // «Space · профіль»: smaller photo, extra details
+  expanded?: boolean; // "Space · profile": smaller photo, extra details
   onMore?: () => void;
   onPress?: () => void;
   wide?: boolean; // W05 card (380×520): taller photo, bigger initial and name
@@ -25,7 +25,7 @@ type Props = {
 
 export const sharedLabel = (n: number) => translate('room.card.shared', { count: n });
 
-// M09 person card: the photo (or a gradient with a huge initial), pills, name, @username · affiliation, tags, «Говори зі мною про».
+// M09 person card: the photo (or a gradient with a huge initial), pills, name, @username · affiliation, tags, "Talk to me about".
 // Figma M09: photo 240 / initial 150 / pills inset 14 / body 16·19; W05: 250 / 160 / 16 / 18·20.
 export function PersonCard({ attendee, width, height, showShared, expanded, onMore, onPress, wide }: Props) {
   const { c } = useTheme();

@@ -10,7 +10,7 @@ type Props = {
   onPress?: () => void;
   size?: number; // 56/60 for action rows, 44 on rails, 36 in headers
   variant?: 'surface' | 'glass' | 'accent' | 'plain';
-  label?: string; // caption under the button (feed right rail: «Зберегти», «Другу»)
+  label?: string; // caption under the button (feed right rail: "Save", "Share")
   active?: boolean; // filled state, e.g. saved bookmark
   accessibilityLabel?: string;
   style?: StyleProp<ViewStyle>;

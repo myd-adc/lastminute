@@ -1,4 +1,4 @@
--- Stage 1 core: scenes, profiles, events, attendance («Я йду»), room decisions, matches, messages, blocks, reports.
+-- Stage 1 core: scenes, profiles, events, attendance ("I'm going"), room decisions, matches, messages, blocks, reports.
 -- Product rules are enforced here (RLS + security definer functions), never only in the client:
 --   symmetry  — attendees are visible only to people going to the same event;
 --   consent   — nobody sees who chose them; a match exists only when both chose «go»;
@@ -106,7 +106,7 @@ create table public.matches (
   user_a uuid not null references auth.users (id) on delete cascade,
   user_b uuid not null references auth.users (id) on delete cascade,
   created_at timestamptz not null default now(),
-  closed_by uuid references auth.users (id), -- «Закрити чат зараз»
+  closed_by uuid references auth.users (id), -- "Close chat now"
   unique (event_id, user_a, user_b),
   check (user_a < user_b)
 );
@@ -189,7 +189,7 @@ returns boolean language sql stable security definer set search_path = public as
   );
 $$;
 
--- Counters shown before «Я йду» (no identities): how many are going, how many alone, how many you've met before.
+-- Counters shown before "I'm going" (no identities): how many are going, how many alone, how many you've met before.
 create or replace function public.event_stats(p_event uuid)
 returns table (going integer, solo integer)
 language sql stable security definer set search_path = public as $$
@@ -242,7 +242,7 @@ alter table public.messages enable row level security;
 alter table public.blocks enable row level security;
 alter table public.reports enable row level security;
 
--- Scenes and events are public to signed-in users (the feed and «Усе місто»).
+-- Scenes and events are public to signed-in users (the feed and "The whole city").
 create policy scenes_read on public.scenes for select to authenticated using (true);
 create policy events_read on public.events for select to authenticated using (true);
 
@@ -262,7 +262,7 @@ create policy scene_members_insert on public.scene_members for insert to authent
   with check (user_id = auth.uid() and verified_at is null and verified_email is null);
 create policy scene_members_delete on public.scene_members for delete to authenticated using (user_id = auth.uid());
 
--- «Я йду»: you see your own rows, and other attendees only of events you're going to yourself.
+-- "I'm going": you see your own rows, and other attendees only of events you're going to yourself.
 create policy attendances_read on public.attendances for select to authenticated
   using (
     user_id = auth.uid()

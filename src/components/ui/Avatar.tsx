@@ -31,7 +31,7 @@ export function Avatar({ name, gradient, size, photoUri, ring }: Props) {
   );
 }
 
-// Overlapping avatars with an optional «+11» bubble, as on feed cards and «Хто йде».
+// Overlapping avatars with an optional "+11" bubble, as on feed cards and "Who's going".
 export function AvatarStack({
   people,
   size = 32,

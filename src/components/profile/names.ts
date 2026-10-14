@@ -44,5 +44,5 @@ export function pronouns(user: Pick<User, 'gender'> | undefined, lang: Lang = ge
 // Accent text has to stay readable on the light background: Figma uses a deep olive there (color/accent-text #4F6B00).
 export const accentText = (c: Palette, scheme: Scheme) => (scheme === 'light' ? '#4F6B00' : c.accent);
 
-// «Open mic: стендап для своїх» → «Open mic».
+// "Open mic: stand-up among friends" → "Open mic".
 export const shortTitle = (title: string) => title.split(':')[0].trim();

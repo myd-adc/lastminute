@@ -13,7 +13,7 @@ import { useIsWide } from '@/lib/layout';
 import { useStore } from '@/store/AppStore';
 import { type, useTheme } from '@/theme';
 
-// M01b / W01b «Реєстрація»: e-mail + password, then the code from the letter (M02) confirms the address.
+// M01b / W01b "Create an account": e-mail + password, then the code from the letter (M02) confirms the address.
 export default function SignupScreen() {
   const { state, dispatch } = useStore();
   const { c } = useTheme();

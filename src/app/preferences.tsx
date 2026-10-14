@@ -8,7 +8,7 @@ import { useT } from '@/i18n';
 import { useStore } from '@/store/AppStore';
 import { onest, type, useTheme } from '@/theme';
 
-// M16 → «Вподобання»: M04 content prefilled from the store.
+// M16 → "Interests": M04 content prefilled from the store.
 export default function PreferencesScreen() {
   const { c } = useTheme();
   const { state, dispatch } = useStore();

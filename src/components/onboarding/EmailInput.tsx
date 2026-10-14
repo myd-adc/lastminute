@@ -7,7 +7,7 @@ import { TextField } from './kit';
 export const normalizeEmail = (s: string) => s.trim().toLowerCase();
 export const isEmail = (s: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(s.trim());
 
-// M01 / W01 «Пошта» input: the sign-in code goes to this address.
+// M01 / W01 "Email" input: the sign-in code goes to this address.
 export function EmailInput({
   value,
   onChange,

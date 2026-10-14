@@ -16,7 +16,7 @@ import { useIsWide } from '@/lib/layout';
 import { useStore } from '@/store/AppStore';
 import { onest, type, useTheme } from '@/theme';
 
-// M22 «Налаштування спільноти» — creator only.
+// M22 "Community settings" — creator only.
 export default function CommunitySettingsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const community = getCommunity(id);

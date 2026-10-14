@@ -7,7 +7,7 @@ import { useT } from '@/i18n';
 import { suggestUsername } from '@/lib/username';
 import { useStore } from '@/store/AppStore';
 
-// M16 → «Змінити профіль»: the M03 form prefilled from the stored profile.
+// M16 → "Edit profile": the M03 form prefilled from the stored profile.
 export default function EditProfileScreen() {
   const { state, dispatch } = useStore();
   const { t } = useT();

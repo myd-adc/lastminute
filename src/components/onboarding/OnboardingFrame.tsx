@@ -64,7 +64,7 @@ function MobileFrame({ step, title, subtitle, children, cta }: Props) {
 }
 
 // W02: logo + stepper rail, a 620 pt form column starting at x 360 / y 120, nav buttons 48 pt above the bottom,
-// and the 380 pt «Так тебе бачитимуть» preview panel.
+// and the 380 pt "How you'll look at events" preview panel.
 function WideFrame({ step, title, subtitle, children, cta, preview }: Props) {
   const { c } = useTheme();
   const { t } = useT();

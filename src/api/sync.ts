@@ -17,12 +17,12 @@ export type Synced = Pick<State, 'going' | 'decisions' | 'messages' | 'closedCha
 };
 export type Snapshot = { remote: RemoteData; synced: Synced };
 
-const HISTORY_MS = 30 * DAY; // past events kept for chats, «Минулі події» and shared-event counts
+const HISTORY_MS = 30 * DAY; // past events kept for chats, "Past events" and shared-event counts
 const iso = (s: string) => new Date(s).toISOString(); // one timestamp format, so string comparisons stay valid
 
 // chatId → match id, for writing messages and closing chats.
 const matchByChat = new Map<string, string>();
-// Everyone seen so far stays resolvable by id (e.g. names in «Заблоковані» after RLS hides them).
+// Everyone seen so far stays resolvable by id (e.g. names in "Blocked" after RLS hides them).
 const knownUsers = new Map<string, User>();
 
 const must = <T>(res: { data: T | null; error: { message: string } | null }): T => {
@@ -81,7 +81,7 @@ export async function fetchSnapshot(me: string): Promise<Snapshot> {
   const meProfile = profiles.find((p) => p.id === me);
   const pastIds = new Set(eventRows.filter((e) => Date.parse(e.ends_at) <= now).map((e) => e.id));
 
-  // Counters exclude the user: the selectors add their own «Я йду» on top, as in the demo.
+  // Counters exclude the user: the selectors add their own "I'm going" on top, as in the demo.
   const events = eventRows.map((e) => {
     const s = stats.find((x) => x.event_id === e.id);
     const myRow = mine.find((a) => a.event_id === e.id);
@@ -134,7 +134,7 @@ export async function fetchSnapshot(me: string): Promise<Snapshot> {
         userId: a.user_id,
         solo,
         inSoloGroup: solo && a.join_solo_group,
-        // Only a mutual «Піти разом» is ever visible: a one-sided one stays hidden (consent).
+        // Only a mutual "Go together" is ever visible: a one-sided one stays hidden (consent).
         likesYou: matchSet.has(pairKey(a.event_id, a.user_id)),
       };
     });

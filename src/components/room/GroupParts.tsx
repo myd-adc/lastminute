@@ -20,7 +20,7 @@ export const useAccentText = () => useTheme().c.accentInk;
 
 export const membersLabel = (n: number) => translate('common.count.participants', { count: n });
 
-// Everything the «Самі на …» screens need, derived once.
+// Everything the "Solo at …" screens need, derived once.
 export function useSoloGroup(event: Event) {
   const { state, dispatch } = useStore();
   const group = soloGroups[event.id];
@@ -49,7 +49,7 @@ export function useSoloGroup(event: Event) {
 
 type Group = ReturnType<typeof useSoloGroup>;
 
-// «Точка зустрічі» card with the «Я буду ✓» toggle (Figma «Pinned meeting point»).
+// "Meeting point" card with the "I'll be there ✓" toggle (Figma "Pinned meeting point").
 export function MeetCard({ g, showMenu = true }: { g: Group; showMenu?: boolean }) {
   const { c } = useTheme();
   const { t } = useT();

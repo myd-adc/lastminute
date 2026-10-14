@@ -79,7 +79,7 @@ const AFFILIATIONS = [
 
 const IDEAS = ['concert', 'reading', 'boardGame'] as const;
 
-// M03 form, shared by onboarding (profile-setup) and «Змінити профіль».
+// M03 form, shared by onboarding (profile-setup) and "Edit profile".
 export function ProfileForm({
   value,
   onChange,
@@ -132,7 +132,7 @@ export function ProfileForm({
         </View>
       </View>
 
-      {/* M03: «Ім’я» and «Нік» share a row; ✓ in the accent ink once the username is free. */}
+      {/* M03: "Name" and "Username" share a row; ✓ in the accent ink once the username is free. */}
       <View style={styles.nameRow}>
         <View style={styles.half}>
           <Field label={t('onboarding.profile.name')}>

@@ -10,7 +10,7 @@ import { Button } from '@/components/ui';
 import { useT } from '@/i18n';
 import { useStore } from '@/store/AppStore';
 
-// M01c «Забув пароль?»: the recovery code goes to the address (M02), then M02b sets the new password.
+// M01c "Forgot your password?": the recovery code goes to the address (M02), then M02b sets the new password.
 export default function ResetScreen() {
   const { state, dispatch } = useStore();
   const { t } = useT();

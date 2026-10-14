@@ -10,7 +10,7 @@ import { useIsWide } from '@/lib/layout';
 import { useStore } from '@/store/AppStore';
 import { onest, type, useTheme } from '@/theme';
 
-// «Заблоковані»: people the user blocked (from M17 or a chat). Unblocking returns them to rooms and albums.
+// "Blocked": people the user blocked (from M17 or a chat). Unblocking returns them to rooms and albums.
 export default function BlockedScreen() {
   const { c } = useTheme();
   const { t } = useT();

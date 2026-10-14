@@ -28,7 +28,7 @@ const normalizeHandle = (v: string) => {
   return t.startsWith('@') || t.includes('/') || t.startsWith('+') ? t : `@${t}`;
 };
 
-// M15 «Як пройшло?» — after-event survey, mutual contact exchange and the next event for you. W08 on wide web.
+// M15 "How did it go?" — after-event survey, mutual contact exchange and the next event for you. W08 on wide web.
 export default function AfterScreen() {
   const { c } = useTheme();
   const { t } = useT();
@@ -145,7 +145,7 @@ export default function AfterScreen() {
     );
   }
 
-  // M15: the top row sits 8 pt under the status bar (safe-area inset on device); 56 pt «Готово» pinned at the bottom.
+  // M15: the top row sits 8 pt under the status bar (safe-area inset on device); 56 pt "Done" pinned at the bottom.
   return (
     <KeyboardAvoidingView style={[styles.flex, { backgroundColor: c.bg }]} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <Glow blobs={glows.after} />

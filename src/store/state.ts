@@ -10,16 +10,16 @@ export const STATE_VERSION = 7;
 export type Me = {
   name: string;
   username?: string; // «taras.k», shown as @taras.k; unique on the server
-  affiliation: string; // «Філософія, 4 курс», optional
-  talkAbout: string; // «Говори зі мною про…», ≤ 80 chars
+  affiliation: string; // "Philosophy, 4th year", optional
+  talkAbout: string; // "Talk to me about…", ≤ 80 chars
   gradient: GradientId;
   photoUri?: string;
 };
 
 export type Going = {
   at: string;
-  with: 'solo' | 'friends'; // M08 «Ти йдеш сам чи з кимось?»
-  joinSoloGroup: boolean; // M08 «Додати мене» to «Самі на …»
+  with: 'solo' | 'friends'; // M08 "Going solo or with someone?"
+  joinSoloGroup: boolean; // M08 "Add me" to "Solo at …"
 };
 
 // 'saved' is reached from the bookmark next to the tabs and shows as a tab only while open.
@@ -49,21 +49,21 @@ export type State = {
   settings: {
     theme: ThemeMode;
     notify: { soloOnMyEvent: boolean; albumOpened: boolean; newCommunityEvents: boolean };
-    showSolo: boolean; // «Показувати, що я йду сам(а)»
-    showSharedEvents: boolean; // «Показувати спільні події»
+    showSolo: boolean; // "Show that I'm going solo"
+    showSharedEvents: boolean; // "Show shared events"
   };
 
   feedTab: FeedTab;
   skipped: Record<string, true>; // eventId → swiped away with ✕
-  saved: Record<string, true>; // eventId → «Зберегти»
-  going: Record<string, Going>; // eventId → «Я йду»
-  // Room swipe decisions per person per event: pairKey → 'go' («Піти разом») | 'skip' (✕).
+  saved: Record<string, true>; // eventId → "Save"
+  going: Record<string, Going>; // eventId → "I'm going"
+  // Room swipe decisions per person per event: pairKey → 'go' ("Go together") | 'skip' (✕).
   decisions: Record<string, { choice: 'go' | 'skip'; at: string }>;
   messages: Record<string, Message[]>; // chatId → thread
   lastRead: Record<string, string>; // chatId → ISO
-  groupMeetConfirmed: Record<string, true>; // eventId → «Я буду» at the group meeting point
+  groupMeetConfirmed: Record<string, true>; // eventId → "I'll be there" at the group meeting point
   myContacts: Record<string, string>; // pairKey → contact the user left («@taras_hnatyk»)
-  closedChats: Record<string, true>; // chatId → «Закрити чат зараз»
+  closedChats: Record<string, true>; // chatId → "Close chat now"
   photos: Photo[]; // photos the user added to albums
   surveys: Record<string, Survey>; // eventId → M15 answers
   reports: Report[];
@@ -153,7 +153,7 @@ export type Action =
   | { type: 'sync'; synced: Synced }
   | { type: 'logout' };
 
-// History a freshly onboarded demo user starts with: two past events with matches in «Минулі події», two communities.
+// History a freshly onboarded demo user starts with: two past events with matches in "Past events", two communities.
 function seedHistory(state: State): State {
   const going = { ...state.going };
   const decisions = { ...state.decisions };

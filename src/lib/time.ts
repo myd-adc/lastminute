@@ -32,13 +32,13 @@ export const time = (iso: string) => {
 export const weekdayShort = (iso: string) => list('weekdayShort')[new Date(iso).getDay()];
 export const weekdayTitle = (iso: string) => list('weekdayTitle')[new Date(iso).getDay()];
 export const dayOfMonth = (iso: string) => pad(new Date(iso).getDate());
-// «Субота, 10 жовтня» / «Saturday, 10 October»
+// "Saturday, 10 October"
 export const longDate = (iso: string) => {
   const d = new Date(iso);
   return `${list('weekdayLong')[d.getDay()]}, ${d.getDate()} ${list('months')[d.getMonth()]}`;
 };
 
-// «Сьогодні» / «Завтра» / «Вчора» / «Пт»
+// "Today" / "Tomorrow" / "Yesterday" / "Fri"
 export function dayLabel(iso: string, now: number) {
   const diff = dayDiff(iso, now);
   if (diff === 0) return t('common.time.today');
@@ -47,10 +47,10 @@ export function dayLabel(iso: string, now: number) {
   return weekdayTitle(iso);
 }
 
-// «Сьогодні · 20:00» on poster pills, «Сьогодні 20:00» in headers.
+// "Today · 20:00" on poster pills, "Today 20:00" in headers.
 export const whenLabel = (iso: string, now: number, sep = ' · ') => `${dayLabel(iso, now)}${sep}${time(iso)}`;
 
-// Chat-list style timestamp: «18:06» today, «нд» this week, else «12.10».
+// Chat-list style timestamp: "18:06" today, "Sun" this week, else "12.10".
 export function shortStamp(iso: string, now: number) {
   const diff = dayDiff(iso, now);
   if (diff === 0) return time(iso);
@@ -59,14 +59,14 @@ export function shortStamp(iso: string, now: number) {
   return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}`;
 }
 
-// «27 год» / «27 h», «40 хв» / «40 min» — compact countdown used on chat timers.
+// "27 h", "40 min" — compact countdown used on chat timers.
 export function countdown(ms: number) {
   const min = Math.max(0, Math.ceil(ms / 60000));
   if (min >= 60) return t('common.time.hoursShort', { n: Math.floor(min / 60) });
   return t('common.time.minutesShort', { n: min });
 }
 
-// «23 год 40 хв» / «23 h 40 min»
+// "23 h 40 min"
 export function countdownLong(ms: number) {
   const min = Math.max(0, Math.floor(ms / 60000));
   const h = Math.floor(min / 60);

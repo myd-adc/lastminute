@@ -20,7 +20,7 @@ export type PreviewPerson = {
   solo?: boolean;
 };
 
-// W02 right panel: «Так тебе бачитимуть на події» — a live, smaller version of the M09 person card.
+// W02 right panel: "How you'll look at events" — a live, smaller version of the M09 person card.
 export function PreviewCard({ person }: { person: PreviewPerson }) {
   const { c } = useTheme();
   const { t } = useT();

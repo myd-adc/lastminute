@@ -20,7 +20,7 @@ import { eventShort, genderKey, nameObject } from './chatUtils';
 export type ChatThreadProps = {
   chatId: string; // dmChatId(eventId, userId) or groupChatId(eventId)
   eventId: string;
-  userId?: string; // DM partner; omitted for the «Самі на …» group
+  userId?: string; // DM partner; omitted for the "Solo at …" group
   // 'screen' = full M13/M08b screen body (composer pinned at bottom);
   // 'panel' = embedded right-hand panel on wide web (W05/W06).
   variant: 'screen' | 'panel';

@@ -1,4 +1,4 @@
-// Strings for the feed flow (M06/M07/M08/M10, W03/W04, «Спільноти» tab). Mirror every key in ../en/feed.ts.
+// Strings for the feed flow (M06/M07/M08/M10, W03/W04, "Communities" tab). Mirror every key in ../en/feed.ts.
 export const feed = {
   city: 'Львів',
   share: 'Другу',

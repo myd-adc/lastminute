@@ -19,7 +19,7 @@ export function useAuthorName() {
 }
 
 // Square photo tiles. Phone (M14): 3 columns, 4 pt gap, 12 pt radius, author initial bottom-left, last tile «+ Your photo».
-// Wide (W07): ~180 pt tiles, 10 pt gap, 14 pt radius, author + «20 хв» chip, own photos outlined with a «Твоє» pill,
+// Wide (W07): ~180 pt tiles, 10 pt gap, 14 pt radius, author + "20 min" chip, own photos outlined with a "Yours" pill,
 // no add tile (the right panel has the drop zone). Tapping a tile opens a full-screen viewer.
 export function AlbumGrid({ photos, wide, onAdd }: { photos: Photo[]; wide?: boolean; onAdd: () => void }) {
   const { c } = useTheme();

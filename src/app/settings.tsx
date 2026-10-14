@@ -19,7 +19,7 @@ import { useIsWide } from '@/lib/layout';
 import { useStore } from '@/store/AppStore';
 import { onest, useTheme } from '@/theme';
 
-// M16b «Налаштування» (+ «Демо» section for testing the live / after-event states).
+// M16b "Settings" (+ "Demo" section for testing the live / after-event states).
 // Frame rhythm: 40 pt header 6 pt under the status bar, 12 pt to the first caption, then a uniform 7 pt gap.
 export default function SettingsScreen() {
   const { c } = useTheme();

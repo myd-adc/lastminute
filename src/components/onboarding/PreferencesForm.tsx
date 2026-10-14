@@ -11,7 +11,7 @@ import { onest, useTheme } from '@/theme';
 
 export const MIN_INTERESTS = 3;
 
-// «Інді» has the same 🎸 as «Концерти» and is a genre rather than a format, so the picker leaves it out (as in M04).
+// "Indie" has the same 🎸 as "Concerts" and is a genre rather than a format, so the picker leaves it out (as in M04).
 // A function, not a constant: `interests` is a live binding that switches with the language.
 export const pickableInterests = () => interests.filter((i) => i.id !== 'indie');
 
@@ -19,7 +19,7 @@ export type PreferencesDraft = { interests: InterestId[]; vibe: Vibe | null; goe
 
 export const preferencesValid = (p: PreferencesDraft) => p.interests.length >= MIN_INTERESTS;
 
-// M04 body, shared by onboarding (interests) and «Вподобання і сцени».
+// M04 body, shared by onboarding (interests) and "Interests".
 // Figma: 22 pt between sections and 8 pt under a section title on phones (M04); 30 pt and 12 pt on wide web (W02).
 export function PreferencesForm({ value, onChange }: { value: PreferencesDraft; onChange: (v: PreferencesDraft) => void }) {
   const toggle = (id: InterestId) =>

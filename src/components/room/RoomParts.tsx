@@ -11,7 +11,7 @@ import { albumOpen } from '@/lib/selectors';
 import { time } from '@/lib/time';
 import { onest, type, useTheme } from '@/theme';
 
-// «👋 Хто йде» / «🔒 Альбом · з 20:00». The album tab navigates to the album screen.
+// "👋 Who's going" / "🔒 Album · from 20:00". The album tab navigates to the album screen.
 export function RoomTabs({ event, now, compact, style }: { event: Event; now: number; compact?: boolean; style?: StyleProp<ViewStyle> }) {
   const { c } = useTheme();
   const { t } = useT();
@@ -37,7 +37,7 @@ export function RoomTabs({ event, now, compact, style }: { event: Event; now: nu
   );
 }
 
-// ✕ and «👋 Піти разом» (60 pt action row, 14 pt gap). `goWidth` fixes the CTA width (W05: 260).
+// ✕ and "👋 Go together" (60 pt action row, 14 pt gap). `goWidth` fixes the CTA width (W05: 260).
 export function RoomActions({ onSkip, onGo, goWidth, style }: { onSkip: () => void; onGo: () => void; goWidth?: number; style?: StyleProp<ViewStyle> }) {
   const { t } = useT();
   return (

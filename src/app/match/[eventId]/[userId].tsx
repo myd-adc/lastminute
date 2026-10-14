@@ -22,7 +22,7 @@ const FACE = 136;
 const FACE_BOX = 149.5; // bounding box of the tilted face
 const STATUS_BAR = 50; // Figma frame status bar; on device the safe-area inset replaces it
 
-// M11 «Ви йдете разом» — full-screen celebration after a mutual «Піти разом».
+// M11 "Going together" — full-screen celebration after a mutual "Go together".
 export default function MatchScreen() {
   const { eventId, userId } = useLocalSearchParams<{ eventId: string; userId: string }>();
   const { c, scheme } = useTheme();

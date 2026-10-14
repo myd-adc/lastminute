@@ -14,7 +14,7 @@ type Props = {
   savedCount: number;
 };
 
-// M06/M10/W03 header tabs, TikTok order: «Спільноти» · «Знайомі» · «Для тебе» (+ «Збережені» while it is picked
+// M06/M10/W03 header tabs, TikTok order: "Communities" · "Met" · "For you" (+ "Saved" while it is picked
 // is open), accent underline under the active one. The bookmark on the right opens and closes the saved stack.
 // Phone row is 32 pt high (Figma y = 58…90, i.e. 8 pt under the status bar).
 export function FeedTabs({ value, onChange, onPoster, wide, savedCount }: Props) {

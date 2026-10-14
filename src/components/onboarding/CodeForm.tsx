@@ -13,7 +13,7 @@ const RESEND_SECONDS = 60;
 
 const mmss = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
-// M02 body: six code boxes driven by one hidden number-pad input, resend countdown, «Змінити пошту», spam hint.
+// M02 body: six code boxes driven by one hidden number-pad input, resend countdown, "Change email", spam hint.
 export function CodeForm({
   code,
   onChange,

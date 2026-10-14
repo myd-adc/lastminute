@@ -116,7 +116,7 @@ const makeStyles = (c: Palette, scheme: Scheme) =>
 
 const styles = StyleSheet.create({
   content: { position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 20, gap: 16, pointerEvents: 'box-none' },
-  // Info column (292 pt) + 52 pt rail (44 pt circles) at x = 318; the rail spans the info block, top of the pills to the bottom of «хто йде».
+  // Info column (292 pt) + 52 pt rail (44 pt circles) at x = 318; the rail spans the info block, top of the pills to the bottom of "who's going".
   mid: { flexDirection: 'row', gap: 6 },
   info: { flex: 1, gap: 12, justifyContent: 'flex-end' },
   infoTop: { gap: 12 },

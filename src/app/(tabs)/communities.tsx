@@ -11,7 +11,7 @@ import { discoverCommunities, myCommunities } from '@/lib/selectors';
 import { useStore } from '@/store/AppStore';
 import { display, onest, useTheme } from '@/theme';
 
-// M18 «Спільноти» tab: the user's communities, ones to discover, and starting a new one.
+// M18 "Communities" tab: the user's communities, ones to discover, and starting a new one.
 export default function CommunitiesScreen() {
   const { c } = useTheme();
   const { state, loading } = useStore();

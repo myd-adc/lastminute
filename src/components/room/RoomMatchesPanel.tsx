@@ -14,7 +14,7 @@ import { TimerPill } from './TimerPill';
 
 export const MATCH_PANEL_WIDTH = 440;
 
-// W05 right panel: «Метчі на цю подію», match rows and the selected DM thread.
+// W05 right panel: "Matches for this event", match rows and the selected DM thread.
 export function RoomMatchesPanel({
   event,
   now,

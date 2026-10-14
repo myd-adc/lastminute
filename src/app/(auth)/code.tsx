@@ -17,7 +17,7 @@ import { display, onest, useTheme } from '@/theme';
 
 const back = () => (router.canGoBack() ? router.back() : router.replace('/login'));
 
-// M02 «Введи код з листа»: confirms the address after sign-up, or opens the reset (M02b). Demo: any 6 digits pass.
+// M02 "Enter the code from the email": confirms the address after sign-up, or opens the reset (M02b). Demo: any 6 digits pass.
 export default function CodeScreen() {
   const { c } = useTheme();
   const { t } = useT();
@@ -91,7 +91,7 @@ export default function CodeScreen() {
       </AuthSplit>
     );
 
-  // M02: back chevron 12 pt below the safe area, 28 pt to the title, 30 pt to the code boxes; «Підтвердити» rides
+  // M02: back chevron 12 pt below the safe area, 28 pt to the title, 30 pt to the code boxes; "Confirm" rides
   // 12 pt above the number pad.
   return (
     <AuthScreen glow="code" footer={cta}>

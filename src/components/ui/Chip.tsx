@@ -35,7 +35,7 @@ export function Chip({
   );
 }
 
-// Small rounded label (13 pt semibold, 14 radius): date pills, «Йде сама», «3 / 14», tags on cards.
+// Small rounded label (13 pt semibold, 14 radius): date pills, "Going solo", "3 / 14", tags on cards.
 export function Pill({
   label,
   tone = 'surface2',

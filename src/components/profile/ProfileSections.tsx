@@ -15,7 +15,7 @@ import { demoMode, demoOffsetFor, demoTarget, type DemoMode } from './demo';
 import { accentText } from './names';
 import { Group, GroupLabel, Row } from './Rows';
 
-// Building blocks shared by M16 «Профіль», M16b «Налаштування» and the two-column W09 web profile.
+// Building blocks shared by M16 "Profile", M16b "Settings" and the two-column W09 web profile.
 // A section is a caption plus its group as siblings, so the parent column's gap spaces them exactly as the frames do
 // (12 pt in M16, 7 pt in M16b, 16 pt in W09).
 
@@ -28,7 +28,7 @@ export function Section({ label, children }: { label: string; children: ReactNod
   );
 }
 
-// Small soft-accent pill: «УКУ ✓» / «UCU ✓» (Figma «Pill»: 10×5 padding, radius 12, SemiBold 12).
+// Small soft-accent pill: "UCU ✓" (Figma "Pill": 10×5 padding, radius 12, SemiBold 12).
 export function VerifiedPill({ label }: { label: string }) {
   const { c, scheme } = useTheme();
   return (
@@ -38,7 +38,7 @@ export function VerifiedPill({ label }: { label: string }) {
   );
 }
 
-// M16 profile card: 14 pt padding, 60 pt avatar, name Onest Bold 17, «Змінити» SemiBold 13 in accent.
+// M16 profile card: 14 pt padding, 60 pt avatar, name Onest Bold 17, "Edit" SemiBold 13 in accent.
 export function ProfileCard() {
   const { c, scheme } = useTheme();
   const { t, lang } = useT();
@@ -184,7 +184,7 @@ export function AccountSection({ confirming, setConfirming }: { confirming: bool
 
 const themeModes: ThemeMode[] = ['dark', 'light', 'system'];
 
-// M16b «Вигляд»: 12 pt card padding around a bg-coloured track (4 pt inset, radius 14), segments 9 pt tall padding,
+// M16b "Appearance": 12 pt card padding around a bg-coloured track (4 pt inset, radius 14), segments 9 pt tall padding,
 // radius 10, Onest SemiBold 13.
 export function AppearanceSection() {
   const { c } = useTheme();

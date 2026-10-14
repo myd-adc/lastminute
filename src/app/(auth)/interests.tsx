@@ -12,7 +12,7 @@ import { useT } from '@/i18n';
 import { useStore } from '@/store/AppStore';
 import { type, useTheme } from '@/theme';
 
-// M04 «Що тебе витягує з дому?» — the last onboarding step: saves the profile and opens the feed.
+// M04 "What gets you out of the house?" — the last onboarding step: saves the profile and opens the feed.
 export default function InterestsScreen() {
   const { state, dispatch } = useStore();
   const { t } = useT();

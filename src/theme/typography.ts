@@ -27,8 +27,8 @@ export const onest = (weight: Weight, size: number, lineHeight?: number): TextSt
 
 // Named styles for the sizes that repeat across the v4 frames.
 export const type = {
-  hero: display(40, 44), // M01 «Не йди сам…»
-  title: display(30, 36), // screen titles: «Чати», «Профіль», «Введи код з SMS»
+  hero: display(40, 44), // M01 hero line
+  title: display(30, 36), // screen titles: "Chats", "Profile", "Enter the code"
   title2: display(24, 30), // event titles on sheets/cards
   title3: display(22, 28), // person name on the card
   button: onest('bold', 17),

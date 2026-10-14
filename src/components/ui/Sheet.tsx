@@ -11,7 +11,7 @@ import { goBack } from './Screen';
 
 type Props = {
   children: ReactNode;
-  // A function footer gets the animated close for its own buttons («Готово»).
+  // A function footer gets the animated close for its own buttons ("Done").
   footer?: ReactNode | ((close: () => void) => ReactNode);
   onClose?: () => void;
   maxHeight?: `${number}%`;

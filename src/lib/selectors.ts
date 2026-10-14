@@ -19,7 +19,7 @@ export const expiresAt = (e: Event) => Date.parse(e.endsAt) + CHAT_TTL_AFTER_EVE
 
 export const isMember = (state: State, communityId: string) => !!state.memberships[communityId];
 export const myCommunities = (state: State): Community[] => communities.filter((c) => isMember(state, c.id));
-// The «УКУ ✓» pill next to the user's name: the first community they joined with a confirmed address.
+// The "UCU ✓" pill next to the user's name: the first community they joined with a confirmed address.
 export const verifiedCommunity = (state: State): Community | undefined => myCommunities(state).find((c) => !!c.emailDomain);
 export const discoverCommunities = (state: State): Community[] => communities.filter((c) => !isMember(state, c.id));
 // City events and open communities are for everyone; a domain-only community's events only for its members.
@@ -47,13 +47,13 @@ function friendIds(state: State): Set<string> {
   return ids;
 }
 
-// «Знайомі»: how many people you met before are going. A count only, never who (symmetry).
+// "Met": how many people you met before are going. A count only, never who (symmetry).
 export function metCount(state: State, e: Event, friends = friendIds(state)): number {
   if (e.metCount !== undefined) return e.metCount;
   return attendeesOf(e.id).filter((a) => friends.has(a.userId)).length;
 }
 
-// «Для тебе» ranking: events matching the user's interests first, then by time.
+// "For you" ranking: events matching the user's interests first, then by time.
 const byInterest = (state: State) => (a: Event, b: Event) =>
   Number(state.interests.includes(b.category)) - Number(state.interests.includes(a.category)) || a.startsAt.localeCompare(b.startsAt);
 
@@ -68,7 +68,7 @@ export function tabEvents(state: State, now: number, tab: State['feedTab']): Eve
   return [...all].sort(byInterest(state));
 }
 
-// Swipe feed for the current tab: skipped and «Я йду» ones drop out of the stack. Saved ones stay saved even if
+// Swipe feed for the current tab: skipped and "I'm going" ones drop out of the stack. Saved ones stay saved even if
 // skipped later, so the saved stack ignores skips.
 export const feedEvents = (state: State, now: number): Event[] =>
   tabEvents(state, now, state.feedTab).filter((e) => (state.feedTab === 'saved' || !state.skipped[e.id]) && !state.going[e.id]);
@@ -88,7 +88,7 @@ export const attendeesFor = (state: State, eventId: string): Attendee[] =>
     .map((attendance) => ({ attendance, user: getUser(attendance.userId) }))
     .filter((a): a is Attendee => !!a.user && !state.blocked[a.user.id]);
 
-// People the user has met at earlier events («знайомі»).
+// People the user has met at earlier events ("Met").
 export const acquaintances = (state: State, eventId: string) =>
   attendeesFor(state, eventId).filter((a) => a.user.sharedEvents > 0);
 
@@ -99,16 +99,16 @@ export function roomQueue(state: State, eventId: string) {
   return { pending, decided: all.length - pending.length, total: all.length };
 }
 
-// «Даринка, 20»; live profiles have no age yet, so just the name.
+// "Darynka, 20"; live profiles have no age yet, so just the name.
 export const nameAge = (u: User) => (u.age ? `${u.name}, ${u.age}` : u.name);
 
 export const decisionOf = (state: State, eventId: string, userId: string) => state.decisions[pairKey(eventId, userId)]?.choice;
 
-// Match = the user pressed «Піти разом» and the other side already did too.
+// Match = the user pressed "Go together" and the other side already did too.
 export const isMatch = (state: State, eventId: string, userId: string) =>
   decisionOf(state, eventId, userId) === 'go' && !!attendanceOf(eventId, userId)?.likesYou && !state.blocked[userId];
 
-// «Очікує»: the user pressed «Піти разом», the other side has not (yet).
+// "Pending": the user pressed "Go together", the other side has not (yet).
 export const isWaiting = (state: State, eventId: string, userId: string) =>
   decisionOf(state, eventId, userId) === 'go' && !attendanceOf(eventId, userId)?.likesYou && !state.blocked[userId];
 
@@ -192,7 +192,7 @@ export function chatList(state: State, now: number): ChatSummary[] {
 
 export const unreadCount = (state: State, now: number) => chatList(state, now).filter((c) => c.unread).length;
 
-// ── Group «Самі на …» ──────────────────────────────────────────────────
+// ── Group "Solo at …" ──────────────────────────────────────────────────
 
 export function soloGroupMembers(state: State, eventId: string): User[] {
   return attendeesFor(state, eventId)

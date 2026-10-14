@@ -2,7 +2,7 @@ import { Platform, StyleSheet, useWindowDimensions, type ViewStyle } from 'react
 
 export const WIDE_BREAKPOINT = 1024;
 
-// Web at ≥ 1024 px renders the «Веб» frames (sidebar shell); phones and narrow browsers get the «Мобільний» frames.
+// Web at ≥ 1024 px renders the Figma web frames (sidebar shell); phones and narrow browsers get the mobile frames.
 export function useIsWide() {
   const { width } = useWindowDimensions();
   return Platform.OS === 'web' && width >= WIDE_BREAKPOINT;

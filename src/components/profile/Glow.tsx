@@ -29,7 +29,7 @@ function phi(x: number) {
 const STOPS = [0, 0.15, 0.3, 0.42, 0.52, 0.62, 0.72, 0.82, 0.91, 1];
 
 export const glows = {
-  // M15 «Як пройшло?»: orange top-left, pink top-right (390 pt frame).
+  // M15 "How did it go?": orange top-left, pink top-right (390 pt frame).
   after: [
     { x: 60, y: 100, r: 140, sigma: 45, opacity: 0.35, dark: '#FF8A3D', light: '#FF7426' },
     { fromRight: 80, y: 160, r: 120, sigma: 45, opacity: 0.35, dark: '#FF3D8B', light: '#E3246C' },

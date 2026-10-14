@@ -5,7 +5,7 @@ import type { GradientId } from '@/theme/palette';
 // Anyone can start one; open to everyone or only to people with a confirmed e-mail on `emailDomain`.
 export type Community = {
   id: string;
-  name: string; // «УКУ», «Настолки Львів»
+  name: string; // "UCU", "Board games Lviv"
   description: string;
   gradient: GradientId;
   photoUri?: string; // cover photo; without one the initial sits on the gradient
@@ -35,20 +35,20 @@ export type GoesWith = 'solo' | 'pair' | 'company';
 export type Event = {
   id: string;
   communityId: string | null; // null = city-wide event added by us
-  title: string; // «Open mic: стендап для своїх»
+  title: string; // "Open mic: stand-up among friends"
   poster: { lines: string[]; emoji: string; gradient: GradientId }; // big poster word(s) on the feed card
   startsAt: string; // ISO
   endsAt: string; // ISO
-  venue: string; // «Бар «Кульбаба»»
-  address: string; // «вул. Вигадана, 12»
-  walk?: string; // «7 хв пішки від УКУ»
+  venue: string; // "Kulbaba bar"
+  address: string; // "12 Fictional St"
+  walk?: string; // "7 min walk from UCU"
   price: number | null; // UAH, null = free
   priceNote?: string;
   category: InterestId;
   ageLimit?: number;
   description: string;
-  partner: boolean; // «Майданчик-партнер LastMinute»
-  goingCount: number; // total «Я йду», including people who are not listed
+  partner: boolean; // "LastMinute partner venue"
+  goingCount: number; // total "I'm going", including people who are not listed
   soloCount: number; // how many of them go without company
   metCount?: number; // live backend: people the user matched with before who are going (count only)
 };
@@ -59,21 +59,21 @@ export type User = {
   username?: string; // «darynka», shown as @darynka
   age?: number; // not collected by the live backend yet
   gender?: 'f' | 'm';
-  affiliation: string; // «Соціологія, 3 курс»
-  talkAbout: string; // «Говори зі мною про…»
+  affiliation: string; // "Sociology, 3rd year"
+  talkAbout: string; // "Talk to me about…"
   tags: InterestId[];
   gradient: GradientId;
   photoUri?: string; // signed URL from the private bucket (live) — only for people the user may see
-  sharedEvents: number; // «Були разом на N подіях» with the current user
+  sharedEvents: number; // "Were together at N events" with the current user
 };
 
 export type Attendance = {
   eventId: string;
   userId: string;
-  solo: boolean; // «Йде сама/сам»
-  inSoloGroup?: boolean; // member of the «Самі на …» group chat
+  solo: boolean; // "Going solo"
+  inSoloGroup?: boolean; // member of the "Solo at …" group chat
   // Mock-only behaviour of the other side:
-  likesYou?: boolean; // already pressed «Піти разом» on the current user
+  likesYou?: boolean; // already pressed "Go together" on the current user
   replies?: string[]; // what they answer in the DM, one per message the user sends
   leavesContact?: string; // contact they leave after the event («@yulia_l»)
 };

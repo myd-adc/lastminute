@@ -41,7 +41,7 @@ npx expo export --platform web   # production web build into dist/
 
 ## Code style
 
-- Comments in English. Ukrainian only when quoting UI copy (`«Я йду»`).
+- Comments in English only; quote UI copy by its English text (`"I'm going"`). Cyrillic only where the comment is about Ukrainian grammar itself (`Даринка → Даринкою`).
 - Comment only what the code can't say: the why, a constraint, a non-obvious workaround. No restating the code, no narration of changes, no TODO essays.
 - One short line is the norm; a block comment only at the top of a screen to name its Figma frame.
 - No emoji anywhere: code, comments, commits, docs.

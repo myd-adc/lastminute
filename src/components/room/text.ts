@@ -4,7 +4,7 @@ import type { Event, User } from '@/data/types';
 import { getLang } from '@/i18n/core';
 import { t } from '@/i18n/translate';
 
-// «Open mic: стендап для своїх» → «Open mic»
+// "Open mic: stand-up among friends" → "Open mic"
 export const shortTitle = (e: Event) => e.title.split(':')[0].trim();
 
 // «Бар «Кульбаба»» → «Кульбаба» (with quotes); venues without a quoted name stay as they are.

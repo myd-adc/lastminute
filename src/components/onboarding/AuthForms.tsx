@@ -15,7 +15,7 @@ import { QrCard } from './QrCard';
 
 type Size = 'md' | 'lg'; // lg = M01 (56 pt, 16 radius, 18 inset), md = W01 (52 pt, 14 radius, 16 inset)
 
-// «Нік або пошта» on M01 / W01.
+// "Username or email" on M01 / W01.
 export function LoginInput({ value, onChange, onSubmit, autoFocus, size = 'lg' }: { value: string; onChange: (v: string) => void; onSubmit?: () => void; autoFocus?: boolean; size?: Size }) {
   const { t } = useT();
   return (
@@ -36,7 +36,7 @@ export function LoginInput({ value, onChange, onSubmit, autoFocus, size = 'lg' }
   );
 }
 
-// «Пароль» with «Показати / Сховати» at the end; `fresh` marks a new password for password managers.
+// "Password" with "Show / Hide" at the end; `fresh` marks a new password for password managers.
 export function PasswordInput({
   value,
   onChange,
@@ -81,7 +81,7 @@ export function PasswordInput({
   );
 }
 
-// «Ще немає акаунта? Зареєструватися» / «Вже є акаунт? Увійти», centred under the main button.
+// "No account yet? Sign up" / "Already have an account? Sign in", centred under the main button.
 export function SwitchLine({ lead, link, onPress }: { lead: string; link: string; onPress: () => void }) {
   const { c } = useTheme();
   const ink = useAccentInk();
@@ -119,7 +119,7 @@ export function MobileAuth({ children }: { children: ReactNode }) {
   );
 }
 
-// W01 / W01b auth panel: title, subtitle, the form, «або», the QR block and the trust line (16 pt rhythm).
+// W01 / W01b auth panel: title, subtitle, the form, "or", the QR block and the trust line (16 pt rhythm).
 export function WideAuth({ title, subtitle, children }: { title: string; subtitle: string; children: ReactNode }) {
   const { c } = useTheme();
   const { t } = useT();

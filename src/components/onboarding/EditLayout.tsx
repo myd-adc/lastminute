@@ -7,7 +7,7 @@ import { useIsWide } from '@/lib/layout';
 
 import { PreviewCard, type PreviewPerson } from './PreviewCard';
 
-// Shell for «Змінити профіль» / «Вподобання і сцени»: header with back, pinned «Зберегти»,
+// Shell for "Edit profile" / "Interests": header with back, pinned "Save",
 // and on wide web a live preview card next to the form.
 export function EditLayout({
   title,

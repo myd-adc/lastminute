@@ -17,7 +17,7 @@ import { useT } from '@/i18n';
 import { useIsWide } from '@/lib/layout';
 import { display, useTheme } from '@/theme';
 
-// M16 «Профіль»; on wide web — W09 (two columns inside the WebShell).
+// M16 "Profile"; on wide web — W09 (two columns inside the WebShell).
 // Frame rhythm: 40 pt title row 10 pt under the status bar, then one column with a uniform 12 pt gap.
 export default function MeScreen() {
   const { c } = useTheme();

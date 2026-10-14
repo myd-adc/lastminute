@@ -6,7 +6,7 @@ import { unreadCount } from '@/lib/selectors';
 import { useNow, useStore } from '@/store/AppStore';
 import { useTheme } from '@/theme';
 
-// Four tabs (Події · Спільноти · Чати · Профіль). Phone: floating glass bar; wide web: the WebShell sidebar instead.
+// Four tabs (Events · Communities · Chats · Profile). Phone: floating glass bar; wide web: the WebShell sidebar instead.
 export default function TabsLayout() {
   const { c } = useTheme();
   const { state } = useStore();

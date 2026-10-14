@@ -12,7 +12,7 @@ import { useIsWide } from '@/lib/layout';
 import { useStore } from '@/store/AppStore';
 import { type, useTheme } from '@/theme';
 
-// M20 «Нова спільнота».
+// M20 "New community".
 export default function NewCommunityScreen() {
   const { c } = useTheme();
   const { t } = useT();

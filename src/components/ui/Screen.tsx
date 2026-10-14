@@ -75,7 +75,7 @@ export function Header({
   subtitle?: string;
   right?: ReactNode;
   onBack?: (() => void) | null;
-  large?: boolean; // «Налаштування»-style big Unbounded title next to the chevron
+  large?: boolean; // "Settings"-style big Unbounded title next to the chevron
 }) {
   const { c } = useTheme();
   return (
@@ -105,7 +105,7 @@ export function Header({
   );
 }
 
-// Big Unbounded screen title with an optional right action (M12 «Чати», M16 «Профіль»).
+// Big Unbounded screen title with an optional right action (M12 "Chats", M16 "Profile").
 export function ScreenTitle({ title, right }: { title: string; right?: ReactNode }) {
   const { c } = useTheme();
   return (

@@ -22,7 +22,7 @@ const DAYS = 7;
 const DURATIONS = [1, 2, 3, 4];
 const TIME_RE = /^([01]?\d|2[0-3]):([0-5]\d)$/;
 
-// M21 «Нова подія» — only the community's creator gets here.
+// M21 "New event" — only the community's creator gets here.
 export default function NewEventScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const community = getCommunity(id);
@@ -55,7 +55,7 @@ function NewEvent({ community }: { community: Community }) {
   }, [start, day, now]);
   const endsAt = startsAt ? new Date(Date.parse(startsAt) + hours * HOUR).toISOString() : null;
   const lines = (words.trim() || title.trim()).toUpperCase().split(/\s+/).filter(Boolean).slice(0, 2);
-  // «Антикафе «Кабінет», вул. Шептицьких, 24»: the place is everything before the first comma.
+  // "Kabinet anticafe, 24 Sheptytskykh St": the place is everything before the first comma.
   const [venue, ...rest] = where.split(',');
   const address = rest.join(',').trim();
   const valid = title.trim().length >= 2 && venue.trim().length >= 2 && !!startsAt && Date.parse(startsAt) > now;
