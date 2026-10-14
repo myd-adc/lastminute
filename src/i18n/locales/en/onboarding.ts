@@ -160,7 +160,7 @@ export const onboarding: Translation<typeof Uk> = {
     getStarted: 'Get started',
     hero: 'Don’t go alone.\nGo with people who are already going.',
     sub: 'See what’s on tonight, tap “I’m going”, and only then see who else is going.',
-    note: 'Sign in with a code from your email. No password.',
+    note: 'Free. Sign up with an email and a password.',
     phonesA11y: 'App screens: the event feed and an event room',
     how: {
       title: 'How it works',
