@@ -14,7 +14,6 @@ import { EndOfFeed } from './EndOfFeed';
 import { FeedPage } from './FeedPage';
 import { MobileFeedSkeleton } from './FeedSkeleton';
 import { FeedTabs } from './FeedTabs';
-import { FilterSheet } from './FilterSheet';
 import { useToast } from './Toast';
 import { useFeed } from './useFeed';
 
@@ -24,10 +23,9 @@ export function MobileFeed() {
   const insets = useSafeAreaInsets();
   const clearance = tabBarClearance(insets.bottom);
   const toast = useToast(clearance + 8);
-  const { state, dispatch, now, feed, previews, handlers, setTab } = useFeed(toast.show);
+  const { state, now, feed, previews, handlers, setTab } = useFeed(toast.show);
   const { loading } = useStore();
   const [size, setSize] = useState({ w: 0, h: 0 });
-  const [filters, setFilters] = useState(false);
   const listRef = useRef<FlatList<Event>>(null);
   const index = useRef(0);
   const feedRef = useRef(feed);
@@ -96,7 +94,7 @@ export function MobileFeed() {
   );
 
   const header = (onPoster: boolean) => (
-    <FeedTabs value={state.feedTab} onChange={setTab} onPoster={onPoster} onFilters={() => setFilters(true)} />
+    <FeedTabs value={state.feedTab} onChange={setTab} onPoster={onPoster} savedCount={Object.keys(state.saved).length} />
   );
 
   const renderItem = ({ item }: { item: Event }) => (
@@ -145,15 +143,6 @@ export function MobileFeed() {
           </>
         )
       )}
-      <FilterSheet
-        visible={filters}
-        onClose={() => setFilters(false)}
-        value={state.feedTab}
-        onChange={setTab}
-        savedCount={Object.keys(state.saved).length}
-        skippedCount={Object.keys(state.skipped).length}
-        onResetSkipped={() => dispatch({ type: 'resetSkipped' })}
-      />
       {toast.node}
     </View>
   );

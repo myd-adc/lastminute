@@ -94,6 +94,7 @@ export function WideFeed() {
         setTab(tab);
       }}
       wide
+      savedCount={Object.keys(state.saved).length}
     />
   );
 

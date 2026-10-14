@@ -68,9 +68,10 @@ export function tabEvents(state: State, now: number, tab: State['feedTab']): Eve
   return [...all].sort(byInterest(state));
 }
 
-// Swipe feed for the current tab: unseen events first; skipped and «Я йду» ones drop out of the stack.
+// Swipe feed for the current tab: skipped and «Я йду» ones drop out of the stack. Saved ones stay saved even if
+// skipped later, so the saved stack ignores skips.
 export const feedEvents = (state: State, now: number): Event[] =>
-  tabEvents(state, now, state.feedTab).filter((e) => !state.skipped[e.id] && !state.going[e.id]);
+  tabEvents(state, now, state.feedTab).filter((e) => (state.feedTab === 'saved' || !state.skipped[e.id]) && !state.going[e.id]);
 
 export const myUpcoming = (state: State, now: number) => upcoming(state, now).filter((e) => state.going[e.id]);
 export const nextForYou = (state: State, now: number, exceptId?: string) =>

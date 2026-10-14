@@ -20,16 +20,8 @@ export const feed = {
     communities: 'Спільноти',
     met: 'Знайомі',
     saved: 'Збережені',
-    filters: 'Фільтри стрічки',
-  },
-  filter: {
-    title: 'Що гортати',
-    forYouSub: 'Усі події міста й відкритих спільнот',
-    communitiesSub: 'Лише події твоїх спільнот',
-    metSub: 'Куди йдуть ті, з ким ти вже ходив(ла)',
-    savedSub: { one: '{count} збережено', few: '{count} збережено', many: '{count} збережено' },
-    savedEmpty: 'Поки нічого не збережено',
-    restoreSkipped: 'Повернути пропущені ({count})',
+    showSaved: 'Показати збережені',
+    hideSaved: 'Назад до стрічки',
   },
   card: {
     going: { one: '{count} йде', few: '{count} йдуть', many: '{count} йдуть' },

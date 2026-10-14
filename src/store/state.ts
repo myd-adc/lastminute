@@ -22,7 +22,7 @@ export type Going = {
   joinSoloGroup: boolean; // M08 «Додати мене» to «Самі на …»
 };
 
-// 'saved' is reached from the filter sheet, not shown as a tab of its own.
+// 'saved' is reached from the bookmark next to the tabs and shows as a tab only while open.
 export type FeedTab = 'forYou' | 'communities' | 'met' | 'saved';
 
 export type Report = { userId: string; eventId?: string; reason: ReportReason; alsoBlock: boolean; at: string };

@@ -22,16 +22,8 @@ export const feed: Translation<typeof Uk> = {
     communities: 'Communities',
     met: 'Met',
     saved: 'Saved',
-    filters: 'Feed filters',
-  },
-  filter: {
-    title: 'What to swipe',
-    forYouSub: 'Every city event and open communities',
-    communitiesSub: 'Only events of your communities',
-    metSub: 'Where people you’ve been out with are going',
-    savedSub: { one: '{count} saved', other: '{count} saved' },
-    savedEmpty: 'Nothing saved yet',
-    restoreSkipped: 'Bring back skipped ({count})',
+    showSaved: 'Show saved',
+    hideSaved: 'Back to the feed',
   },
   card: {
     going: { one: '{count} going', other: '{count} going' },
