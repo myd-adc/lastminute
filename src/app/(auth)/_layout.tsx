@@ -3,8 +3,8 @@ import { Stack } from 'expo-router';
 import { useIsWide } from '@/lib/layout';
 import { useTheme } from '@/theme';
 
-// M01 → M02 → M03 → M04. `login` is the entry; each step pushes the next one; M04 finishes onboarding.
-export const unstable_settings = { initialRouteName: 'login' };
+// W00 → M01 → M02 → M03 → M04. `welcome` is the entry (it redirects to `login` below wide web); each step pushes the next one.
+export const unstable_settings = { initialRouteName: 'welcome' };
 
 export default function AuthLayout() {
   const { c } = useTheme();

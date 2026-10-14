@@ -47,6 +47,17 @@ const variants = {
       { x: 280, y: 680, r: 160, blur: 70, color: LIME, opacity: 0.18 },
     ],
   },
+  // W00 landing hero (1440 × 810): pink behind the headline, violet behind the phones, lime low between them.
+  landing: {
+    w: 1440,
+    h: 810,
+    scaleY: true,
+    glows: [
+      { x: 140, y: 180, r: 260, blur: 70, color: PINK, opacity: 0.3 },
+      { x: 1000, y: 280, r: 240, blur: 70, color: VIOLET, opacity: 0.32 },
+      { x: 580, y: 580, r: 160, blur: 70, color: LIME, opacity: 0.12 },
+    ],
+  },
 } satisfies Record<string, Variant>;
 
 export type GlowVariant = keyof typeof variants;
