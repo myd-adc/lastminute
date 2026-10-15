@@ -89,3 +89,27 @@ export const pop = (p: Animated.Value) => ({ opacity: p, transform: [{ translate
 
 // Toast and small chips: fades in, rises 8 pt.
 export const rise = (p: Animated.Value) => ({ opacity: p, transform: [{ translateY: lerp(p, 8, 0) }] });
+
+// Web: Escape closes the topmost overlay. Each one pushes its handler; only the last one fires.
+const escapeStack: (() => void)[] = [];
+if (Platform.OS === 'web' && typeof window !== 'undefined') {
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && escapeStack.length) escapeStack[escapeStack.length - 1]();
+  });
+}
+
+export function useEscape(onEscape: () => void, enabled = true) {
+  const handler = useRef(onEscape);
+  useEffect(() => {
+    handler.current = onEscape;
+  });
+  useEffect(() => {
+    if (!enabled || Platform.OS !== 'web') return;
+    const fire = () => handler.current();
+    escapeStack.push(fire);
+    return () => {
+      const i = escapeStack.lastIndexOf(fire);
+      if (i >= 0) escapeStack.splice(i, 1);
+    };
+  }, [enabled]);
+}

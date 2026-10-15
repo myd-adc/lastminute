@@ -7,6 +7,7 @@ import { Button } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { soloGroups } from '@/data/mock';
 import type { Event, User } from '@/data/types';
+import { genderForms } from '@/lib/genderForms';
 import { useT } from '@/i18n';
 import { t as translate } from '@/i18n/translate';
 import { decisionOf, isMatch, soloGroupMembers } from '@/lib/selectors';
@@ -133,7 +134,7 @@ export function GroupGate({ event, g }: { event: Event; g: Group }) {
       </Text>
       <Text style={[type.body, { color: c.muted, textAlign: 'center' }]}>
         {g.group
-          ? t('room.group.gateBody', { members: membersLabel(g.members.length), event: event.title })
+          ? t('room.group.gateBody', { members: membersLabel(g.members.length), event: event.title, ...genderForms(g.state.me?.gender) })
           : t('room.group.noGroupBody')}
       </Text>
       {g.group && (
@@ -169,7 +170,7 @@ function MemberRow({ event, user, confirmed }: { event: Event; user: User; confi
       </View>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={matched ? writeTo(user.name) : decided ? t('room.group.alreadyWaved') : t('room.group.goWith', { name: user.name })}
+        accessibilityLabel={matched ? writeTo(user.name) : decided ? t('room.group.alreadyWaved', genderForms(state.me?.gender)) : t('room.group.goWith', { name: user.name })}
         disabled={decided && !matched}
         onPress={wave}
         style={[styles.waveBtn, { backgroundColor: decided ? c.accent : c.surface2 }]}
@@ -197,7 +198,7 @@ export function GroupMembersPanel({ event, g }: { event: Event; g: Group }) {
             <View style={{ flex: 1, gap: 2 }}>
               <Text style={[onest('semibold', 15, 19), { color: c.text }]}>{t('room.group.you', { name: me.name })}</Text>
               <Text style={[onest('regular', 12, 15), { color: g.meConfirmed ? accentText : c.muted }]} numberOfLines={1}>
-                {[me.affiliation, g.meConfirmed ? t('room.group.meConfirmed') : t('room.group.meNotYet')].filter(Boolean).join(' · ')}
+                {[me.affiliation, g.meConfirmed ? t('room.group.meConfirmed') : t('room.group.meNotYet', genderForms(me?.gender))].filter(Boolean).join(' · ')}
               </Text>
             </View>
           </View>

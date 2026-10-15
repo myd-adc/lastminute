@@ -9,6 +9,7 @@ import { footerBottom } from '@/lib/layout';
 import { Avatar } from '@/components/ui';
 import { attendanceOf, getEvent, getUser } from '@/data/mock';
 import type { Message } from '@/data/types';
+import { genderForms } from '@/lib/genderForms';
 import { useT } from '@/i18n';
 import { albumOpen, chatState, expiresAt, isPast, messagesOf } from '@/lib/selectors';
 import { time } from '@/lib/time';
@@ -178,7 +179,7 @@ export function ChatThread({ chatId, eventId, userId, variant }: ChatThreadProps
             <Lock size={18} color={c.muted} />
             <Text style={[s.noticeText, s.flex]}>
               {manuallyClosed
-                ? t('chat.thread.closedByMe')
+                ? t('chat.thread.closedByMe', genderForms(state.me?.gender))
                 : t('chat.thread.closedExpired')}
             </Text>
           </View>

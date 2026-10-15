@@ -7,13 +7,13 @@ import { emptyProfile } from '@/components/onboarding/ProfileForm';
 import { useT } from '@/i18n';
 import { useStore } from '@/store/AppStore';
 
-// M04b "A little about you" — onboarding step 2 of 3: year of birth and spoken languages.
+// M04b "A little about you" — onboarding step 2 of 3: year of birth, how to write about the person, languages.
 export default function AboutScreen() {
   const { state, dispatch } = useStore();
   const { t } = useT();
   const [fallbackMe] = useState(emptyProfile);
   const me = state.me ?? fallbackMe;
-  const [draft, setDraft] = useState<AboutDraft>(() => ({ birthYear: me.birthYear, languages: me.languages }));
+  const [draft, setDraft] = useState<AboutDraft>(() => ({ birthYear: me.birthYear, languages: me.languages, gender: me.gender }));
   const valid = aboutValid(draft);
 
   const next = () => {

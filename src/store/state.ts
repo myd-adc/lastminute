@@ -14,6 +14,7 @@ export type Me = {
   talkAbout: string; // "Talk to me about…", ≤ 80 chars
   birthYear?: number; // M04b; only the year, so age is approximate by design
   languages?: SpokenLang[]; // M04b
+  gender?: 'f' | 'm'; // M04b, optional: Ukrainian needs it for «йде сама / сам» and the past tense
   gradient: GradientId;
   photoUri?: string;
 };

@@ -8,6 +8,7 @@ import { Text } from '@/components/ui/Text';
 import { isRemoteLoaded } from '@/data/mock';
 import { useT } from '@/i18n';
 import { goingCount, matchesAt, myCommunities, myUpcoming } from '@/lib/selectors';
+import { genderForms } from '@/lib/genderForms';
 import { going as goingLabel, whenLabel } from '@/lib/time';
 import { useNow, useStore } from '@/store/AppStore';
 import { display, fonts, onest, type, useTheme } from '@/theme';
@@ -30,6 +31,7 @@ export function EndOfFeed({ header, contentStyle }: Props) {
   const skipped = Object.keys(state.skipped).length;
   const inCommunities = myCommunities(state).length > 0;
   const light = scheme === 'light';
+  const forms = genderForms(state.me?.gender);
 
   // Live backend before the first snapshot: the feed is loading, not finished.
   if (isLive && !isRemoteLoaded()) {
@@ -46,12 +48,12 @@ export function EndOfFeed({ header, contentStyle }: Props) {
     tab === 'saved'
       ? { title: t('feed.end.savedTitle'), sub: t('feed.end.savedSub') }
       : tab === 'met'
-        ? { title: t('feed.end.metTitle'), sub: t('feed.end.metSub') }
+        ? { title: t('feed.end.metTitle'), sub: t('feed.end.metSub', forms) }
         : tab === 'communities'
           ? inCommunities
             ? { title: t('feed.end.communitiesTitle'), sub: t('feed.end.communitiesSub') }
             : { title: t('feed.end.communitiesEmptyTitle'), sub: t('feed.end.communitiesEmptySub') }
-          : { title: t('feed.end.forYouTitle'), sub: t('feed.end.forYouSub') };
+          : { title: t('feed.end.forYouTitle'), sub: t('feed.end.forYouSub', forms) };
   // "For you" and an empty "Communities" lead to communities; the other tabs lead back to "For you".
   const findCommunities = tab === 'forYou' || (tab === 'communities' && !inCommunities);
 

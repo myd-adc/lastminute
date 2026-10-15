@@ -12,7 +12,7 @@ export const profile = {
   },
   visibility: {
     label: 'Видимість',
-    showSolo: 'Показувати, що я йду сам(а)',
+    showSolo: 'Показувати, що я йду сам{a}',
     showSoloSub: 'Допомагає таким самим тебе знайти',
     showShared: 'Показувати спільні події',
     showSharedSub: '«Були разом на 2 подіях»',
@@ -132,10 +132,10 @@ export const profile = {
   after: {
     notFound: 'Подію не знайдено',
     title: 'Як пройшло?',
-    talkedQuestion: 'Ти поговорив(ла) з кимось новим?',
+    talkedQuestion: 'Ти поговори{v} з кимось новим?',
     talked: { lots: '🙌 Так, з кількома', single: '☝️ З однією людиною', none: '🙅 Ні' },
-    cameWithQuestion: 'Ти прийшов(ла)…',
-    cameWith: { match: '👯 Разом з метчем', solo: '🙋 Сам(а)', friends: '🎉 Зі своїми' },
+    cameWithQuestion: 'Ти прийш{ov}…',
+    cameWith: { match: '👯 Разом з метчем', solo: '🙋 Сам{a}', friends: '🎉 Зі своїми' },
     contactTitle: 'Залишити контакт з {name}?',
     chatCloses: 'Чат закриється {day} о {time}',
     left: 'Залишено',

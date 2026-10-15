@@ -10,6 +10,7 @@ import { Avatar, Button, Chip, goBack, Gradient } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { getEvent } from '@/data/mock';
 import type { Event, Survey, User } from '@/data/types';
+import { genderForms } from '@/lib/genderForms';
 import { useT } from '@/i18n';
 import { useIsWide, footerBottom } from '@/lib/layout';
 import { attendeesFor, expiresAt, matchesAt, nextForYou } from '@/lib/selectors';
@@ -40,6 +41,7 @@ export default function AfterScreen() {
   const event = getEvent(id);
 
   const saved = state.surveys[id];
+  const forms = genderForms(state.me?.gender);
   const [talked, setTalked] = useState<Survey['talked']>(saved?.talked ?? null);
   const [cameWith, setCameWith] = useState<Survey['cameWith']>(saved?.cameWith ?? null);
   const [handles, setHandles] = useState<Record<string, string>>({});
@@ -84,17 +86,17 @@ export default function AfterScreen() {
       )}
       <Text style={[wide ? display(32, 40) : display(28, 35), { color: c.text }, !wide && styles.titleMobile]}>{t('profile.after.title')}</Text>
 
-      <Text style={[onest('semibold', 16, 20), { color: c.text }]}>{t('profile.after.talkedQuestion')}</Text>
+      <Text style={[onest('semibold', 16, 20), { color: c.text }]}>{t('profile.after.talkedQuestion', forms)}</Text>
       <View style={styles.chips}>
         {talkedOptions.map((o) => (
           <Chip key={o} label={t(`profile.after.talked.${talkedKey[o]}`)} selected={talked === o} onPress={() => setTalked(talked === o ? null : o)} />
         ))}
       </View>
 
-      <Text style={[onest('semibold', 16, 20), { color: c.text }]}>{t('profile.after.cameWithQuestion')}</Text>
+      <Text style={[onest('semibold', 16, 20), { color: c.text }]}>{t('profile.after.cameWithQuestion', forms)}</Text>
       <View style={[styles.chips, !wide && styles.beforeCards]}>
         {cameWithOptions.map((o) => (
-          <Chip key={o} label={t(`profile.after.cameWith.${o}`)} selected={cameWith === o} onPress={() => setCameWith(cameWith === o ? null : o)} />
+          <Chip key={o} label={t(`profile.after.cameWith.${o}`, forms)} selected={cameWith === o} onPress={() => setCameWith(cameWith === o ? null : o)} />
         ))}
       </View>
 

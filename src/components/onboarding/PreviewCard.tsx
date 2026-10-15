@@ -6,6 +6,7 @@ import { Text } from '@/components/ui/Text';
 import { getInterest } from '@/data/mock';
 import type { InterestId } from '@/data/types';
 import { useT } from '@/i18n';
+import { genderForms } from '@/lib/genderForms';
 import { withHandle } from '@/lib/username';
 import { display, onest, useTheme, type GradientId } from '@/theme';
 
@@ -18,6 +19,7 @@ export type PreviewPerson = {
   photoUri?: string;
   interests: InterestId[];
   solo?: boolean;
+  gender?: 'f' | 'm';
 };
 
 // W02 right panel: "How you'll look at events" — a live, smaller version of the M09 person card.
@@ -39,7 +41,7 @@ export function PreviewCard({ person }: { person: PreviewPerson }) {
               <Text style={[display(110, 120), { color: '#0B0B10' }]}>{name.charAt(0).toUpperCase()}</Text>
             </Gradient>
           )}
-          {person.solo && <Pill label={t('onboarding.preview.solo')} tone="bg" style={styles.soloPill} />}
+          {person.solo && <Pill label={t('onboarding.preview.solo', genderForms(person.gender))} tone="bg" style={styles.soloPill} />}
         </View>
         <View style={styles.body}>
           <Text style={[display(20, 25), { color: c.text }]} numberOfLines={1}>

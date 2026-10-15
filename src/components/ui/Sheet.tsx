@@ -4,7 +4,7 @@ import { Animated, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView,
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { fullWindow, useIsWide } from '@/lib/layout';
-import { pop, slideUp, useOverlayMotion, useSheetDrag } from '@/lib/motion';
+import { pop, slideUp, useEscape, useOverlayMotion, useSheetDrag } from '@/lib/motion';
 import { t } from '@/i18n/translate';
 import { useTheme } from '@/theme';
 
@@ -51,6 +51,7 @@ function Panel({ children, footer, onClose, maxHeight = '86%', dismissible = tru
   // A Modal sheet closes by flipping `visible`; a route sheet plays its exit here before the route goes.
   const close = onHidden ? onClose : () => exit(onClose);
   const drag = useSheetDrag(close, dismissible && !wide);
+  useEscape(close, dismissible && open !== false);
   return (
     <View style={[wide ? fullWindow : StyleSheet.absoluteFill, wide && styles.centre]}>
       <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: c.scrim, opacity: progress }]}>

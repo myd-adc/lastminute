@@ -5,6 +5,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Avatar, Chip, Toggle } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
+import { genderForms } from '@/lib/genderForms';
 import { useIsWide } from '@/lib/layout';
 import { withHandle } from '@/lib/username';
 import { myCommunities, pendingSurveys, profileStats, verifiedCommunity } from '@/lib/selectors';
@@ -105,13 +106,14 @@ export function VisibilitySection({ whoSees }: { whoSees?: boolean } = {}) {
   const { t } = useT();
   const { state, dispatch } = useStore();
   const { showSolo, showSharedEvents } = state.settings;
+  const forms = genderForms(state.me?.gender);
   return (
     <Section label={t('profile.visibility.label')}>
       <Group>
         <Row
-          label={t('profile.visibility.showSolo')}
+          label={t('profile.visibility.showSolo', forms)}
           sub={t('profile.visibility.showSoloSub')}
-          right={<Toggle value={showSolo} accessibilityLabel={t('profile.visibility.showSolo')} onChange={(v) => dispatch({ type: 'setPrivacy', key: 'showSolo', value: v })} />}
+          right={<Toggle value={showSolo} accessibilityLabel={t('profile.visibility.showSolo', forms)} onChange={(v) => dispatch({ type: 'setPrivacy', key: 'showSolo', value: v })} />}
         />
         <Row
           last={!whoSees}

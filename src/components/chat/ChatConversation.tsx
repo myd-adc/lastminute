@@ -8,6 +8,7 @@ import { Avatar, goBack } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { getEvent, getUser } from '@/data/mock';
 import { useT } from '@/i18n';
+import { useEscape } from '@/lib/motion';
 import { chatState, expiresAt, nameAge } from '@/lib/selectors';
 import { countdown, time } from '@/lib/time';
 import { dmChatId, useNow, useStore } from '@/store/AppStore';
@@ -26,6 +27,7 @@ export function ChatConversation({ eventId, userId, variant }: { eventId: string
   const { state, dispatch } = useStore();
   const now = useNow();
   const [menuOpen, setMenuOpen] = useState(false);
+  useEscape(() => setMenuOpen(false), menuOpen);
 
   const event = getEvent(eventId);
   const user = getUser(userId);

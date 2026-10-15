@@ -6,6 +6,7 @@ import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 're
 import { Avatar, AvatarStack, Button, IconButton, Pill } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import type { Event } from '@/data/types';
+import { genderForms } from '@/lib/genderForms';
 import { useT } from '@/i18n';
 import { acquaintances, attendeesFor, goingCount, nameAge, nextForYou, soloCount } from '@/lib/selectors';
 import { going as goingLabel, whenLabel } from '@/lib/time';
@@ -203,7 +204,7 @@ export function WideFeed() {
                 </Text>
                 <Text style={[onest('regular', 13, 17), { color: c.muted }]}>{a.user.affiliation}</Text>
               </View>
-              <Pill label={a.attendance.solo ? t('feed.wide.tagSolo') : t('feed.wide.tagFriends')} weight="medium" />
+              <Pill label={a.attendance.solo ? t('feed.wide.tagSolo', genderForms(a.user.gender)) : t('feed.wide.tagFriends')} weight="medium" />
             </View>
           ))}
         </View>

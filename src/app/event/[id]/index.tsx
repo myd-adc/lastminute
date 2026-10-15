@@ -17,7 +17,7 @@ import type { Event } from '@/data/types';
 import { useT } from '@/i18n';
 import { t as translate } from '@/i18n/translate';
 import { fullWindow, useIsWide } from '@/lib/layout';
-import { pop, slideUp, useOverlayMotion, useSheetDrag } from '@/lib/motion';
+import { pop, slideUp, useEscape, useOverlayMotion, useSheetDrag } from '@/lib/motion';
 import { acquaintances, attendeesFor, eventAuthor, goingCount, isMyEvent, soloCount, soloGroupMembers } from '@/lib/selectors';
 import { dayLabel, whenLabel } from '@/lib/time';
 import { useNow, useStore, type Going } from '@/store/AppStore';
@@ -169,6 +169,7 @@ function MobileDetails({ event }: { event: Event }) {
   const { progress, exit } = useOverlayMotion();
   const close = () => exit(() => goBack('/'));
   const drag = useSheetDrag(close);
+  useEscape(close);
   return (
     <>
       <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: DIM_SHEET, opacity: progress }]}>
@@ -219,6 +220,7 @@ function WideDetails({ event }: { event: Event }) {
   const groupLabel = t('feed.details.joinGroup', { title: shortTitle(event) });
   const { progress, exit } = useOverlayMotion();
   const close = () => exit(() => goBack('/'));
+  useEscape(close);
 
   return (
     <View style={[fullWindow, styles.centre]}>

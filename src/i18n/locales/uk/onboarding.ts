@@ -61,6 +61,9 @@ export const onboarding = {
     birthYearPlaceholder: 'Обери рік',
     birthYearPick: 'Обери рік народження',
     birthYearNote: 'Іншим показуємо тільки вік, не рік.',
+    gender: 'Як про тебе писати',
+    genders: { female: 'Вона', male: 'Він', unset: 'Не вказувати' },
+    genderNote: 'Від цього залежать слова на кшталт «йде сама» чи «йде сам».',
     languages: 'Якими мовами спілкуєшся · необов’язково',
     languagesNote: 'Можна обрати кілька.',
   },
@@ -119,7 +122,7 @@ export const onboarding = {
   preview: {
     title: 'Так тебе бачитимуть на події',
     namePlaceholder: 'Твоє ім’я',
-    solo: '🙋 Йде сам(а)',
+    solo: '🙋 Йде сам{a}',
     talkAbout: 'Говори зі мною про',
     note: 'Картку бачать лише ті, хто натиснув «Я йду» на ту саму подію.',
   },

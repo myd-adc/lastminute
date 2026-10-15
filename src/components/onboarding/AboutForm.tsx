@@ -16,11 +16,17 @@ export const SPOKEN_LANGS: SpokenLang[] = ['uk', 'en', 'pl', 'de', 'es', 'fr', '
 const MIN_AGE = 14;
 const MAX_AGE = 100;
 
-export type AboutDraft = { birthYear?: number; languages?: SpokenLang[] };
+export type AboutDraft = { birthYear?: number; languages?: SpokenLang[]; gender?: 'f' | 'm' };
+
+const GENDERS: { id: 'f' | 'm' | undefined; key: 'female' | 'male' | 'unset' }[] = [
+  { id: 'f', key: 'female' },
+  { id: 'm', key: 'male' },
+  { id: undefined, key: 'unset' },
+];
 
 export const aboutValid = (v: AboutDraft) => !!v.birthYear;
 
-// M04b "A little about you": year of birth (needed for 18+ events) and the languages the person speaks.
+// M04b "A little about you": year of birth (needed for 18+ events), grammatical gender and spoken languages.
 export function AboutForm({ value, onChange }: { value: AboutDraft; onChange: (v: AboutDraft) => void }) {
   const { c } = useTheme();
   const { t } = useT();
@@ -43,6 +49,15 @@ export function AboutForm({ value, onChange }: { value: AboutDraft; onChange: (v
         </Pressable>
       </Field>
       <Text style={[type.footnote, { color: c.muted, marginTop: -6 }]}>{t('onboarding.about.birthYearNote')}</Text>
+
+      <Field label={t('onboarding.about.gender')}>
+        <View style={styles.chips}>
+          {GENDERS.map((g) => (
+            <Chip key={g.key} label={t(`onboarding.about.genders.${g.key}`)} selected={value.gender === g.id} onPress={() => onChange({ ...value, gender: g.id })} />
+          ))}
+        </View>
+      </Field>
+      <Text style={[type.footnote, { color: c.muted, marginTop: -6 }]}>{t('onboarding.about.genderNote')}</Text>
 
       <Field label={t('onboarding.about.languages')}>
         <View style={styles.chips}>
