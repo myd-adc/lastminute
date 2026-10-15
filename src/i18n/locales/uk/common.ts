@@ -1,5 +1,13 @@
 // Shared strings: actions, time words, counters. Mirror every key in ../en/common.ts.
 export const common = {
+  add: {
+    label: 'Створити',
+    title: 'Що створюємо?',
+    event: 'Свою подію',
+    eventSub: 'Без спільноти — просто поклич людей',
+    community: 'Спільноту',
+    communitySub: 'Відкриту для всіх або лише для пошти домену',
+  },
   languages: {
     uk: 'Українська',
     en: 'Англійська',

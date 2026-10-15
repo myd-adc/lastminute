@@ -2,6 +2,14 @@ import type { Translation } from '../types';
 import type { common as Uk } from '../uk/common';
 
 export const common: Translation<typeof Uk> = {
+  add: {
+    label: 'Create',
+    title: 'What are we making?',
+    event: 'Your own event',
+    eventSub: 'No community needed — just call people out',
+    community: 'A community',
+    communitySub: 'Open to everyone, or limited to an e-mail domain',
+  },
   languages: {
     uk: 'Ukrainian',
     en: 'English',
