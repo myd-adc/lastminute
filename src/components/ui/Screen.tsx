@@ -29,24 +29,29 @@ export function Screen({ children, scroll = true, withTabBar, keyboard, footer, 
   const top = wide ? 32 : insets.top + 8;
   const bottom = withTabBar && !wide ? tabBarClearance(insets.bottom) : footer ? 16 : footerBottom(insets.bottom);
   const pad = padded ? { paddingHorizontal: wide ? 40 : 20 } : null;
+  // Wide web: a full-bleed column stretches buttons across the whole window. Screens that want more pass their own
+  // maxWidth through `contentStyle`, which comes last and wins.
+  const column = wide ? styles.column : null;
 
   const body = scroll ? (
     <ScrollView
       style={styles.flex}
-      contentContainerStyle={[{ paddingTop: top, paddingBottom: bottom }, pad, styles.gap, contentStyle]}
+      contentContainerStyle={[{ paddingTop: top, paddingBottom: bottom }, pad, styles.gap, column, contentStyle]}
       keyboardShouldPersistTaps="handled"
     >
       {children}
     </ScrollView>
   ) : (
-    <View style={[styles.flex, { paddingTop: top, paddingBottom: footer ? 0 : bottom }, pad, styles.gap, contentStyle]}>{children}</View>
+    <View style={[styles.flex, { paddingTop: top, paddingBottom: footer ? 0 : bottom }, pad, styles.gap, column, contentStyle]}>{children}</View>
   );
 
   const content = (
     <View style={[styles.flex, { backgroundColor: c.bg }]}>
       {backdrop}
       {body}
-      {footer && <View style={[pad, { paddingTop: 12, paddingBottom: wide ? 32 : footerBottom(insets.bottom), gap: 12 }]}>{footer}</View>}
+      {footer && (
+        <View style={[pad, column, { paddingTop: 12, paddingBottom: wide ? 32 : footerBottom(insets.bottom), gap: 12 }]}>{footer}</View>
+      )}
     </View>
   );
 
@@ -129,6 +134,7 @@ export function SectionLabel({ children, right }: { children: string; right?: Re
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   gap: { gap: 16 },
+  column: { width: '100%', maxWidth: 640, alignSelf: 'center' },
   header: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 44 },
   titleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
 });

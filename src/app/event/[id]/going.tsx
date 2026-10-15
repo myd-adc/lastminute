@@ -34,7 +34,7 @@ export default function GoingScreen() {
     return (
       <Screen>
         <Text style={[type.title2, { color: c.text }]}>{t('feed.details.notFound')}</Text>
-        <Button label={t('feed.backToFeed')} onPress={() => router.replace('/')} />
+        <Button label={t('feed.backToFeed')} onPress={() => router.replace('/')} style={styles.cta} />
       </Screen>
     );
   }
@@ -70,8 +70,8 @@ function GoingView({ event }: { event: Event }) {
     return (
       <Screen contentStyle={styles.narrow}>
         <Text style={[type.title2, { color: c.text }]}>{t('feed.going.notGoing', { title })}</Text>
-        <Button label={t('common.imGoing')} onPress={() => dispatch({ type: 'go', eventId: event.id })} />
-        <Button variant="secondary" label={t('feed.backToFeed')} onPress={() => router.replace('/')} />
+        <Button label={t('common.imGoing')} onPress={() => dispatch({ type: 'go', eventId: event.id })} style={styles.cta} />
+        <Button variant="secondary" label={t('feed.backToFeed')} onPress={() => router.replace('/')} style={styles.cta} />
       </Screen>
     );
   }
@@ -171,6 +171,8 @@ function GoingView({ event }: { event: Event }) {
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   narrow: { width: '100%', maxWidth: 480, alignSelf: 'center' },
+  // A lone CTA on an error screen reads as a banner when it spans the whole column.
+  cta: { alignSelf: 'flex-start', paddingHorizontal: 32 },
   scroll: { paddingHorizontal: 20, paddingBottom: 16 },
   body: { gap: 10 },
   footer: { paddingHorizontal: 20, paddingTop: 12 },

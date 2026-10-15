@@ -23,7 +23,7 @@ export default function NewPersonalEventScreen() {
       <Screen contentStyle={styles.narrow}>
         <Text style={[type.title2, { color: c.text }]}>{t('feed.own.fullTitle')}</Text>
         <Text style={[type.body, { color: c.muted }]}>{t('feed.own.fullBody', { count: MAX_OWN_EVENTS })}</Text>
-        <Button label={t('feed.backToFeed')} variant="secondary" onPress={() => router.replace('/')} />
+        <Button label={t('feed.backToFeed')} variant="secondary" onPress={() => router.replace('/')} style={styles.cta} />
       </Screen>
     );
   }
@@ -39,4 +39,7 @@ export default function NewPersonalEventScreen() {
   );
 }
 
-const styles = { narrow: { maxWidth: 480, width: '100%' as const, alignSelf: 'center' as const, gap: 12 } };
+const styles = {
+  narrow: { maxWidth: 480, width: '100%' as const, alignSelf: 'center' as const, gap: 12 },
+  cta: { alignSelf: 'flex-start' as const, paddingHorizontal: 32 },
+};

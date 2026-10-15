@@ -11,7 +11,7 @@ import { RoomSkeleton } from '@/components/skeletons/ListSkeletons';
 import { RoomMatchesPanel } from '@/components/room/RoomMatchesPanel';
 import { KeyboardHints, RoomActions, RoomDone, RoomFootnote, RoomLocked, RoomTabs } from '@/components/room/RoomParts';
 import { venueShort } from '@/components/room/text';
-import { Button, Gradient, Header, IconButton, Pill, goBack } from '@/components/ui';
+import { Button, Gradient, Header, IconButton, Pill, Screen, goBack } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { getEvent } from '@/data/mock';
 import type { Event } from '@/data/types';
@@ -34,13 +34,12 @@ export default function RoomScreen() {
 function NotFound() {
   const { c } = useTheme();
   const { t } = useT();
-  const insets = useSafeAreaInsets();
   return (
-    <View style={[styles.flex, { backgroundColor: c.bg, paddingTop: insets.top + 8, paddingHorizontal: 20, gap: 16 }]}>
+    <Screen>
       <Header title={t('room.title')} />
       <Text style={[type.body, { color: c.muted }]}>{t('room.eventGone')}</Text>
-      <Button label={t('room.toEvents')} variant="secondary" onPress={() => router.replace('/')} />
-    </View>
+      <Button label={t('room.toEvents')} variant="secondary" onPress={() => router.replace('/')} style={styles.notFoundCta} />
+    </Screen>
   );
 }
 
@@ -233,6 +232,7 @@ function RoomWide({ event }: { event: Event }) {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
+  notFoundCta: { alignSelf: 'flex-start', paddingHorizontal: 32 },
   row: { flexDirection: 'row' },
   pad: { flex: 1, paddingHorizontal: 20 },
   mobileHead: { paddingHorizontal: 20, gap: 12 },
