@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { Globe, Plus, Settings } from 'lucide-react-native';
+import { Globe, Plus } from 'lucide-react-native';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
@@ -36,18 +36,8 @@ export function WideProfile() {
     <ScrollView style={{ flex: 1, backgroundColor: c.bg }} contentContainerStyle={styles.page}>
       <View style={styles.titleRow}>
         <Text style={[display(30, 38), { color: c.text }]}>{t('common.tabs.profile')}</Text>
-        <View style={styles.titleActions}>
-          <LangSwitch />
-          {/* Not in W09: compact entry to the full settings (email, student email, version). */}
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={t('profile.settingsTitle')}
-            onPress={() => router.push('/settings')}
-            style={({ hovered }: { hovered?: boolean }) => [styles.settingsBtn, { backgroundColor: hovered ? c.surface2 : c.surface }]}
-          >
-            <Settings size={18} color={c.muted} strokeWidth={2} />
-          </Pressable>
-        </View>
+        {/* No settings button here: W09 already carries every row of the phone settings screen. */}
+        <LangSwitch />
       </View>
       <View style={styles.columns}>
         <View style={[styles.col, styles.colLeft]}>
@@ -57,7 +47,7 @@ export function WideProfile() {
           <WideAccount />
         </View>
         <View style={[styles.col, styles.colRight]}>
-          <VisibilitySection />
+          <VisibilitySection whoSees />
           <NotificationsSection />
           <WideSafety />
           <AppearanceSection />
@@ -210,7 +200,6 @@ function WideAccount() {
           <ConfirmRow question={t('profile.account.deleteQuestion')} confirmLabel={t('profile.account.delete')} onCancel={() => setConfirm(null)} onConfirm={() => dispatch({ type: 'logout' })} />
         ) : (
           <Row
-            last
             label={t('profile.account.deleteAccount')}
             sub={t('profile.account.deleteAccountSub')}
             destructive
@@ -218,6 +207,7 @@ function WideAccount() {
             onPress={() => setConfirm('delete')}
           />
         )}
+        <Row last label={t('profile.settings.version')} value="0.1 beta" />
       </Group>
     </Section>
   );
@@ -248,11 +238,9 @@ function WideSafety() {
 const styles = StyleSheet.create({
   page: { paddingHorizontal: 48, paddingTop: 36, paddingBottom: 48, gap: 24, maxWidth: 1196 },
   titleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: 40 },
-  titleActions: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   lang: { flexDirection: 'row', alignItems: 'center', padding: 4, gap: 4, borderRadius: 14 },
   langIcon: { paddingLeft: 8, paddingRight: 4 },
   langSeg: { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  settingsBtn: { width: 38, height: 38, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
   columns: { flexDirection: 'row', gap: 40, alignItems: 'flex-start' },
   col: { flexBasis: 0, gap: 16 },
   colLeft: { flexGrow: 500 },

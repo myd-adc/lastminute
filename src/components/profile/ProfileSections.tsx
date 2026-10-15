@@ -100,7 +100,8 @@ export function StatsCard() {
   );
 }
 
-export function VisibilitySection() {
+// `whoSees` is for the wide profile, which carries no separate settings screen to state the rule.
+export function VisibilitySection({ whoSees }: { whoSees?: boolean } = {}) {
   const { t } = useT();
   const { state, dispatch } = useStore();
   const { showSolo, showSharedEvents } = state.settings;
@@ -113,7 +114,7 @@ export function VisibilitySection() {
           right={<Toggle value={showSolo} accessibilityLabel={t('profile.visibility.showSolo')} onChange={(v) => dispatch({ type: 'setPrivacy', key: 'showSolo', value: v })} />}
         />
         <Row
-          last
+          last={!whoSees}
           label={t('profile.visibility.showShared')}
           sub={t('profile.visibility.showSharedSub')}
           right={
@@ -124,6 +125,7 @@ export function VisibilitySection() {
             />
           }
         />
+        {whoSees && <Row last label={t('profile.settings.whoSeesCard')} value={t('profile.settings.onlyGoing')} />}
       </Group>
     </Section>
   );
