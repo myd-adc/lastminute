@@ -173,7 +173,7 @@ function MobileDetails({ event }: { event: Event }) {
   return (
     <>
       <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: DIM_SHEET, opacity: progress }]}>
-        <Pressable accessibilityLabel={t('common.close')} style={StyleSheet.absoluteFill} onPress={close} />
+        <Pressable accessibilityRole="button" accessibilityLabel={t('common.close')} style={StyleSheet.absoluteFill} onPress={close} />
       </Animated.View>
       <Animated.View
         {...drag.panHandlers}
@@ -225,7 +225,7 @@ function WideDetails({ event }: { event: Event }) {
   return (
     <View style={[fullWindow, styles.centre]}>
       <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: DIM_DIALOG, opacity: progress }]}>
-        <Pressable accessibilityLabel={t('common.close')} style={StyleSheet.absoluteFill} onPress={close} />
+        <Pressable accessibilityRole="button" accessibilityLabel={t('common.close')} style={StyleSheet.absoluteFill} onPress={close} />
       </Animated.View>
       <Animated.View style={[styles.dialog, { width: w, height: h, backgroundColor: c.surface, borderColor: c.line }, pop(progress)]}>
         <View style={{ width: posterW, height: h }}>
@@ -251,7 +251,7 @@ function WideDetails({ event }: { event: Event }) {
                 <Chip label={t('feed.details.withSomeone')} selected={mode === 'friends'} onPress={() => setWith('friends')} />
               </View>
               {mode === 'solo' && (
-                <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: join }} onPress={() => setJoin(!join)} style={styles.joinRow}>
+                <Pressable accessibilityRole="checkbox" aria-checked={join} onPress={() => setJoin(!join)} style={styles.joinRow}>
                   <View style={[styles.box, join ? { backgroundColor: c.accent } : { borderWidth: 1.5, borderColor: c.line }]}>
                     {join && <Check size={14} color={c.onAccent} strokeWidth={3} />}
                   </View>

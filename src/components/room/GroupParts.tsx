@@ -83,7 +83,7 @@ export function MeetCard({ g, showMenu = true }: { g: Group; showMenu?: boolean 
         </Text>
         <Pressable
           accessibilityRole="switch"
-          accessibilityState={{ checked: g.meConfirmed }}
+          aria-checked={g.meConfirmed}
           onPress={g.toggleMeet}
           style={({ pressed }) => [
             styles.meetPill,

@@ -71,7 +71,7 @@ export function ChatsTwoPane({ initialChatId }: { initialChatId?: string }) {
               <Pressable
                 key={key}
                 accessibilityRole="tab"
-                accessibilityState={{ selected: on }}
+                aria-selected={on}
                 onPress={() => setTab(key)}
                 style={[s.tab, on && { backgroundColor: c.surface2 }]}
               >

@@ -62,7 +62,7 @@ export function RoomMatchesPanel({
                 <Pressable
                   key={u.id}
                   accessibilityRole="button"
-                  accessibilityState={{ selected: on }}
+                  aria-pressed={on}
                   onPress={() => onSelect(u.id)}
                   style={({ hovered }: { hovered?: boolean }) => [styles.row, (on || hovered) && { backgroundColor: c.surface2 }]}
                 >

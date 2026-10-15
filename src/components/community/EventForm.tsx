@@ -96,7 +96,7 @@ export function EventForm({ title: head, sub, communityId, defaultGradient, note
 
       <Pressable
         accessibilityRole="button"
-        accessibilityState={{ expanded: posterOpen }}
+        aria-expanded={posterOpen}
         onPress={() => setPosterOpen((v) => !v)}
         style={styles.cover}
       >
@@ -125,7 +125,7 @@ export function EventForm({ title: head, sub, communityId, defaultGradient, note
           />
           <View style={styles.chips}>
             {gradientIds.map((g) => (
-              <Pressable key={g} accessibilityRole="radio" accessibilityState={{ checked: g === gradient }} onPress={() => setGradient(g)} hitSlop={4}>
+              <Pressable key={g} accessibilityRole="radio" aria-checked={g === gradient} onPress={() => setGradient(g)} hitSlop={4}>
                 <Gradient id={g} style={[styles.swatch, g === gradient && { borderColor: c.text, borderWidth: 2 }]} />
               </Pressable>
             ))}
@@ -147,7 +147,7 @@ export function EventForm({ title: head, sub, communityId, defaultGradient, note
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t('community.event.day')}
-          accessibilityState={{ expanded: whenOpen }}
+          aria-expanded={whenOpen}
           onPress={() => setWhenOpen((v) => !v)}
         >
           <InputBox focused={whenOpen}>

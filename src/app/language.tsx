@@ -30,7 +30,7 @@ export default function LanguageScreen() {
                 key={l.id}
                 accessibilityRole="radio"
                 accessibilityLabel={l.native}
-                accessibilityState={{ selected: on }}
+                aria-checked={on}
                 onPress={() => dispatch({ type: 'setLanguage', language: l.id })}
                 style={({ pressed }) => [
                   styles.row,

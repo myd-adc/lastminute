@@ -33,14 +33,14 @@ export function FeedTabs({ value, onChange, onPoster, wide, savedCount }: Props)
   ];
   return (
     <View style={[styles.row, !wide && styles.phoneRow]}>
-      <View style={[styles.tabs, { gap: wide ? 24 : 18 }]}>
+      <View style={[styles.tabs, { gap: wide ? 24 : 18 }]} accessibilityRole="tablist">
         {items.map((item) => {
           const active = item.key === value;
           return (
             <Pressable
               key={item.key}
               accessibilityRole="tab"
-              accessibilityState={{ selected: active }}
+              aria-selected={active}
               onPress={() => onChange(item.key)}
               hitSlop={8}
               style={[styles.tab, { gap: wide ? 6 : 4 }]}
@@ -63,7 +63,7 @@ export function FeedTabs({ value, onChange, onPoster, wide, savedCount }: Props)
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={t(savedOpen ? 'feed.tabs.hideSaved' : 'feed.tabs.showSaved')}
-        accessibilityState={{ selected: savedOpen }}
+        aria-pressed={savedOpen}
         onPress={() => onChange(savedOpen ? 'forYou' : 'saved')}
         hitSlop={12}
         style={({ pressed }) => [styles.saved, pressed && { opacity: 0.7 }]}

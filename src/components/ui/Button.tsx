@@ -26,7 +26,7 @@ export function Button({ label, onPress, variant = 'primary', size = 'lg', icon:
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityState={{ disabled: !!disabled }}
+      aria-disabled={!!disabled}
       onPress={onPress}
       disabled={disabled || loading || !onPress}
       style={({ pressed }) => [

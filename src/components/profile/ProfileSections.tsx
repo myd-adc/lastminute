@@ -204,7 +204,7 @@ export function AppearanceSection() {
               <Pressable
                 key={key}
                 accessibilityRole="radio"
-                accessibilityState={{ selected: on }}
+                aria-checked={on}
                 onPress={() => dispatch({ type: 'setTheme', theme: key })}
                 style={[styles.seg, on && { backgroundColor: c.surface2 }]}
               >

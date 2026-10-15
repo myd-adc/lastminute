@@ -72,7 +72,7 @@ export function CommunityForm({
       {!value.photoUri && (
         <View style={styles.swatches} accessibilityRole="radiogroup" accessibilityLabel={t('community.form.colour')}>
           {gradientIds.map((g) => (
-            <Pressable key={g} accessibilityRole="radio" accessibilityState={{ checked: g === value.gradient }} onPress={() => set({ gradient: g })} hitSlop={4}>
+            <Pressable key={g} accessibilityRole="radio" aria-checked={g === value.gradient} onPress={() => set({ gradient: g })} hitSlop={4}>
               <Gradient id={g} style={[styles.swatch, g === value.gradient && { borderColor: c.text, borderWidth: 2 }]}>
                 {g === value.gradient && <Check size={14} color="#fff" strokeWidth={3} />}
               </Gradient>

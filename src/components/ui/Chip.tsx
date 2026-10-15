@@ -20,7 +20,7 @@ export function Chip({
   return (
     <Pressable
       accessibilityRole={onPress ? 'button' : undefined}
-      accessibilityState={{ selected: !!selected }}
+      aria-pressed={!!selected}
       onPress={onPress}
       disabled={!onPress}
       style={({ pressed }) => [

@@ -55,7 +55,7 @@ function Panel({ children, footer, onClose, maxHeight = '86%', dismissible = tru
   return (
     <View style={[wide ? fullWindow : StyleSheet.absoluteFill, wide && styles.centre]}>
       <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: c.scrim, opacity: progress }]}>
-        {dismissible && <Pressable accessibilityLabel={t('common.close')} style={StyleSheet.absoluteFill} onPress={close} />}
+        {dismissible && <Pressable accessibilityRole="button" accessibilityLabel={t('common.close')} style={StyleSheet.absoluteFill} onPress={close} />}
       </Animated.View>
       <Animated.View
         {...drag.panHandlers}

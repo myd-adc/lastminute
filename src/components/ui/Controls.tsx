@@ -20,14 +20,14 @@ export function Segmented<K extends string>({
 }) {
   const { c } = useTheme();
   return (
-    <View style={[styles.track, { backgroundColor: c.surface }, style]}>
+    <View style={[styles.track, { backgroundColor: c.surface }, style]} accessibilityRole="tablist">
       {options.map((o) => {
         const on = o.key === value;
         return (
           <Pressable
             key={o.key}
             accessibilityRole="tab"
-            accessibilityState={{ selected: on, disabled: !!o.disabled }}
+            aria-selected={on} aria-disabled={!!o.disabled}
             disabled={o.disabled}
             onPress={() => onChange(o.key)}
             style={[styles.segment, on && { backgroundColor: c.surface2 }]}
@@ -54,7 +54,7 @@ export function Toggle({ value, onChange, accessibilityLabel }: { value: boolean
     <Pressable
       accessibilityRole="switch"
       accessibilityLabel={accessibilityLabel}
-      accessibilityState={{ checked: value }}
+      aria-checked={!!value}
       onPress={() => onChange(!value)}
       hitSlop={8}
       style={[styles.switchTrack, { backgroundColor: value ? c.accent : c.surface2 }]}
@@ -73,7 +73,7 @@ export function Toggle({ value, onChange, accessibilityLabel }: { value: boolean
 export function Checkbox({ checked, onChange, label, sub }: { checked: boolean; onChange: (v: boolean) => void; label: string; sub?: string }) {
   const { c } = useTheme();
   return (
-    <Pressable accessibilityRole="checkbox" accessibilityState={{ checked }} onPress={() => onChange(!checked)} style={styles.checkRow}>
+    <Pressable accessibilityRole="checkbox" aria-checked={checked} onPress={() => onChange(!checked)} style={styles.checkRow}>
       <View style={[styles.box, checked ? { backgroundColor: c.accent } : { borderWidth: 1.5, borderColor: c.line }]}>
         {checked && <Check size={16} color={c.onAccent} strokeWidth={3} />}
       </View>

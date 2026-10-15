@@ -135,7 +135,7 @@ function GoingView({ event }: { event: Event }) {
               </View>
               <Pressable
                 accessibilityRole="checkbox"
-                accessibilityState={{ checked: g.joinSoloGroup }}
+                aria-checked={g.joinSoloGroup}
                 onPress={() => setGoing({ joinSoloGroup: !g.joinSoloGroup })}
                 hitSlop={8}
                 style={styles.checkRow}

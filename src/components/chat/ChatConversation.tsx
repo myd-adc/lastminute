@@ -116,7 +116,7 @@ export function ChatConversation({ eventId, userId, variant }: { eventId: string
 
       {menuOpen && (
         <>
-          <Pressable accessibilityLabel={t('chat.menu.close')} style={StyleSheet.absoluteFill} onPress={() => setMenuOpen(false)} />
+          <Pressable accessibilityRole="button" accessibilityLabel={t('chat.menu.close')} style={StyleSheet.absoluteFill} onPress={() => setMenuOpen(false)} />
           <View style={[s.menu, panel ? s.menuPanel : { top: headerTop + 79 }]}>
             {status === 'open' && (
               <MenuItem

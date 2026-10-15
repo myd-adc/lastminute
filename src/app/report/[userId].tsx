@@ -92,7 +92,7 @@ export default function ReportScreen() {
               <Pressable
                 key={r}
                 accessibilityRole="radio"
-                accessibilityState={{ selected: on }}
+                aria-checked={on}
                 onPress={() => setReason(r)}
                 style={[styles.reason, (i < reasons.length - 1 || reason === 'other') && { borderBottomWidth: 1, borderBottomColor: c.line }]}
               >
@@ -117,7 +117,7 @@ export default function ReportScreen() {
 
         <Pressable
           accessibilityRole="checkbox"
-          accessibilityState={{ checked: alsoBlock }}
+          aria-checked={alsoBlock}
           onPress={() => setAlsoBlock(!alsoBlock)}
           style={[styles.block, { borderColor: c.line }]}
         >

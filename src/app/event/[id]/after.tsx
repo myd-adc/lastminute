@@ -127,7 +127,7 @@ export default function AfterScreen() {
     // W08: 640 pt dialog (surface, 1 pt line border, radius 28, 40 pt padding) over the dimmed shell.
     return (
       <View style={[styles.flex, styles.centre, { backgroundColor: c.scrim }]}>
-        <Pressable accessibilityLabel={t('common.close')} style={StyleSheet.absoluteFill} onPress={() => goBack('/')} />
+        <Pressable accessibilityRole="button" accessibilityLabel={t('common.close')} style={StyleSheet.absoluteFill} onPress={() => goBack('/')} />
         <View style={[styles.dialog, { backgroundColor: c.surface, borderColor: c.line }]}>
           <Glow blobs={glows.afterWide} />
           <ScrollView contentContainerStyle={styles.dialogContent} keyboardShouldPersistTaps="handled">

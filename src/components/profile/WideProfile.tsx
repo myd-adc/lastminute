@@ -77,7 +77,7 @@ function LangSwitch() {
             key={l.id}
             accessibilityRole="radio"
             accessibilityLabel={l.native}
-            accessibilityState={{ selected: on }}
+            aria-checked={on}
             onPress={() => dispatch({ type: 'setLanguage', language: l.id })}
             style={[styles.langSeg, on && { backgroundColor: c.surface2 }]}
           >
