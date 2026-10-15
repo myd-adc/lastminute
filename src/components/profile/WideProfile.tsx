@@ -20,6 +20,7 @@ import {
   ConfirmRow,
   DemoSection,
   NotificationsSection,
+  SavedSection,
   Section,
   StatsCard,
   VerifiedPill,
@@ -43,6 +44,7 @@ export function WideProfile() {
         <View style={[styles.col, styles.colLeft]}>
           <BigProfileCard />
           <StatsCard />
+          <SavedSection />
           <MyCommunities />
           <WideAccount />
         </View>

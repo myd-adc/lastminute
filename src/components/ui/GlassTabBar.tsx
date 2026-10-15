@@ -1,6 +1,6 @@
 import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
-import { Bookmark, Compass, MessageSquare, User, Users, type LucideIcon } from 'lucide-react-native';
+import { Compass, MessageSquare, User, Users, type LucideIcon } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -8,10 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { t, useT, type TKey } from '@/i18n';
 import { tabBarBottom } from '@/lib/layout';
 import { ms, ND } from '@/lib/motion';
-import { useStore } from '@/store/AppStore';
-import { onest, useTheme } from '@/theme';
-
-import { Text } from './Text';
+import { useTheme } from '@/theme';
 
 export type TabKey = 'events' | 'communities' | 'chats' | 'me';
 
@@ -50,7 +47,6 @@ export function GlassTabBar({ active, unread }: { active: TabKey; unread?: boole
   }, [index, x, stretch]);
   return (
     <View style={[styles.wrap, { bottom: tabBarBottom(insets.bottom) }]}>
-      <View style={styles.group}>
       <View style={[styles.shadow, { boxShadow: lightMode ? '0px 12px 16px rgba(10,10,15,0.16)' : '0px 12px 16px rgba(10,10,15,0.45)' }]}>
         <BlurView
           intensity={30}
@@ -94,49 +90,7 @@ export function GlassTabBar({ active, unread }: { active: TabKey; unread?: boole
           })}
         </BlurView>
       </View>
-      <SavedButton lightMode={lightMode} />
-      </View>
     </View>
-  );
-}
-
-// "Saved" is a filter over the feed, not a section of the app, so it sits beside the bar rather than inside it.
-function SavedButton({ lightMode }: { lightMode: boolean }) {
-  const { c } = useTheme();
-  const { state, dispatch } = useStore();
-  const open = state.feedTab === 'saved';
-  const count = Object.keys(state.saved).length;
-  const ink = open ? (lightMode ? c.text : c.accent) : lightMode ? 'rgba(11,11,16,0.6)' : 'rgba(246,245,242,0.72)';
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={t(open ? 'feed.tabs.hideSaved' : 'feed.tabs.showSaved')}
-      accessibilityState={{ selected: open }}
-      onPress={() => {
-        dispatch({ type: 'setFeedTab', tab: open ? 'forYou' : 'saved' });
-        router.navigate('/');
-      }}
-      style={({ pressed }) => [styles.savedShadow, pressed && styles.pressed]}
-    >
-      <BlurView
-        intensity={30}
-        tint={lightMode ? 'light' : 'dark'}
-        style={[
-          styles.saved,
-          {
-            backgroundColor: lightMode ? 'rgba(255,255,255,0.5)' : 'rgba(36,36,46,0.42)',
-            borderColor: lightMode ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.38)',
-          },
-        ]}
-      >
-        <Bookmark size={22} color={ink} fill={open ? ink : 'transparent'} strokeWidth={2} />
-      </BlurView>
-      {count > 0 && !open && (
-        <View style={[styles.badge, { backgroundColor: c.accent, borderColor: c.bg }]}>
-          <Text style={[onest('bold', 10, 12), { color: c.onAccent }]}>{count > 9 ? '9+' : count}</Text>
-        </View>
-      )}
-    </Pressable>
   );
 }
 
@@ -148,10 +102,6 @@ const STEP = TAB + GAP;
 
 const styles = StyleSheet.create({
   wrap: { position: 'absolute', left: 0, right: 0, alignItems: 'center', pointerEvents: 'box-none' },
-  group: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  savedShadow: { borderRadius: 26 },
-  saved: { width: 52, height: 52, borderRadius: 26, borderWidth: 1, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' },
-  badge: { position: 'absolute', top: -2, right: -2, minWidth: 18, height: 18, borderRadius: 9, borderWidth: 2, paddingHorizontal: 4, alignItems: 'center', justifyContent: 'center' },
   shadow: { borderRadius: 32 },
   bar: {
     width: 296,

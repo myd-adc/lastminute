@@ -14,9 +14,8 @@ type Props = {
   savedCount: number;
 };
 
-// M06/M10/W03 header tabs, TikTok order: "Communities" · "Met" · "For you" (+ "Saved" while it is picked),
-// accent underline under the active one. On wide web the bookmark on the right opens and closes the saved stack;
-// the phone has it on the glass tab bar instead, where the thumb already is.
+// M06/M10/W03 header tabs, TikTok order: "Communities" · "Met" · "For you" (+ "Saved" on wide, while it is
+// picked), accent underline under the active one. The bookmark on the right opens and closes the saved stack.
 // Phone row is 32 pt high (Figma y = 58…90, i.e. 8 pt under the status bar).
 export function FeedTabs({ value, onChange, onPoster, wide, savedCount }: Props) {
   const { c, scheme } = useTheme();
@@ -61,7 +60,6 @@ export function FeedTabs({ value, onChange, onPoster, wide, savedCount }: Props)
           );
         })}
       </View>
-      {wide && (
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={t(savedOpen ? 'feed.tabs.hideSaved' : 'feed.tabs.showSaved')}
@@ -77,7 +75,6 @@ export function FeedTabs({ value, onChange, onPoster, wide, savedCount }: Props)
           </View>
         )}
       </Pressable>
-      )}
     </View>
   );
 }

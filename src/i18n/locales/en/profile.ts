@@ -18,6 +18,11 @@ export const profile: Translation<typeof Uk> = {
     showShared: 'Show shared events',
     showSharedSub: '“2 events together”',
   },
+  saved: {
+    label: 'Saved',
+    row: 'Saved events',
+    empty: 'Events you put aside for later show up here',
+  },
   safety: {
     label: 'Safety',
     blocked: 'Blocked',
