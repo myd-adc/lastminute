@@ -3,7 +3,7 @@ import { supabase } from './client';
 export const COVERS = 'covers'; // public: communities/<community id>/<file>
 export const AVATARS = 'avatars'; // private: <user id>/<file>, read through signed URLs
 
-// Long enough to outlive a session between syncs; every sync issues fresh ones.
+// Long enough to outlive a session between syncs; `signedUrls` renews them past half-life.
 const SIGNED_TTL = 6 * 60 * 60;
 
 // Profile photo uploads in flight: a sync meanwhile must not swap the picked image for the old server one.
@@ -30,11 +30,27 @@ export async function removeImage(bucket: string, path: string | null | undefine
   if (path) await supabase.storage.from(bucket).remove([path]);
 }
 
+// Signed URLs already issued, reused while they have more than half their life left. A fresh token on every sync
+// made each photo a new URL, so the browser re-downloaded every avatar and showed a hole meanwhile. Paths are unique
+// per upload, so a changed photo still gets a new URL.
+const issued = new Map<string, { url: string; until: number }>();
+
 // path → signed URL for the ones the user may read (the bucket's RLS drops the rest).
 export async function signedUrls(bucket: string, paths: string[]): Promise<Map<string, string>> {
   const out = new Map<string, string>();
-  if (!paths.length) return out;
-  const { data } = await supabase.storage.from(bucket).createSignedUrls(paths, SIGNED_TTL);
-  for (const s of data ?? []) if (s.path && s.signedUrl && !s.error) out.set(s.path, s.signedUrl);
+  const now = Date.now();
+  const missing: string[] = [];
+  for (const path of new Set(paths)) {
+    const hit = issued.get(`${bucket}/${path}`);
+    if (hit && hit.until - now > (SIGNED_TTL * 1000) / 2) out.set(path, hit.url);
+    else missing.push(path);
+  }
+  if (!missing.length) return out;
+  const { data } = await supabase.storage.from(bucket).createSignedUrls(missing, SIGNED_TTL);
+  for (const s of data ?? []) {
+    if (!s.path || !s.signedUrl || s.error) continue;
+    issued.set(`${bucket}/${s.path}`, { url: s.signedUrl, until: now + SIGNED_TTL * 1000 });
+    out.set(s.path, s.signedUrl);
+  }
   return out;
 }
