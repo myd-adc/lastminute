@@ -21,8 +21,8 @@ export const chat: Translation<typeof Uk> = {
   paneEmptyText: 'Tap “Go together” in an event room — once the person waves back, a chat opens.',
   groupName: 'Solo at {event}',
   row: {
-    waiting: 'You tapped 👋 — waiting…',
-    contact: 'Contact: {contact} · {event}',
+    waiting: 'Your 👋 is waiting',
+    contact: '{contact} · {event}',
     closed: 'Chat closed · {event}',
     groupEmpty: 'Group for those going solo',
     dmEmpty: 'Say hi first 👋',

@@ -12,7 +12,8 @@ export const room: Translation<typeof Uk> = {
     albumAt: 'Album · {time}',
     albumFrom: 'Album · from {time}',
   },
-  footnote: '{name} only finds out if you both tap 👋',
+  footnote: '{name} sees your card the same way — and only finds out if you both tap 👋',
+  waved: '👋 Done. The chat opens once {name} taps "Go together" too.',
   stampSkip: '✕ Skip',
   locked: {
     title: 'The room is only for people who are going',

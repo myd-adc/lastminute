@@ -4,6 +4,7 @@ import { useCallback, useRef, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useToast } from '@/components/feed/Toast';
 import { CardDeck, type Choice, type DeckHandle } from '@/components/room/CardDeck';
 import { RoomSkeleton } from '@/components/skeletons/ListSkeletons';
 import { RoomMatchesPanel } from '@/components/room/RoomMatchesPanel';
@@ -43,21 +44,27 @@ function NotFound() {
 }
 
 // Shared room logic for both layouts.
-function useRoom(event: Event, onMatch?: (userId: string) => void) {
+function useRoom(event: Event, toastBottom: number, onMatch?: (userId: string) => void) {
   const { state, dispatch, decide: decideOn } = useStore();
+  const { t } = useT();
   const now = useNow();
+  const toast = useToast(toastBottom);
   const queue = roomQueue(state, event.id);
   const going = !!state.going[event.id];
 
   const decide = useCallback(
     (a: Attendee, choice: Choice) => {
       decideOn(event.id, a.user.id, choice).then((matched) => {
-        if (!matched) return;
+        if (!matched) {
+          // The other side learns nothing until they press too, so the reassurance goes to this user only.
+          if (choice === 'go') toast.show(t('room.waved', { name: a.user.name }), 3600);
+          return;
+        }
         onMatch?.(a.user.id);
         router.push({ pathname: '/match/[eventId]/[userId]', params: { eventId: event.id, userId: a.user.id } });
       });
     },
-    [decideOn, event.id, onMatch],
+    [decideOn, event.id, onMatch, t, toast],
   );
 
   const report = useCallback(
@@ -72,6 +79,7 @@ function useRoom(event: Event, onMatch?: (userId: string) => void) {
   return {
     state,
     now,
+    toast,
     queue,
     going,
     decide,
@@ -91,7 +99,7 @@ function RoomMobile({ event }: { event: Event }) {
   const { c } = useTheme();
   const { t } = useT();
   const insets = useSafeAreaInsets();
-  const r = useRoom(event);
+  const r = useRoom(event, footerBottom(insets.bottom) + 150);
   const deck = useRef<DeckHandle>(null);
   const top = r.queue.pending[0];
 
@@ -141,6 +149,7 @@ function RoomMobile({ event }: { event: Event }) {
           </View>
         </>
       )}
+      {r.toast.node}
     </View>
   );
 }
@@ -152,7 +161,7 @@ function RoomWide({ event }: { event: Event }) {
   const { c } = useTheme();
   const { t } = useT();
   const [selected, setSelected] = useState<string | null>(null);
-  const r = useRoom(event, setSelected);
+  const r = useRoom(event, 150, setSelected);
   const deck = useRef<DeckHandle>(null);
   const top = r.queue.pending[0];
 
@@ -204,6 +213,7 @@ function RoomWide({ event }: { event: Event }) {
         )}
       </View>
       <RoomMatchesPanel event={event} now={r.now} selectedId={selected} onSelect={setSelected} />
+      {r.toast.node}
     </View>
   );
 }

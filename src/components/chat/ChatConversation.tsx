@@ -73,30 +73,40 @@ export function ChatConversation({ eventId, userId, variant }: { eventId: string
 
   return (
     <View style={s.flex}>
-      <View style={[s.header, panel ? s.headerPanel : { paddingTop: headerTop + 4 }]}>
-        {variant === 'screen' && (
-          <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12} onPress={() => goBack('/chats')}>
-            <ChevronLeft size={26} color={c.text} strokeWidth={2} />
+      <View style={[s.headerBlock, panel ? s.headerBlockPanel : { paddingTop: headerTop + 4 }]}>
+        <View style={[s.headerRow, panel && s.headerRowPanel]}>
+          {variant === 'screen' && (
+            <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12} onPress={() => goBack('/chats')}>
+              <ChevronLeft size={26} color={c.text} strokeWidth={2} />
+            </Pressable>
+          )}
+          <Avatar name={user.name} gradient={user.gradient} photoUri={user.photoUri} size={panel ? 44 : 40} ring={!panel} />
+          <View style={[s.flex, { minWidth: 0, gap: panel ? 2 : 1 }]}>
+            <Text style={[onest('bold', panel ? 17 : 16), { color: c.text }]} numberOfLines={1}>
+              {panel ? nameAge(user) : user.name}
+            </Text>
+            {panel && (
+              <Text style={[onest('regular', 13), { color: c.muted }]} numberOfLines={1}>
+                {sub}
+              </Text>
+            )}
+          </View>
+          {statusPill}
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('chat.menu.open')}
+            onPress={() => setMenuOpen((v) => !v)}
+            style={({ pressed }) => [s.more, pressed && { opacity: 0.8 }]}
+          >
+            <MoreHorizontal size={18} color={c.text} strokeWidth={2} />
           </Pressable>
-        )}
-        <Avatar name={user.name} gradient={user.gradient} photoUri={user.photoUri} size={panel ? 44 : 40} ring={!panel} />
-        <View style={[s.flex, { minWidth: 0, gap: panel ? 2 : 1 }]}>
-          <Text style={[onest('bold', panel ? 17 : 16), { color: c.text }]} numberOfLines={1}>
-            {panel ? nameAge(user) : user.name}
-          </Text>
+        </View>
+        {/* Beside the timer pill the phone header cuts this line off, so it gets a row of its own. */}
+        {!panel && (
           <Text style={[onest('regular', 13), { color: c.muted }]} numberOfLines={1}>
             {sub}
           </Text>
-        </View>
-        {statusPill}
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={t('chat.menu.open')}
-          onPress={() => setMenuOpen((v) => !v)}
-          style={({ pressed }) => [s.more, pressed && { opacity: 0.8 }]}
-        >
-          <MoreHorizontal size={18} color={c.text} strokeWidth={2} />
-        </Pressable>
+        )}
       </View>
 
       <ChatThread chatId={chatId} eventId={eventId} userId={userId} variant={variant} />
@@ -104,7 +114,7 @@ export function ChatConversation({ eventId, userId, variant }: { eventId: string
       {menuOpen && (
         <>
           <Pressable accessibilityLabel={t('chat.menu.close')} style={StyleSheet.absoluteFill} onPress={() => setMenuOpen(false)} />
-          <View style={[s.menu, panel ? s.menuPanel : { top: headerTop + 58 }]}>
+          <View style={[s.menu, panel ? s.menuPanel : { top: headerTop + 79 }]}>
             {status === 'open' && (
               <MenuItem
                 icon={<X size={16} color={c.text} strokeWidth={2} />}
@@ -169,10 +179,8 @@ const makeStyles = (c: Palette) =>
     flex: { flex: 1 },
     empty: { alignItems: 'center', justifyContent: 'center', gap: 10, padding: 24 },
     emptyBtn: { marginTop: 8, height: 48, borderRadius: 24, paddingHorizontal: 24, alignItems: 'center', justifyContent: 'center' },
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 10,
+    headerBlock: {
+      gap: 4,
       paddingHorizontal: 20,
       paddingBottom: 16,
       borderBottomWidth: 1,
@@ -180,7 +188,9 @@ const makeStyles = (c: Palette) =>
       backgroundColor: c.bg,
     },
     // W06 conversation header: 20/16 pt vertical, 28 pt left, 24 pt right.
-    headerPanel: { gap: 12, paddingTop: 20, paddingBottom: 16, paddingLeft: 28, paddingRight: 24 },
+    headerBlockPanel: { paddingTop: 20, paddingBottom: 16, paddingLeft: 28, paddingRight: 24 },
+    headerRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+    headerRowPanel: { gap: 12 },
     pill: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 14, borderWidth: 1 },
     more: { width: 36, height: 36, borderRadius: 18, backgroundColor: c.surface2, alignItems: 'center', justifyContent: 'center' },
     menu: {

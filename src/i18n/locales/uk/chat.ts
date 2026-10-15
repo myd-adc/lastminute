@@ -19,8 +19,8 @@ export const chat = {
   paneEmptyText: 'Натисни «Піти разом» у кімнаті події — коли людина відповість взаємністю, відкриється чат.',
   groupName: 'Самі на {event}',
   row: {
-    waiting: 'Ти натиснув(ла) 👋 — чекаємо…',
-    contact: 'Контакт: {contact} · {event}',
+    waiting: 'Твій 👋 чекає відповіді',
+    contact: '{contact} · {event}',
     closed: 'Чат закрито · {event}',
     groupEmpty: 'Група тих, хто йде сам',
     dmEmpty: 'Напиши першим 👋',

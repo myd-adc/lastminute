@@ -11,11 +11,12 @@ export function useToast(bottom: number) {
   const [open, setOpen] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  const show = useCallback((m: string) => {
+  // A plain confirmation reads in 2.2 s; a sentence that explains what happens next needs longer.
+  const show = useCallback((m: string, ms = 2200) => {
     setMsg(m);
     setOpen(true);
     clearTimeout(timer.current);
-    timer.current = setTimeout(() => setOpen(false), 2200);
+    timer.current = setTimeout(() => setOpen(false), ms);
   }, []);
   useEffect(() => () => clearTimeout(timer.current), []);
 
