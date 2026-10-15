@@ -78,6 +78,7 @@ export function EndOfFeed({ header, contentStyle }: Props) {
         ) : (
           <Button label={t('feed.end.backToForYou')} onPress={() => dispatch({ type: 'setFeedTab', tab: 'forYou' })} />
         )}
+        <Button variant="secondary" label={t('feed.own.create')} onPress={() => router.push('/event/new')} />
         <Button
           variant="secondary"
           label={notify ? t('feed.end.notifyOn') : t('feed.end.notifyOff')}

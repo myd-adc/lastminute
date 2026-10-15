@@ -7,6 +7,16 @@ export const feed: Translation<typeof Uk> = {
   shareArrow: '↗ Send',
   shareToFriend: 'Send to a friend',
   shareText: '{title} — {when}, {venue}. Want to go together?',
+  own: {
+    title: 'Your own event',
+    sub: 'Going somewhere and looking for company? Say so — it shows up in "For you".',
+    left: { one: '{count} more event to go', other: '{count} more events to go' },
+    fullTitle: 'No room for another one',
+    fullBody: 'You can run {count} of your own events at a time. Cancel one or wait for it to pass.',
+    byPerson: '👤 From a person',
+    create: 'Create your own event',
+    createSub: 'No community needed — just call people out',
+  },
   leave: {
     action: 'Not going any more',
     title: 'Cancel going to "{title}"?',

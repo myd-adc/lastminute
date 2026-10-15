@@ -198,7 +198,8 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     async (draft: api.EventDraft) => {
       if (!isLive) {
         const id = newId('e');
-        baseDispatch({ type: 'createEvent', event: { ...draft, id, partner: false, goingCount: 0, soloCount: 0 } });
+        const authorId = draft.communityId === null ? 'me' : undefined;
+        baseDispatch({ type: 'createEvent', event: { ...draft, id, authorId, partner: false, goingCount: 0, soloCount: 0 } });
         return id;
       }
       const me = meRef.current;

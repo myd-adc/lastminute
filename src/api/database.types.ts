@@ -185,6 +185,7 @@ export type Database = {
           ends_at: string;
           id: string;
           partner: boolean;
+          personal: boolean;
           poster: NonNullable<Json>;
           price: number | null;
           price_note: string | null;
@@ -208,6 +209,7 @@ export type Database = {
           ends_at: string;
           id?: string;
           partner?: boolean;
+          personal?: boolean;
           poster?: NonNullable<Json>;
           price?: number | null;
           price_note?: string | null;
@@ -230,6 +232,7 @@ export type Database = {
           ends_at?: string;
           id?: string;
           partner?: boolean;
+          personal?: boolean;
           poster?: NonNullable<Json>;
           price?: number | null;
           price_note?: string | null;

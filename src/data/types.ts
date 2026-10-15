@@ -34,7 +34,8 @@ export type GoesWith = 'solo' | 'pair' | 'company';
 
 export type Event = {
   id: string;
-  communityId: string | null; // null = city-wide event added by us
+  communityId: string | null; // null = city-wide event added by us, or a personal one (see authorId)
+  authorId?: string; // set only on personal events: the person who created it ('me' in the demo)
   title: string; // "Open mic: stand-up among friends"
   poster: { lines: string[]; emoji: string; gradient: GradientId }; // big poster word(s) on the feed card
   startsAt: string; // ISO

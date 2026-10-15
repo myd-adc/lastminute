@@ -10,7 +10,7 @@ import { categoryLabel, mapsUrl, priceLabel, shortTitle } from '@/components/fee
 import { PosterArt } from '@/components/feed/PosterArt';
 import { shareEvent } from '@/components/feed/share';
 import { useToast } from '@/components/feed/Toast';
-import { AvatarStack, Button, Chip, CloseButton, goBack, IconButton, Pill, Sheet } from '@/components/ui';
+import { Avatar, AvatarStack, Button, Chip, CloseButton, goBack, IconButton, Pill, Sheet } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { getEvent, soloGroups } from '@/data/mock';
 import type { Event } from '@/data/types';
@@ -18,7 +18,7 @@ import { useT } from '@/i18n';
 import { t as translate } from '@/i18n/translate';
 import { fullWindow, useIsWide } from '@/lib/layout';
 import { pop, slideUp, useOverlayMotion, useSheetDrag } from '@/lib/motion';
-import { acquaintances, attendeesFor, goingCount, soloCount, soloGroupMembers } from '@/lib/selectors';
+import { acquaintances, attendeesFor, eventAuthor, goingCount, soloCount, soloGroupMembers } from '@/lib/selectors';
 import { dayLabel, whenLabel } from '@/lib/time';
 import { useNow, useStore, type Going } from '@/store/AppStore';
 import { display, onest, type, useTheme } from '@/theme';
@@ -95,6 +95,7 @@ function Body({ event, d, wide }: { event: Event; d: ReturnType<typeof useDetail
   const { c } = useTheme();
   const { t } = useT();
   const extra = Math.max(0, d.goingN - d.preview.length);
+  const author = eventAuthor(d.state, event);
   const solo = t(d.hasGroup && !wide ? 'feed.details.soloGroupOpen' : 'feed.details.solo', { count: d.soloN });
   const known = d.knownN > 0 ? ` · ${t('feed.details.known', { count: d.knownN })}` : '';
   const peopleSub = wide ? (d.going ? solo + known : t('feed.details.namesAfter', { text: solo + known })) : solo;
@@ -106,6 +107,12 @@ function Body({ event, d, wide }: { event: Event; d: ReturnType<typeof useDetail
         <Pill label={categoryLabel(event)} weight="medium" />
         {event.ageLimit ? <Pill label={`${event.ageLimit}+`} weight="medium" /> : null}
       </View>
+      {author && (
+        <View style={styles.author}>
+          <Avatar name={author.name} gradient={author.gradient} photoUri={author.photoUri} size={28} />
+          <Text style={[onest('semibold', 13, 17), { color: c.muted }]}>{t('feed.own.byPerson')} · {author.name}</Text>
+        </View>
+      )}
       <Text style={[wide ? display(30, 34) : display(24, 28), { color: c.text }]}>{event.title}</Text>
       <Text style={[onest('regular', 15, wide ? 23 : 22), { color: c.text }]}>{event.description}</Text>
       <InfoRow
@@ -266,6 +273,7 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   pills: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   partner: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 10, borderRadius: 14 },
+  author: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: -4 },
   sheet: { position: 'absolute', left: 0, right: 0, bottom: 0, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' },
   handle: { alignSelf: 'center', width: 40, height: 5, borderRadius: 3, marginTop: 10 },
   // paddingTop clears the close button in the top-right corner.

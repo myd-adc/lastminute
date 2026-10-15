@@ -2,6 +2,7 @@
 import { albumPhotos, attendanceOf, attendeesOf, communities, events, getCommunity, getEvent, getUser, PAST_EVENT_IDS, pastChats, soloGroups } from '@/data/mock';
 import type { Attendance, Community, Event, Message, Photo, User } from '@/data/types';
 import { dmChatId, groupChatId, pairKey, type State } from '@/store/state';
+import type { GradientId } from '@/theme/palette';
 
 import { ageForSure, DAY } from './time';
 
@@ -84,6 +85,20 @@ export const feedEvents = (state: State, now: number): Event[] =>
 export const myUpcoming = (state: State, now: number) => upcoming(state, now).filter((e) => state.going[e.id]);
 export const nextForYou = (state: State, now: number, exceptId?: string) =>
   tabEvents(state, now, 'forYou').filter((e) => e.id !== exceptId && !state.going[e.id]);
+
+// Personal events carry the person who made them; a community or city event carries nobody.
+export function eventAuthor(state: State, e: Event): { name: string; gradient: GradientId; photoUri?: string } | null {
+  if (!e.authorId) return null;
+  if (e.authorId === 'me') return state.me ? { name: state.me.name, gradient: state.me.gradient, photoUri: state.me.photoUri } : null;
+  const u = getUser(e.authorId);
+  return u ? { name: u.name, gradient: u.gradient, photoUri: u.photoUri } : null;
+}
+
+export const isMyEvent = (state: State, e: Event) => e.authorId === 'me';
+
+// Upcoming personal events the user is running right now — the cap keeps one person from filling the feed.
+export const MAX_OWN_EVENTS = 3;
+export const myOwnEvents = (state: State, now: number) => upcoming(state, now).filter((e) => isMyEvent(state, e));
 
 // ── People ──────────────────────────────────────────────────────────────
 

@@ -53,7 +53,13 @@ export default function CommunitiesScreen() {
 
       {/* M18 keeps the CTA just above the tab bar; on a long list (and on wide web) it simply follows it. */}
       {!wide && <View style={styles.spacer} />}
-      <Button label={t('community.list.create')} onPress={() => router.push('/community/new')} style={[styles.create, wide && styles.createWide]} />
+      <Button label={t('feed.own.create')} onPress={() => router.push('/event/new')} style={[styles.create, wide && styles.createWide]} />
+      <Button
+        label={t('community.list.create')}
+        variant="secondary"
+        onPress={() => router.push('/community/new')}
+        style={[styles.second, wide && styles.createWide]}
+      />
     </Screen>
   );
 }
@@ -65,5 +71,6 @@ const styles = StyleSheet.create({
   list: { gap: 12 },
   spacer: { flexGrow: 1 },
   create: { marginTop: 12 },
+  second: { marginTop: 10 },
   createWide: { alignSelf: 'flex-start', paddingHorizontal: 32 },
 });

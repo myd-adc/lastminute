@@ -35,6 +35,7 @@ function toEvent(e: Tables<'events'>, going: number, solo: number, met: number):
   return {
     id: e.id,
     communityId: e.community_id,
+    authorId: e.personal ? (e.created_by ?? undefined) : undefined,
     title: { uk: e.title_uk, en: e.title_en },
     description: { uk: e.description_uk, en: e.description_en },
     poster: {
@@ -298,6 +299,7 @@ export async function createEvent(me: string, d: EventDraft): Promise<string> {
     .insert({
       community_id: d.communityId,
       created_by: me,
+      personal: d.communityId === null, // a city-wide row has no community either, so the flag is what tells them apart
       title_uk: d.title,
       title_en: d.title,
       description_uk: d.description,
