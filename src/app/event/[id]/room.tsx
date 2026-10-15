@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { CalendarX, ChevronLeft } from 'lucide-react-native';
+import { ChevronLeft } from 'lucide-react-native';
 import { useCallback, useRef, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -120,11 +120,6 @@ function RoomMobile({ event }: { event: Event }) {
             </Text>
           </View>
           {r.going && <Pill label={r.counter} />}
-          {r.going && (
-            <Pressable accessibilityRole="button" accessibilityLabel={t('feed.leave.action')} hitSlop={8} onPress={() => setLeaving(true)}>
-              <CalendarX size={21} color={c.muted} strokeWidth={2} />
-            </Pressable>
-          )}
         </View>
         <RoomTabs event={event} now={r.now} />
       </View>
@@ -152,6 +147,9 @@ function RoomMobile({ event }: { event: Event }) {
           <View style={styles.mobileFoot}>
             <RoomActions onSkip={() => deck.current?.swipe('skip')} onGo={() => deck.current?.swipe('go')} />
             <RoomFootnote name={top.user.name} />
+            <View style={styles.leaveRow}>
+              <LeaveEventLink onPress={() => setLeaving(true)} />
+            </View>
           </View>
         </>
       )}
@@ -238,7 +236,8 @@ const styles = StyleSheet.create({
   mobileHead: { paddingHorizontal: 20, gap: 12 },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 10, height: 44 },
   mobileDeck: { flex: 1, paddingHorizontal: 20, paddingTop: 20, paddingBottom: 22 },
-  mobileFoot: { paddingHorizontal: 20, gap: 18 },
+  mobileFoot: { paddingHorizontal: 20, gap: 14 },
+  leaveRow: { alignItems: 'center' },
   wideMain: { paddingHorizontal: 40, paddingTop: 30, paddingBottom: 44 },
   wideHead: { flexDirection: 'row', alignItems: 'center', gap: 14, height: 52 },
   thumb: { width: 52, height: 52, borderRadius: 14 },

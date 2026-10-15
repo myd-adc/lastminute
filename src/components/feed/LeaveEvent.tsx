@@ -15,7 +15,7 @@ export function LeaveEventLink({ onPress, label }: { onPress: () => void; label?
   const { c } = useTheme();
   const { t } = useT();
   return (
-    <Pressable accessibilityRole="button" hitSlop={8} onPress={onPress} style={styles.link}>
+    <Pressable accessibilityRole="button" hitSlop={8} onPress={onPress}>
       <Text style={[onest('semibold', 14, 18), { color: c.muted }]}>{label ?? t('feed.leave.action')}</Text>
     </Pressable>
   );
@@ -96,7 +96,6 @@ export function CancelEventSheet({ event, visible, onClose }: { event: Event; vi
 }
 
 const styles = StyleSheet.create({
-  link: { alignSelf: 'flex-start' },
   lines: { gap: 8 },
   danger: { height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center' },
   dangerLabel: { color: '#FFFFFF' },
