@@ -292,6 +292,9 @@ export async function deleteCommunity(communityId: string) {
   ok(await supabase.from('communities').delete().eq('id', communityId));
 }
 
+// Only the author may do this: RLS checks created_by.
+export const deleteEvent = (eventId: string) => write(supabase.from('events').delete().eq('id', eventId));
+
 // Events created in the app are single-language: the same text goes into both language columns.
 export async function createEvent(me: string, d: EventDraft): Promise<string> {
   const { data, error } = await supabase

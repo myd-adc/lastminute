@@ -270,6 +270,8 @@ function mirror(me: string, action: Action, next: State): Promise<unknown> | und
     }
     case 'deleteCommunity':
       return api.deleteCommunity(action.communityId);
+    case 'cancelEvent':
+      return api.deleteEvent(action.eventId);
     case 'setMe':
     case 'setPreferences':
     case 'setPrivacy':

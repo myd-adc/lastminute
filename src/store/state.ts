@@ -126,6 +126,7 @@ export type Action =
   | { type: 'updateCommunity'; communityId: string; patch: Partial<Community> }
   | { type: 'deleteCommunity'; communityId: string }
   | { type: 'createEvent'; event: Event }
+  | { type: 'cancelEvent'; eventId: string }
   | { type: 'completeOnboarding'; notify: boolean; seedDemo?: boolean }
   | { type: 'restoreAccount'; me: Me; interests: InterestId[]; vibe: Vibe | null; goesWith: GoesWith | null }
   | { type: 'setTheme'; theme: ThemeMode }
@@ -214,6 +215,13 @@ export function reducer(state: State, action: Action): State {
       };
     case 'createEvent':
       return { ...state, localEvents: [...state.localEvents, action.event] };
+    case 'cancelEvent':
+      return {
+        ...state,
+        localEvents: state.localEvents.filter((e) => e.id !== action.eventId),
+        going: omit(state.going, action.eventId),
+        saved: omit(state.saved, action.eventId),
+      };
     case 'completeOnboarding': {
       const next = {
         ...state,

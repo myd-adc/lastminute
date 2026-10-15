@@ -5,7 +5,7 @@ import { Animated, Linking, Pressable, ScrollView, StyleSheet, useWindowDimensio
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { InfoRow, PeopleStack } from '@/components/feed/DetailsParts';
-import { LeaveEventLink, LeaveEventSheet } from '@/components/feed/LeaveEvent';
+import { CancelEventSheet, LeaveEventLink, LeaveEventSheet } from '@/components/feed/LeaveEvent';
 import { categoryLabel, mapsUrl, priceLabel, shortTitle } from '@/components/feed/format';
 import { PosterArt } from '@/components/feed/PosterArt';
 import { shareEvent } from '@/components/feed/share';
@@ -18,7 +18,7 @@ import { useT } from '@/i18n';
 import { t as translate } from '@/i18n/translate';
 import { fullWindow, useIsWide } from '@/lib/layout';
 import { pop, slideUp, useOverlayMotion, useSheetDrag } from '@/lib/motion';
-import { acquaintances, attendeesFor, eventAuthor, goingCount, soloCount, soloGroupMembers } from '@/lib/selectors';
+import { acquaintances, attendeesFor, eventAuthor, goingCount, isMyEvent, soloCount, soloGroupMembers } from '@/lib/selectors';
 import { dayLabel, whenLabel } from '@/lib/time';
 import { useNow, useStore, type Going } from '@/store/AppStore';
 import { display, onest, type, useTheme } from '@/theme';
@@ -60,6 +60,7 @@ function useDetails(event: Event) {
   const now = useNow();
   const toast = useToast(120);
   const [leaving, setLeaving] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
   const going = state.going[event.id];
   const saved = !!state.saved[event.id];
   const attendees = attendeesFor(state, event.id);
@@ -83,7 +84,7 @@ function useDetails(event: Event) {
   };
   const openUrl = (url: string) => Linking.openURL(url).catch(() => toast.show(t('feed.toast.openFailed')));
 
-  return { state, dispatch, now, toast, going, saved, preview, goingN, soloN, knownN, hasGroup, share, toggleSave, openRoom, go, openUrl, leaving, setLeaving };
+  return { state, dispatch, now, toast, going, saved, preview, goingN, soloN, knownN, hasGroup, share, toggleSave, openRoom, go, openUrl, leaving, setLeaving, cancelling, setCancelling };
 }
 
 // Figma dims: M07 rgba(bg, 0.55) behind the sheet, W04 rgba(bg, 0.73) behind the dialog (same in light).
@@ -96,6 +97,7 @@ function Body({ event, d, wide }: { event: Event; d: ReturnType<typeof useDetail
   const { t } = useT();
   const extra = Math.max(0, d.goingN - d.preview.length);
   const author = eventAuthor(d.state, event);
+  const mine = isMyEvent(d.state, event);
   const solo = t(d.hasGroup && !wide ? 'feed.details.soloGroupOpen' : 'feed.details.solo', { count: d.soloN });
   const known = d.knownN > 0 ? ` · ${t('feed.details.known', { count: d.knownN })}` : '';
   const peopleSub = wide ? (d.going ? solo + known : t('feed.details.namesAfter', { text: solo + known })) : solo;
@@ -143,7 +145,16 @@ function Body({ event, d, wide }: { event: Event; d: ReturnType<typeof useDetail
           <Text style={[onest('regular', 13, 18), styles.flex, { color: c.muted }]}>{t('feed.details.partnerNote')}</Text>
         </View>
       )}
-      {d.going && <LeaveEventLink onPress={() => d.setLeaving(true)} />}
+      <View style={styles.ownRow}>
+        {d.going && !mine && <LeaveEventLink onPress={() => d.setLeaving(true)} />}
+        {mine && <LeaveEventLink label={t('feed.own.cancelAction')} onPress={() => d.setCancelling(true)} />}
+        {author && !mine && (
+          <LeaveEventLink
+            label={t('feed.own.report')}
+            onPress={() => router.push({ pathname: '/report/[userId]', params: { userId: event.authorId!, eventId: event.id } })}
+          />
+        )}
+      </View>
     </>
   );
 }
@@ -183,6 +194,7 @@ function MobileDetails({ event }: { event: Event }) {
         </View>
       </Animated.View>
       <LeaveEventSheet event={event} visible={d.leaving} onClose={() => d.setLeaving(false)} />
+      <CancelEventSheet event={event} visible={d.cancelling} onClose={() => d.setCancelling(false)} />
       {d.toast.node}
     </>
   );
@@ -264,6 +276,7 @@ function WideDetails({ event }: { event: Event }) {
         </Pressable>
       </Animated.View>
       <LeaveEventSheet event={event} visible={d.leaving} onClose={() => d.setLeaving(false)} />
+      <CancelEventSheet event={event} visible={d.cancelling} onClose={() => d.setCancelling(false)} />
       {d.toast.node}
     </View>
   );
@@ -274,6 +287,7 @@ const styles = StyleSheet.create({
   pills: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   partner: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 10, borderRadius: 14 },
   author: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: -4 },
+  ownRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 16 },
   sheet: { position: 'absolute', left: 0, right: 0, bottom: 0, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' },
   handle: { alignSelf: 'center', width: 40, height: 5, borderRadius: 3, marginTop: 10 },
   // paddingTop clears the close button in the top-right corner.
