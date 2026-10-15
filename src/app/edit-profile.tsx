@@ -32,7 +32,7 @@ export default function EditProfileScreen() {
         solo: state.goesWith === 'solo',
       }}
     >
-      <ProfileForm value={draft} onChange={setDraft} usernameStatus={usernameStatus} email={state.email} />
+      <ProfileForm value={draft} onChange={setDraft} usernameStatus={usernameStatus} email={state.email} affiliation />
     </EditLayout>
   );
 }

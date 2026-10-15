@@ -63,33 +63,25 @@ export const cleanProfile = (p: ProfileDraft): Me => ({
 });
 
 // Keys into onboarding.profile.affiliations / .idea; the picked text is stored in the current language.
-const AFFILIATIONS = [
-  'philosophy',
-  'sociology',
-  'journalism',
-  'psychology',
-  'history',
-  'cs',
-  'law',
-  'philology',
-  'economics',
-  'masters',
-  'teaching',
-] as const;
+// Broad starting points only — anything specific («Дизайн, 2 курс») goes through the free-text field.
+const AFFILIATIONS = ['studying', 'working', 'it', 'creative', 'teaching', 'freelance'] as const;
 
 const IDEAS = ['concert', 'reading', 'boardGame'] as const;
 
 // M03 form, shared by onboarding (profile-setup) and "Edit profile".
+// `affiliation` is off during onboarding: it is optional, easy to get wrong, and only slows the first screen down.
 export function ProfileForm({
   value,
   onChange,
   usernameStatus,
   email,
+  affiliation,
 }: {
   value: ProfileDraft;
   onChange: (v: ProfileDraft) => void;
   usernameStatus: UsernameStatus;
   email?: string | null;
+  affiliation?: boolean;
 }) {
   const { c, scheme } = useTheme();
   const { t } = useT();
@@ -176,16 +168,18 @@ export function ProfileForm({
       </View>
       {usernameError && <Text style={[type.footnote, { color: c.danger, marginTop: -4 }]}>{usernameError}</Text>}
 
-      <Field label={t('onboarding.profile.affiliationOptional')}>
-        <Pressable accessibilityRole="button" accessibilityLabel={t('onboarding.profile.affiliation')} onPress={() => setPicking(true)}>
-          <InputBox focused={picking}>
-            <Text style={[onest('medium', 16), { color: value.affiliation ? c.text : c.muted, flex: 1 }]} numberOfLines={1}>
-              {value.affiliation || t('onboarding.profile.affiliationPlaceholder')}
-            </Text>
-            <ChevronDown size={18} color={c.muted} strokeWidth={2} />
-          </InputBox>
-        </Pressable>
-      </Field>
+      {affiliation && (
+        <Field label={t('onboarding.profile.affiliationOptional')}>
+          <Pressable accessibilityRole="button" accessibilityLabel={t('onboarding.profile.affiliation')} onPress={() => setPicking(true)}>
+            <InputBox focused={picking}>
+              <Text style={[onest('medium', 16), { color: value.affiliation ? c.text : c.muted, flex: 1 }]} numberOfLines={1}>
+                {value.affiliation || t('onboarding.profile.affiliationPlaceholder')}
+              </Text>
+              <ChevronDown size={18} color={c.muted} strokeWidth={2} />
+            </InputBox>
+          </Pressable>
+        </Field>
+      )}
 
       <Field label={t('onboarding.profile.talkAbout')} right={`${value.talkAbout.length} / ${TALK_MAX}`}>
         <TextField
@@ -205,7 +199,7 @@ export function ProfileForm({
       </View>
 
       <AffiliationSheet
-        visible={picking}
+        visible={!!affiliation && picking}
         value={value.affiliation}
         onClose={() => setPicking(false)}
         onPick={(affiliation) => set({ affiliation })}
