@@ -440,6 +440,7 @@ export type Database = {
           members: number;
         }[];
       };
+      delete_account: { Args: Record<PropertyKey, never>; Returns: undefined };
       event_stats: {
         Args: { p_event: string };
         Returns: {

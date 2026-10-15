@@ -17,11 +17,6 @@ export const profile = {
     showShared: 'Показувати спільні події',
     showSharedSub: '«Були разом на 2 подіях»',
   },
-  saved: {
-    label: 'Збережені',
-    row: 'Збережені події',
-    empty: 'Тут будуть події, які ти відклав{a} на потім',
-  },
   safety: {
     label: 'Безпека',
     blocked: 'Заблоковані',

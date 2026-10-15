@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState, type ReactNode } from 'react';
 
-import { saveProfile, sessionNotice, signOut } from '@/api/auth';
+import { deleteAccount as deleteRemoteAccount, saveProfile, sessionNotice, signOut } from '@/api/auth';
 import { isLive, supabase } from '@/api/client';
 import * as api from '@/api/sync';
 import { attendanceOf, setDataLanguage, setLocalData, setRemoteData } from '@/data/mock';
@@ -33,6 +33,8 @@ type Store = {
   createCommunity: (draft: api.CommunityDraft) => Promise<string | null>;
   addEvent: (draft: api.EventDraft) => Promise<string | null>;
   joinCommunity: (community: Community) => Promise<boolean>;
+  // Deletes the account on the server, then signs out; false leaves the user signed in.
+  deleteAccount: () => Promise<boolean>;
 };
 
 const EMPTY_REMOTE = { communities: [], events: [], users: [], attendances: [] };
@@ -225,6 +227,18 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     [resync],
   );
 
+  const deleteAccount = useCallback(async () => {
+    if (!isLive) {
+      baseDispatch({ type: 'logout' });
+      return true;
+    }
+    leaving.current = true;
+    const ok = await deleteRemoteAccount().catch(() => false);
+    if (ok) baseDispatch({ type: 'logout' });
+    else leaving.current = false;
+    return ok;
+  }, []);
+
   const joinCommunity = useCallback(
     async (community: Community) => {
       if (!isLive) {
@@ -246,8 +260,8 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   );
 
   const value = useMemo(
-    () => ({ state, dispatch, hydrated, loading: isLive && state.onboarded && !remoteReady, sendMessage, decide, createCommunity, addEvent, joinCommunity }),
-    [state, dispatch, hydrated, remoteReady, sendMessage, decide, createCommunity, addEvent, joinCommunity],
+    () => ({ state, dispatch, hydrated, loading: isLive && state.onboarded && !remoteReady, sendMessage, decide, createCommunity, addEvent, joinCommunity, deleteAccount }),
+    [state, dispatch, hydrated, remoteReady, sendMessage, decide, createCommunity, addEvent, joinCommunity, deleteAccount],
   );
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

@@ -159,6 +159,19 @@ export const signOut = () => supabase.auth.signOut({ scope: 'local' });
 // Set when the server ended the session on its own, so the sign-in screen can say why the user landed there.
 export const sessionNotice = { expired: false };
 
+// Removes the account and everything tied to it (see migration delete_account), then the local session.
+export async function deleteAccount(): Promise<boolean> {
+  const { data } = await supabase.auth.getSession();
+  const uid = data.session?.user.id;
+  if (!uid) return false;
+  const { data: profile } = await supabase.from('profiles').select('photo_path').eq('id', uid).maybeSingle();
+  const { error } = await supabase.rpc('delete_account');
+  if (error) return false;
+  await removeImage(AVATARS, profile?.photo_path).catch(() => {});
+  await signOut().catch(() => {});
+  return true;
+}
+
 // Whether a username is free (the user's own counts as free). A failed check reads as free; the save still guards it.
 export async function usernameAvailable(username: string): Promise<boolean> {
   const { data, error } = await supabase.rpc('username_available', { p_username: username });

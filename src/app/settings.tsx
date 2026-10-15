@@ -24,9 +24,10 @@ import { onest, useTheme } from '@/theme';
 export default function SettingsScreen() {
   const { c } = useTheme();
   const { t, lang } = useT();
-  const { state, dispatch } = useStore();
+  const { state, deleteAccount } = useStore();
   const wide = useIsWide();
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleteFailed, setDeleteFailed] = useState(false);
   const language = LANGS.find((l) => l.id === lang)?.native;
 
   return (
@@ -62,8 +63,12 @@ export default function SettingsScreen() {
             question={t('profile.account.deleteQuestion')}
             confirmLabel={t('profile.account.delete')}
             onCancel={() => setConfirmDelete(false)}
-            onConfirm={() => dispatch({ type: 'logout' })}
+            onConfirm={() => {
+              setDeleteFailed(false);
+              deleteAccount().then((ok) => !ok && setDeleteFailed(true));
+            }}
           />
+          {deleteFailed && <Text style={[onest('medium', 13, 17), styles.deleteError, { color: c.danger }]}>{t('profile.account.deleteFailed')}</Text>}
         </Group>
       ) : (
         <Pressable
@@ -90,6 +95,7 @@ const styles = StyleSheet.create({
   content: { gap: 7 },
   wide: { maxWidth: 640, width: '100%', alignSelf: 'center' },
   header: { marginTop: -2, marginBottom: 5 },
+  deleteError: { paddingHorizontal: 16, paddingBottom: 12 },
   delete: { paddingVertical: 12, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
   demoGap: { height: 9 },
 });
