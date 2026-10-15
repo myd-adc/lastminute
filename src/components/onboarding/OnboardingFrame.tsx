@@ -6,7 +6,7 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Button } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
-import { useIsWide } from '@/lib/layout';
+import { useIsWide, webHitArea } from '@/lib/layout';
 import { useStore } from '@/store/AppStore';
 import { display, onest, useTheme } from '@/theme';
 
@@ -54,7 +54,7 @@ function MobileFrame({ step, title, subtitle, children, cta }: Props) {
   return (
     <AuthScreen glow={r.glow} footer={<Button label={cta.label} onPress={cta.onPress} disabled={cta.disabled} />}>
       <View style={styles.header}>
-        <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12} onPress={() => backFrom(step)}>
+        <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12} onPress={() => backFrom(step)} style={webHitArea(24)}>
           <ChevronLeft size={24} color={c.text} strokeWidth={2} />
         </Pressable>
         <StepBar step={step} total={3} />

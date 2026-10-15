@@ -6,6 +6,7 @@ import { goBack } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
 import { display, onest, useTheme } from '@/theme';
+import { webHitArea } from '@/lib/layout';
 
 // M19–M22 header: 40 pt back row, then the Unbounded 26 title (−2 % tracking) and a muted line under it.
 export function PageHead({ title, sub, right }: { title: string; sub?: string; right?: ReactNode }) {
@@ -14,7 +15,7 @@ export function PageHead({ title, sub, right }: { title: string; sub?: string; r
   return (
     <View>
       <View style={styles.top}>
-        <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12} onPress={() => goBack('/communities')}>
+        <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12} onPress={() => goBack('/communities')} style={webHitArea(26)}>
           <ChevronLeft size={26} color={c.text} strokeWidth={2} />
         </Pressable>
         {right}

@@ -5,7 +5,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
-import { useIsWide } from '@/lib/layout';
+import { useIsWide, webHitArea } from '@/lib/layout';
 import { display, onest, type, useTheme } from '@/theme';
 
 import { AuthScreen } from './AuthScreen';
@@ -154,7 +154,7 @@ export function StepScreen({ title, sub, cta, children }: { title: string; sub: 
   const wide = useIsWide();
   const head = (
     <>
-      <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12} onPress={back} style={{ alignSelf: 'flex-start' }}>
+      <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12} onPress={back} style={[{ alignSelf: 'flex-start' }, webHitArea(24)]}>
         <ChevronLeft size={24} color={c.text} strokeWidth={2} />
       </Pressable>
       <View style={{ gap: 10, marginTop: wide ? 0 : 18 }}>

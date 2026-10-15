@@ -14,7 +14,7 @@ import { Text } from '@/components/ui/Text';
 import { getCommunity } from '@/data/mock';
 import type { Community } from '@/data/types';
 import { useT } from '@/i18n';
-import { useIsWide } from '@/lib/layout';
+import { useIsWide, webHitArea } from '@/lib/layout';
 import { communityEvents, goingCount, isMember } from '@/lib/selectors';
 import { useNow, useStore } from '@/store/AppStore';
 import { display, onest, type, useTheme } from '@/theme';
@@ -41,7 +41,7 @@ function Back({ right }: { right?: ReactNode }) {
   const { t } = useT();
   return (
     <View style={styles.top}>
-      <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12} onPress={() => goBack('/communities')}>
+      <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12} onPress={() => goBack('/communities')} style={webHitArea(26)}>
         <ChevronLeft size={26} color={c.text} strokeWidth={2} />
       </Pressable>
       {right}

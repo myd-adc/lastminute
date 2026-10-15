@@ -6,6 +6,7 @@ import { goBack } from '@/components/ui';
 import { Bone, Skeleton } from '@/components/ui/Skeleton';
 import { useT } from '@/i18n';
 import { useTheme } from '@/theme';
+import { webHitArea } from '@/lib/layout';
 
 // M12s: a section caption and five rows of avatar + two lines under the real "Chats" title.
 export function ChatRowsSkeleton({ rows = 5 }: { rows?: number }) {
@@ -51,7 +52,7 @@ export function RoomSkeleton() {
   return (
     <View style={[styles.flex, { backgroundColor: c.bg, paddingTop: insets.top + 6, paddingBottom: insets.bottom + 24, paddingHorizontal: 20 }]}>
       <View style={styles.header}>
-        <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12} onPress={() => goBack('/')}>
+        <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12} onPress={() => goBack('/')} style={webHitArea(26)}>
           <ChevronLeft size={26} color={c.text} strokeWidth={2} />
         </Pressable>
         <View style={[styles.lines, { gap: 6 }]}>

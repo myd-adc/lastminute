@@ -9,7 +9,7 @@ import { AuthScreen } from '@/components/onboarding/AuthScreen';
 import { Button } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
-import { useIsWide } from '@/lib/layout';
+import { useIsWide, webHitArea } from '@/lib/layout';
 import { resendCode, verifyCode, type CodeMode } from '@/api/auth';
 import { isLive } from '@/api/client';
 import { useStore } from '@/store/AppStore';
@@ -81,7 +81,7 @@ export default function CodeScreen() {
     return (
       <AuthSplit>
         <View style={{ gap: 20 }}>
-          <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12} onPress={back} style={{ alignSelf: 'flex-start' }}>
+          <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12} onPress={back} style={[{ alignSelf: 'flex-start' }, webHitArea(24)]}>
             <ChevronLeft size={24} color={c.text} strokeWidth={2} />
           </Pressable>
           {heading}
@@ -95,7 +95,7 @@ export default function CodeScreen() {
   // 12 pt above the number pad.
   return (
     <AuthScreen glow="code" footer={cta}>
-      <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12} onPress={back} style={{ alignSelf: 'flex-start' }}>
+      <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12} onPress={back} style={[{ alignSelf: 'flex-start' }, webHitArea(24)]}>
         <ChevronLeft size={24} color={c.text} strokeWidth={2} />
       </Pressable>
       <View style={{ marginTop: 28, marginBottom: 30 }}>{heading}</View>

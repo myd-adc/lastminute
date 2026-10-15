@@ -12,7 +12,7 @@ import { Text } from '@/components/ui/Text';
 import { getEvent, getUser } from '@/data/mock';
 import type { Event } from '@/data/types';
 import { useT } from '@/i18n';
-import { footerBottom, useIsWide } from '@/lib/layout';
+import { footerBottom, useIsWide, webHitArea } from '@/lib/layout';
 import { albumFor, albumOpen, expiresAt, goingCount, isLive } from '@/lib/selectors';
 import { dayLabel, time, whenLabel } from '@/lib/time';
 import { newId, useNow, useStore } from '@/store/AppStore';
@@ -110,7 +110,7 @@ export default function AlbumScreen() {
     <View style={s.root}>
       <View style={[s.top, { paddingTop: insets.top + 6 }]}>
         <View style={s.header}>
-          <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12} onPress={() => goBack()}>
+          <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12} onPress={() => goBack()} style={webHitArea(26)}>
             <ChevronLeft size={26} color={c.text} strokeWidth={2} />
           </Pressable>
           <View style={s.headerText}>

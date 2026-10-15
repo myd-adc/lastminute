@@ -16,6 +16,7 @@ import { onest, type Palette, useStyles, useTheme } from '@/theme';
 
 import { ChatThread } from './ChatThread';
 import { dayInline, eventShort } from './chatUtils';
+import { webHitArea } from '@/lib/layout';
 
 // DM conversation: header (avatar, name, event line, timer pill, ⋯ menu) + ChatThread.
 // 'screen' = M13 phone screen, 'panel' = right pane of the W06 two-pane layout.
@@ -78,7 +79,7 @@ export function ChatConversation({ eventId, userId, variant }: { eventId: string
       <View style={[s.headerBlock, panel ? s.headerBlockPanel : { paddingTop: headerTop + 4 }]}>
         <View style={[s.headerRow, panel && s.headerRowPanel]}>
           {variant === 'screen' && (
-            <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12} onPress={() => goBack('/chats')}>
+            <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12} onPress={() => goBack('/chats')} style={webHitArea(26)}>
               <ChevronLeft size={26} color={c.text} strokeWidth={2} />
             </Pressable>
           )}

@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { footerBottom, tabBarClearance, useIsWide } from '@/lib/layout';
+import { footerBottom, tabBarClearance, useIsWide, webHitArea } from '@/lib/layout';
 import { t } from '@/i18n/translate';
 import { type, useTheme } from '@/theme';
 
@@ -86,7 +86,7 @@ export function Header({
   return (
     <View style={styles.header}>
       {onBack && (
-        <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12} onPress={onBack}>
+        <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12} onPress={onBack} style={webHitArea(26)}>
           <ChevronLeft size={26} color={c.text} strokeWidth={2} />
         </Pressable>
       )}

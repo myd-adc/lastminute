@@ -13,7 +13,7 @@ import { Text } from '@/components/ui/Text';
 import { getEvent } from '@/data/mock';
 import type { Event } from '@/data/types';
 import { useT } from '@/i18n';
-import { useIsWide } from '@/lib/layout';
+import { useIsWide, webHitArea } from '@/lib/layout';
 import { expiresAt } from '@/lib/selectors';
 import { whenLabel } from '@/lib/time';
 import { groupChatId, useNow } from '@/store/AppStore';
@@ -52,7 +52,7 @@ function Group({ event }: { event: Event }) {
   const head = (
     <View style={[styles.head, wide ? styles.headWide : styles.headMobile, { borderBottomColor: c.line }]}>
       {(!wide || !open) && (
-        <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12} onPress={() => goBack()}>
+        <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12} onPress={() => goBack()} style={webHitArea(26)}>
           <ChevronLeft size={26} color={c.text} strokeWidth={2} />
         </Pressable>
       )}

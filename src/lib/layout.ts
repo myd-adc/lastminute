@@ -20,3 +20,11 @@ export const footerBottom = (bottomInset: number) => Math.max(bottomInset, 34) +
 // leave the sidebar uncovered. Fixed positioning pins the dim and the dialog to the whole window, as in the frames.
 export const fullWindow: ViewStyle =
   Platform.OS === 'web' ? ({ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 100 } as unknown as ViewStyle) : StyleSheet.absoluteFill;
+
+// react-native-web ignores hitSlop, so a bare icon button gets its 44 pt target from padding instead; the negative
+// margin keeps the icon where the layout put it. Native keeps using hitSlop.
+export const webHitArea = (iconSize: number): ViewStyle | null => {
+  if (Platform.OS !== 'web') return null;
+  const pad = Math.max(0, (44 - iconSize) / 2);
+  return { padding: pad, margin: -pad };
+};

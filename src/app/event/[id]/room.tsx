@@ -16,7 +16,7 @@ import { Text } from '@/components/ui/Text';
 import { getEvent } from '@/data/mock';
 import type { Event } from '@/data/types';
 import { useT } from '@/i18n';
-import { useIsWide, footerBottom } from '@/lib/layout';
+import { footerBottom, useIsWide, webHitArea } from '@/lib/layout';
 import { attendeesFor, isWaiting, matchesAt, roomQueue, type Attendee } from '@/lib/selectors';
 import { whenLabel } from '@/lib/time';
 import { useNow, useStore } from '@/store/AppStore';
@@ -108,7 +108,7 @@ function RoomMobile({ event }: { event: Event }) {
     <View style={[styles.flex, { backgroundColor: c.bg, paddingTop: insets.top + 6, paddingBottom: footerBottom(insets.bottom) + 13 }]}>
       <View style={styles.mobileHead}>
         <View style={styles.headerRow}>
-          <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12} onPress={() => goBack()}>
+          <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={12} onPress={() => goBack()} style={webHitArea(26)}>
             <ChevronLeft size={26} color={c.text} strokeWidth={2} />
           </Pressable>
           <View style={[styles.flex, { gap: 2 }]}>
