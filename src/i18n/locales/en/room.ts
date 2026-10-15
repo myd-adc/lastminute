@@ -37,6 +37,7 @@ export const room: Translation<typeof Uk> = {
   },
   card: {
     report: 'Report',
+    speaks: 'Speaks: {langs}',
     talkAbout: 'Talk to me about',
     shared: { one: '✦ Were together at {count} event', other: '✦ Were together at {count} events' },
     sharedLong: {

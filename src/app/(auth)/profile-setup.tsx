@@ -18,7 +18,7 @@ export default function ProfileSetupScreen() {
   const next = () => {
     if (!valid) return;
     dispatch({ type: 'setMe', me: cleanProfile(draft) });
-    router.push('/interests');
+    router.push('/about');
   };
 
   return (

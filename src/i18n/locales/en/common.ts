@@ -2,6 +2,15 @@ import type { Translation } from '../types';
 import type { common as Uk } from '../uk/common';
 
 export const common: Translation<typeof Uk> = {
+  languages: {
+    uk: 'Ukrainian',
+    en: 'English',
+    pl: 'Polish',
+    de: 'German',
+    es: 'Spanish',
+    fr: 'French',
+    other: 'Other',
+  },
   appName: 'lastminute',
   save: 'Save',
   saved: 'Saved',

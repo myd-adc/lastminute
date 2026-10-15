@@ -1,17 +1,19 @@
 import type { Synced } from '@/api/sync';
 import { pastChats, PAST_EVENT_IDS } from '@/data/mock';
-import type { Community, Event, GoesWith, InterestId, Message, Photo, ReportReason, Survey, Vibe } from '@/data/types';
+import type { Community, Event, GoesWith, InterestId, Message, Photo, ReportReason, SpokenLang, Survey, Vibe } from '@/data/types';
 import { deviceLang, type Lang } from '@/i18n/core';
 import type { ThemeMode } from '@/theme';
 import type { GradientId } from '@/theme/palette';
 
-export const STATE_VERSION = 7;
+export const STATE_VERSION = 8;
 
 export type Me = {
   name: string;
   username?: string; // «taras.k», shown as @taras.k; unique on the server
-  affiliation: string; // "Philosophy, 4th year", optional
+  affiliation: string; // "Philosophy, 4th year", optional; asked in "Edit profile", not during onboarding
   talkAbout: string; // "Talk to me about…", ≤ 80 chars
+  birthYear?: number; // M04b; only the year, so age is approximate by design
+  languages?: SpokenLang[]; // M04b
   gradient: GradientId;
   photoUri?: string;
 };

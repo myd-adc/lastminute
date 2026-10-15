@@ -85,3 +85,8 @@ export function plural(n: number, one: string, few: string, many: string) {
 export const going = (n: number) => t('common.count.going', { count: n });
 export const people = (n: number) => t('common.count.people', { count: n });
 export const eventsCount = (n: number) => t('common.count.events', { count: n });
+
+// Age from the year of birth alone. `ageThisYear` is what the person turns during this calendar year;
+// `ageForSure` is the lowest age they can possibly be, which is what an 18+ gate has to use.
+export const ageThisYear = (birthYear: number, now: number) => new Date(now).getFullYear() - birthYear;
+export const ageForSure = (birthYear: number, now: number) => ageThisYear(birthYear, now) - 1;

@@ -78,6 +78,11 @@ export function PersonCard({ attendee, width, height, showShared, expanded, onMo
         <Text style={[onest('regular', 14, 18), { color: c.muted }]} numberOfLines={1}>
           {withHandle(user.username, user.affiliation)}
         </Text>
+        {!!user.languages?.length && (
+          <Text style={[onest('regular', 13, 17), { color: c.muted }]} numberOfLines={1}>
+            {t('room.card.speaks', { langs: user.languages.map((id) => t(`common.languages.${id}`)).join(' · ') })}
+          </Text>
+        )}
         {tags.length > 0 && (
           <View style={styles.tags}>
             {tags.map((tag) => (

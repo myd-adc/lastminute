@@ -1,4 +1,4 @@
-import type { GoesWith, InterestId, Vibe } from '@/data/types';
+import type { GoesWith, InterestId, SpokenLang, Vibe } from '@/data/types';
 import type { Me, State } from '@/store/state';
 import type { GradientId } from '@/theme/palette';
 
@@ -83,6 +83,8 @@ export async function loadAccount(userId: string): Promise<ExistingAccount | nul
       username: p.username,
       affiliation: p.affiliation,
       talkAbout: p.talk_about,
+      birthYear: p.birth_year ?? undefined,
+      languages: (p.languages as SpokenLang[] | null) ?? undefined,
       gradient: p.gradient as GradientId,
       photoUri: p.photo_path ? (await signedUrls(AVATARS, [p.photo_path])).get(p.photo_path) : undefined,
     },
@@ -117,6 +119,8 @@ export async function saveProfile(state: State): Promise<AuthResult> {
     name: state.me.name,
     affiliation: state.me.affiliation,
     talk_about: state.me.talkAbout,
+    birth_year: state.me.birthYear ?? null,
+    languages: state.me.languages ?? [],
     gradient: state.me.gradient,
     interests: state.interests,
     vibe: state.vibe,

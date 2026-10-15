@@ -35,6 +35,7 @@ export const room = {
   },
   card: {
     report: 'Поскаржитись',
+    speaks: 'Говорить: {langs}',
     talkAbout: 'Говори зі мною про',
     shared: { one: '✦ Були разом на {count} події', few: '✦ Були разом на {count} подіях', many: '✦ Були разом на {count} подіях' },
     sharedLong: {

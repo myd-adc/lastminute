@@ -51,8 +51,18 @@ export const onboarding = {
   frame: {
     stepOf: 'Крок {step} з {total}',
     back: '← Назад',
-    steps: { profile: 'Профіль', interests: 'Вподобання' },
+    steps: { profile: 'Профіль', about: 'Про тебе', interests: 'Вподобання' },
     picked: { one: 'обрано {count}', few: 'обрано {count}', many: 'обрано {count}' },
+  },
+  about: {
+    title: 'Трохи про тебе',
+    subtitle: 'Вік потрібен для подій 18+. Мови — щоб на місці було зрозуміло, якою говорити.',
+    birthYear: 'Рік народження',
+    birthYearPlaceholder: 'Обери рік',
+    birthYearPick: 'Обери рік народження',
+    birthYearNote: 'Іншим показуємо тільки вік, не рік.',
+    languages: 'Якими мовами спілкуєшся · необов’язково',
+    languagesNote: 'Можна обрати кілька.',
   },
   profile: {
     title: 'Як тебе показувати іншим?',

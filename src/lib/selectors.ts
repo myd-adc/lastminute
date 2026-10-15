@@ -3,7 +3,7 @@ import { albumPhotos, attendanceOf, attendeesOf, communities, events, getCommuni
 import type { Attendance, Community, Event, Message, Photo, User } from '@/data/types';
 import { dmChatId, groupChatId, pairKey, type State } from '@/store/state';
 
-import { DAY } from './time';
+import { ageForSure, DAY } from './time';
 
 export const CHAT_TTL_AFTER_EVENT_MS = DAY; // chats and albums live until event end + 24 h
 
@@ -57,8 +57,16 @@ export function metCount(state: State, e: Event, friends = friendIds(state)): nu
 const byInterest = (state: State) => (a: Event, b: Event) =>
   Number(state.interests.includes(b.category)) - Number(state.interests.includes(a.category)) || a.startsAt.localeCompare(b.startsAt);
 
+// Events with an age limit stay out of the feed until the user is certainly old enough. Without a year of birth
+// (accounts made before M04b) nothing is hidden.
+function oldEnough(state: State, e: Event, now: number) {
+  if (!e.ageLimit) return true;
+  const year = state.me?.birthYear;
+  return year === undefined || ageForSure(year, now) >= e.ageLimit;
+}
+
 export function tabEvents(state: State, now: number, tab: State['feedTab']): Event[] {
-  const all = upcoming(state, now);
+  const all = upcoming(state, now).filter((e) => oldEnough(state, e, now));
   if (tab === 'saved') return all.filter((e) => state.saved[e.id]);
   if (tab === 'communities') return all.filter((e) => e.communityId && isMember(state, e.communityId));
   if (tab === 'met') {

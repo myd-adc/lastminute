@@ -53,8 +53,18 @@ export const onboarding: Translation<typeof Uk> = {
   frame: {
     stepOf: 'Step {step} of {total}',
     back: '← Back',
-    steps: { profile: 'Profile', interests: 'Interests' },
+    steps: { profile: 'Profile', about: 'About you', interests: 'Interests' },
     picked: { one: '{count} picked', other: '{count} picked' },
+  },
+  about: {
+    title: 'A little about you',
+    subtitle: 'Age is needed for 18+ events. Languages — so people know which one to speak.',
+    birthYear: 'Year of birth',
+    birthYearPlaceholder: 'Pick a year',
+    birthYearPick: 'Pick your year of birth',
+    birthYearNote: 'Others only see your age, never the year.',
+    languages: 'Languages you speak · optional',
+    languagesNote: 'Pick as many as you like.',
   },
   profile: {
     title: 'How should others see you?',

@@ -53,11 +53,15 @@ export type Event = {
   metCount?: number; // live backend: people the user matched with before who are going (count only)
 };
 
+// Languages a person is happy to be spoken to in. 'other' covers everything the list leaves out.
+export type SpokenLang = 'uk' | 'en' | 'pl' | 'de' | 'es' | 'fr' | 'other';
+
 export type User = {
   id: string;
   name: string;
   username?: string; // «darynka», shown as @darynka
   age?: number; // not collected by the live backend yet
+  languages?: SpokenLang[];
   gender?: 'f' | 'm';
   affiliation: string; // "Sociology, 3rd year"
   talkAbout: string; // "Talk to me about…"

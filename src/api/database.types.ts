@@ -322,6 +322,7 @@ export type Database = {
       profiles: {
         Row: {
           affiliation: string;
+          birth_year: number | null;
           created_at: string;
           gender: string | null;
           goes_with: string | null;
@@ -329,6 +330,7 @@ export type Database = {
           id: string;
           interests: string[];
           language: string;
+          languages: string[];
           name: string;
           photo_path: string | null;
           show_shared: boolean;
@@ -341,6 +343,7 @@ export type Database = {
         ComputedFields: never;
         Insert: {
           affiliation?: string;
+          birth_year?: number | null;
           created_at?: string;
           gender?: string | null;
           goes_with?: string | null;
@@ -348,6 +351,7 @@ export type Database = {
           id: string;
           interests?: string[];
           language?: string;
+          languages?: string[];
           name: string;
           photo_path?: string | null;
           show_shared?: boolean;
@@ -359,6 +363,7 @@ export type Database = {
         };
         Update: {
           affiliation?: string;
+          birth_year?: number | null;
           created_at?: string;
           gender?: string | null;
           goes_with?: string | null;
@@ -366,6 +371,7 @@ export type Database = {
           id?: string;
           interests?: string[];
           language?: string;
+          languages?: string[];
           name?: string;
           photo_path?: string | null;
           show_shared?: boolean;

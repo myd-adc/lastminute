@@ -116,6 +116,7 @@ export async function fetchSnapshot(me: string): Promise<Snapshot> {
       username: p.username,
       gender: (p.gender as User['gender']) ?? undefined,
       affiliation: p.affiliation,
+      languages: (p.languages as User['languages']) ?? undefined,
       talkAbout: p.talk_about,
       tags: p.interests as InterestId[],
       gradient: p.gradient as GradientId,

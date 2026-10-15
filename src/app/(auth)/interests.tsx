@@ -43,7 +43,7 @@ export default function InterestsScreen() {
 
   return (
     <OnboardingFrame
-      step={2}
+      step={3}
       title={t('onboarding.interests.title')}
       subtitle={t('onboarding.interests.subtitle')}
       cta={{ label: t('onboarding.interests.start'), onPress: start, disabled: !valid }}

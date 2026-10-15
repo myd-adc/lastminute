@@ -1,5 +1,14 @@
 // Shared strings: actions, time words, counters. Mirror every key in ../en/common.ts.
 export const common = {
+  languages: {
+    uk: 'Українська',
+    en: 'Англійська',
+    pl: 'Польська',
+    de: 'Німецька',
+    es: 'Іспанська',
+    fr: 'Французька',
+    other: 'Інша',
+  },
   appName: 'lastminute',
   save: 'Зберегти',
   saved: 'Збережено',
