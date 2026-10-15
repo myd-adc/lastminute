@@ -9,14 +9,14 @@ import { categoryLabel, mapsUrl, priceLabel, shortTitle } from '@/components/fee
 import { PosterArt } from '@/components/feed/PosterArt';
 import { shareEvent } from '@/components/feed/share';
 import { useToast } from '@/components/feed/Toast';
-import { AvatarStack, Button, Chip, goBack, IconButton, Pill, Sheet } from '@/components/ui';
+import { AvatarStack, Button, Chip, CloseButton, goBack, IconButton, Pill, Sheet } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { getEvent, soloGroups } from '@/data/mock';
 import type { Event } from '@/data/types';
 import { useT } from '@/i18n';
 import { t as translate } from '@/i18n/translate';
 import { fullWindow, useIsWide } from '@/lib/layout';
-import { pop, slideUp, useOverlayMotion } from '@/lib/motion';
+import { pop, slideUp, useOverlayMotion, useSheetDrag } from '@/lib/motion';
 import { acquaintances, attendeesFor, goingCount, soloCount, soloGroupMembers } from '@/lib/selectors';
 import { dayLabel, whenLabel } from '@/lib/time';
 import { useNow, useStore, type Going } from '@/store/AppStore';
@@ -147,14 +147,19 @@ function MobileDetails({ event }: { event: Event }) {
   const { height } = useWindowDimensions();
   const { progress, exit } = useOverlayMotion();
   const close = () => exit(() => goBack('/'));
+  const drag = useSheetDrag(close);
   return (
     <>
       <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: DIM_SHEET, opacity: progress }]}>
         <Pressable accessibilityLabel={t('common.close')} style={StyleSheet.absoluteFill} onPress={close} />
       </Animated.View>
-      <Animated.View style={[styles.sheet, { top: insets.top + 94, backgroundColor: c.surface }, slideUp(progress, height - insets.top - 94)]}>
+      <Animated.View
+        {...drag.panHandlers}
+        style={[styles.sheet, { top: insets.top + 94, backgroundColor: c.surface }, slideUp(progress, height - insets.top - 94, drag.drag)]}
+      >
         <View style={[styles.handle, { backgroundColor: c.line }]} />
-        <ScrollView style={styles.flex} contentContainerStyle={styles.sheetContent} bounces={false}>
+        <CloseButton onPress={close} />
+        <ScrollView style={styles.flex} contentContainerStyle={styles.sheetContent} bounces={false} onScroll={drag.onScroll} scrollEventThrottle={16}>
           <Body event={event} d={d} />
         </ScrollView>
         <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 34) + 10 }]}>
@@ -258,7 +263,8 @@ const styles = StyleSheet.create({
   partner: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 10, borderRadius: 14 },
   sheet: { position: 'absolute', left: 0, right: 0, bottom: 0, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' },
   handle: { alignSelf: 'center', width: 40, height: 5, borderRadius: 3, marginTop: 10 },
-  sheetContent: { paddingHorizontal: 20, paddingTop: 15, paddingBottom: 16, gap: 14 },
+  // paddingTop clears the close button in the top-right corner.
+  sheetContent: { paddingHorizontal: 20, paddingTop: 26, paddingBottom: 16, gap: 14 },
   footer: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 20, paddingTop: 12 },
   save: { width: 110, paddingHorizontal: 12 },
   centre: { alignItems: 'center', justifyContent: 'center' },

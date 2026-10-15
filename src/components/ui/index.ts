@@ -8,6 +8,6 @@ export { Gradient } from './Gradient';
 export { IconButton } from './IconButton';
 export { Placeholder } from './Placeholder';
 export { goBack, Header, Screen, ScreenTitle, SectionLabel } from './Screen';
-export { Sheet } from './Sheet';
+export { CloseButton, Sheet } from './Sheet';
 export { activeTabFor, SIDEBAR_WIDTH, WebShell } from './WebShell';
 export { Bone, Skeleton } from './Skeleton';

@@ -58,7 +58,7 @@ export default function ReportScreen() {
 
   if (sent) {
     return (
-      <Sheet onClose={() => {}}>
+      <Sheet dismissible={false} onClose={() => {}}>
         <View style={styles.thanks}>
           <Text style={{ fontSize: 44 }}>🙏</Text>
           <Text style={[type.title2, { color: c.text, textAlign: 'center' }]}>{t('profile.report.thanks')}</Text>
