@@ -86,6 +86,21 @@ function Navigator() {
         <Stack.Screen name="language" options={overlay} />
         <Stack.Screen name="match/[eventId]/[userId]" options={{ presentation: 'fullScreenModal', animation: 'fade' }} />
         <Stack.Screen name="event/[id]/after" options={{ presentation: 'fullScreenModal' }} />
+        {/* Every other signed-in screen: listed so signing out (or deleting the account) leaves them too. */}
+        <Stack.Screen name="event/[id]/going" />
+        <Stack.Screen name="event/[id]/room" />
+        <Stack.Screen name="event/[id]/group" />
+        <Stack.Screen name="event/[id]/album" />
+        <Stack.Screen name="event/new" />
+        <Stack.Screen name="chat/[eventId]/[userId]" />
+        <Stack.Screen name="community/new" />
+        <Stack.Screen name="community/[id]/index" />
+        <Stack.Screen name="community/[id]/new-event" />
+        <Stack.Screen name="community/[id]/settings" />
+        <Stack.Screen name="settings" />
+        <Stack.Screen name="edit-profile" />
+        <Stack.Screen name="preferences" />
+        <Stack.Screen name="blocked" />
       </Stack.Protected>
     </Stack>
   );
