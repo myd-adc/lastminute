@@ -7,7 +7,6 @@ import {
   AccountSection,
   ProfileCard,
   SafetySection,
-  SavedSection,
   StatsCard,
   VisibilitySection,
 } from '@/components/profile/ProfileSections';
@@ -40,7 +39,6 @@ export default function MeScreen() {
       </View>
       <ProfileCard />
       <StatsCard />
-      <SavedSection />
       <VisibilitySection />
       <SafetySection />
       <AccountSection confirming={confirmLogout} setConfirming={setConfirmLogout} />

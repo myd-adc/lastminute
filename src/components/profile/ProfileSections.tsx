@@ -133,31 +133,6 @@ export function VisibilitySection({ whoSees }: { whoSees?: boolean } = {}) {
   );
 }
 
-// "Saved" lives here rather than on the tab bar: it is a shelf you come back to, not a place you navigate between.
-export function SavedSection() {
-  const { t } = useT();
-  const { state, dispatch } = useStore();
-  const count = Object.keys(state.saved).length;
-  const open = () => {
-    dispatch({ type: 'setFeedTab', tab: 'saved' });
-    router.navigate('/');
-  };
-  return (
-    <Section label={t('profile.saved.label')}>
-      <Group>
-        <Row
-          last
-          label={t('profile.saved.row')}
-          sub={count ? undefined : t('profile.saved.empty', genderForms(state.me?.gender))}
-          value={count ? String(count) : undefined}
-          chevron
-          onPress={open}
-        />
-      </Group>
-    </Section>
-  );
-}
-
 export function SafetySection() {
   const { t } = useT();
   const { state } = useStore();
