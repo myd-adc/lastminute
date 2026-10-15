@@ -22,9 +22,10 @@ export default function ReportScreen() {
   const now = useNow();
   const { userId, eventId } = useLocalSearchParams<{ userId: string; eventId?: string }>();
   const user = getUser(userId);
-  const [reason, setReason] = useState<ReportReason>('messages');
+  // Nothing is preselected: a report is an accusation, so the person picks it, and blocking, themselves.
+  const [reason, setReason] = useState<ReportReason | null>(null);
   const [other, setOther] = useState('');
-  const [alsoBlock, setAlsoBlock] = useState(true);
+  const [alsoBlock, setAlsoBlock] = useState(false);
   const [sent, setSent] = useState<null | { blocked: boolean }>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -37,7 +38,7 @@ export default function ReportScreen() {
   const number = t('profile.emergencyNumber');
 
   const submit = () => {
-    if (!user) return;
+    if (!user || !reason) return;
     dispatch({ type: 'report', report: { userId: user.id, eventId, reason, alsoBlock, at: new Date(now).toISOString() } });
     setSent({ blocked: alsoBlock });
     timer.current = setTimeout(() => {
@@ -70,7 +71,7 @@ export default function ReportScreen() {
     );
   }
 
-  const canSend = reason !== 'other' || other.trim().length > 0;
+  const canSend = !!reason && (reason !== 'other' || other.trim().length > 0);
 
   // M17: content starts 30 pt from the sheet top (Sheet gives 35) with a uniform 12 pt gap; 56 pt CTA.
   return (
