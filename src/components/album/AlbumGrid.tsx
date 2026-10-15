@@ -1,9 +1,9 @@
 import { Plus, X } from 'lucide-react-native';
 import { useState } from 'react';
-import { Image, Modal, Pressable, StyleSheet, View } from 'react-native';
+import { Modal, Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Gradient } from '@/components/ui';
+import { Gradient, RemoteImage } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { getUser } from '@/data/mock';
 import type { Photo } from '@/data/types';
@@ -95,7 +95,7 @@ export function AlbumGrid({ photos, wide, onAdd }: { photos: Photo[]; wide?: boo
 }
 
 function PhotoFill({ photo, emojiSize }: { photo: Photo; emojiSize: number }) {
-  if (photo.uri) return <Image source={{ uri: photo.uri }} style={StyleSheet.absoluteFill} resizeMode="cover" />;
+  if (photo.uri) return <RemoteImage uri={photo.uri} style={StyleSheet.absoluteFill} />;
   return (
     <Gradient id={photo.gradient} style={[StyleSheet.absoluteFill, styles.center]}>
       <Text style={{ fontSize: emojiSize }}>{photo.emoji}</Text>

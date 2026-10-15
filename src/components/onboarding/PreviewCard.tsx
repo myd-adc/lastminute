@@ -1,7 +1,7 @@
 import { Lock } from 'lucide-react-native';
-import { Image, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
-import { Gradient, Pill } from '@/components/ui';
+import { Gradient, Pill, RemoteImage } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { getInterest } from '@/data/mock';
 import type { InterestId } from '@/data/types';
@@ -35,7 +35,7 @@ export function PreviewCard({ person }: { person: PreviewPerson }) {
       <View style={[styles.card, { backgroundColor: c.bg, borderColor: c.line }]}>
         <View style={styles.photo}>
           {person.photoUri ? (
-            <Image source={{ uri: person.photoUri }} style={StyleSheet.absoluteFill} />
+            <RemoteImage uri={person.photoUri} style={StyleSheet.absoluteFill} />
           ) : (
             <Gradient id={person.gradient} style={[StyleSheet.absoluteFill, styles.center]}>
               <Text style={[display(110, 120), { color: '#0B0B10' }]}>{name.charAt(0).toUpperCase()}</Text>

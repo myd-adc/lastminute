@@ -1,9 +1,10 @@
-import { Image, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { fonts, useTheme } from '@/theme';
 import type { GradientId } from '@/theme/palette';
 
 import { Gradient } from './Gradient';
+import { RemoteImage } from './RemoteImage';
 import { Text } from './Text';
 
 type Props = {
@@ -19,7 +20,7 @@ export function Avatar({ name, gradient, size, photoUri, ring }: Props) {
   const { c, scheme } = useTheme();
   const ringStyle = ring && { borderWidth: 2, borderColor: c.bg };
   const shape = { width: size, height: size, borderRadius: size / 2 };
-  if (photoUri) return <Image source={{ uri: photoUri }} style={[shape, ringStyle]} />;
+  if (photoUri) return <RemoteImage uri={photoUri} style={[shape, ringStyle]} />;
   return (
     <View style={[shape, styles.clip, ringStyle]}>
       <Gradient id={gradient} style={[StyleSheet.absoluteFill, styles.center]}>

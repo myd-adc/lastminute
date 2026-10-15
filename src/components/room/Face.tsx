@@ -1,6 +1,6 @@
-import { Image, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
-import { Gradient } from '@/components/ui';
+import { Gradient, RemoteImage } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { fonts, useTheme } from '@/theme';
 import type { GradientId } from '@/theme/palette';
@@ -24,7 +24,7 @@ export function Face({ name, gradient, photoUri, size, fontSize, font = 'onest',
   return (
     <View style={[shape, styles.clip, border, style]}>
       {photoUri ? (
-        <Image source={{ uri: photoUri }} style={StyleSheet.absoluteFill} />
+        <RemoteImage uri={photoUri} style={StyleSheet.absoluteFill} />
       ) : (
         <Gradient id={gradient} style={[StyleSheet.absoluteFill, styles.center]}>
           <Text style={{ fontFamily: font === 'display' ? fonts.display : fonts.bold, fontSize, color: c.text }}>

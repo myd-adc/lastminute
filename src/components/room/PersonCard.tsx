@@ -1,7 +1,7 @@
 import { MoreHorizontal } from 'lucide-react-native';
-import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
-import { Gradient, Pill } from '@/components/ui';
+import { Gradient, Pill, RemoteImage } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { getInterest } from '@/data/mock';
 import { useT } from '@/i18n';
@@ -46,7 +46,7 @@ export function PersonCard({ attendee, width, height, showShared, expanded, onMo
     >
       <Gradient id={user.gradient} style={[styles.photo, { height: photoH }]}>
         {user.photoUri ? (
-          <Image source={{ uri: user.photoUri }} style={StyleSheet.absoluteFill} accessibilityIgnoresInvertColors />
+          <RemoteImage uri={user.photoUri} style={StyleSheet.absoluteFill} />
         ) : (
           <Text
             style={[
