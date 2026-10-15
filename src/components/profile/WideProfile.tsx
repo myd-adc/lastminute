@@ -186,8 +186,10 @@ function MyCommunities() {
 
 function WideAccount() {
   const { t } = useT();
-  const { dispatch } = useStore();
+  const { c } = useTheme();
+  const { dispatch, deleteAccount } = useStore();
   const [confirm, setConfirm] = useState<null | 'logout' | 'delete'>(null);
+  const [deleteFailed, setDeleteFailed] = useState(false);
   return (
     <Section label={t('profile.account.label')}>
       <Group>
@@ -197,7 +199,18 @@ function WideAccount() {
           <Row label={t('profile.account.logout')} destructive chevron onPress={() => setConfirm('logout')} />
         )}
         {confirm === 'delete' ? (
-          <ConfirmRow question={t('profile.account.deleteQuestion')} confirmLabel={t('profile.account.delete')} onCancel={() => setConfirm(null)} onConfirm={() => dispatch({ type: 'logout' })} />
+          <>
+            <ConfirmRow
+              question={t('profile.account.deleteQuestion')}
+              confirmLabel={t('profile.account.delete')}
+              onCancel={() => setConfirm(null)}
+              onConfirm={() => {
+                setDeleteFailed(false);
+                deleteAccount().then((ok) => !ok && setDeleteFailed(true));
+              }}
+            />
+            {deleteFailed && <Text style={[onest('medium', 13, 17), styles.deleteError, { color: c.danger }]}>{t('profile.account.deleteFailed')}</Text>}
+          </>
         ) : (
           <Row
             label={t('profile.account.deleteAccount')}
@@ -236,6 +249,7 @@ function WideSafety() {
 
 // W09 geometry: 48 pt page inset, 30 pt title, 500 + 560 pt columns 40 pt apart, 16 pt column gap.
 const styles = StyleSheet.create({
+  deleteError: { paddingHorizontal: 16, paddingBottom: 12 },
   page: { paddingHorizontal: 48, paddingTop: 36, paddingBottom: 48, gap: 24, maxWidth: 1196 },
   titleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: 40 },
   lang: { flexDirection: 'row', alignItems: 'center', padding: 4, gap: 4, borderRadius: 14 },
