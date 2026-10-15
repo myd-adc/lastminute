@@ -97,8 +97,9 @@ export async function loadAccount(userId: string): Promise<ExistingAccount | nul
 
 // Persists the onboarding answers (M03–M04) for the signed-in user.
 export async function saveProfile(state: State): Promise<AuthResult> {
-  const { data: auth } = await supabase.auth.getUser();
-  const userId = auth.user?.id;
+  // The local session, not getUser(): a network round trip on every save, and a failed one signs the user out.
+  const { data: auth } = await supabase.auth.getSession();
+  const userId = auth.session?.user.id;
   if (!userId || !state.me) return { ok: false, error: 'not_signed_in' };
   // A picked photo is uploaded; a server URL means unchanged; none removes it.
   const { data: current } = await supabase.from('profiles').select('photo_path').eq('id', userId).maybeSingle();
@@ -152,7 +153,11 @@ export async function verifyStudentEmail(email: string, token: string): Promise<
   return error ? fail(error, 'code_failed') : { ok: true, data: undefined };
 }
 
-export const signOut = () => supabase.auth.signOut();
+// Local scope: the default "global" also revokes the account's sessions on every other device and tab.
+export const signOut = () => supabase.auth.signOut({ scope: 'local' });
+
+// Set when the server ended the session on its own, so the sign-in screen can say why the user landed there.
+export const sessionNotice = { expired: false };
 
 // Whether a username is free (the user's own counts as free). A failed check reads as free; the save still guards it.
 export async function usernameAvailable(username: string): Promise<boolean> {

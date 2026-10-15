@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState, type ReactNode } from 'react';
 
-import { saveProfile } from '@/api/auth';
+import { saveProfile, sessionNotice, signOut } from '@/api/auth';
 import { isLive, supabase } from '@/api/client';
 import * as api from '@/api/sync';
 import { attendanceOf, setDataLanguage, setLocalData, setRemoteData } from '@/data/mock';
@@ -52,6 +52,8 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   const meRef = useRef<string | null>(null);
   const syncRef = useRef<ReturnType<typeof api.startSync> | null>(null);
   const resync = useCallback(() => syncRef.current?.resync(), []);
+  // True while the user signs out on purpose; any other SIGNED_OUT means the server ended the session.
+  const leaving = useRef(false);
 
   // Local state changes first (optimistic); the server write follows and the next sync settles any conflict.
   const dispatch = useCallback(
@@ -61,7 +63,8 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       baseDispatch(action);
       if (!isLive) return;
       if (action.type === 'logout') {
-        supabase.auth.signOut().catch(() => {});
+        leaving.current = true;
+        signOut().catch(() => {});
         return;
       }
       const me = meRef.current;
@@ -99,7 +102,11 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     supabase.auth.getSession().then(({ data }) => {
       const uid = data.session?.user.id;
       if (cancelled) return;
-      if (!uid) return baseDispatch({ type: 'logout' });
+      if (!uid) {
+        sessionNotice.expired = true;
+        return baseDispatch({ type: 'logout' });
+      }
+      leaving.current = false;
       meRef.current = uid;
       syncRef.current = api.startSync(uid, {
         onSnapshot: (snap) => {
@@ -108,7 +115,10 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
           AsyncStorage.setItem(REMOTE_KEY, JSON.stringify(snap.remote)).catch(() => {});
           baseDispatch({ type: 'sync', synced: snap.synced });
         },
-        onSignedOut: () => baseDispatch({ type: 'logout' }),
+        onSignedOut: () => {
+          if (!leaving.current) sessionNotice.expired = true;
+          baseDispatch({ type: 'logout' });
+        },
         onError: (e) => {
           // A failed first sync still ends the skeletons: the screens fall back to their empty states.
           setRemoteReady(true);

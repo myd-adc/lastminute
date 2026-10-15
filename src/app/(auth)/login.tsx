@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
 
-import { resendCode, signIn } from '@/api/auth';
+import { resendCode, sessionNotice, signIn } from '@/api/auth';
 import { isLive } from '@/api/client';
 import { AuthError, LoginInput, MobileAuth, PasswordInput, SwitchLine, WideAuth } from '@/components/onboarding/AuthForms';
 import { Field, FieldLabel, TextLink } from '@/components/onboarding/kit';
@@ -19,7 +19,12 @@ export default function LoginScreen() {
   const [login, setLogin] = useState(() => state.email ?? '');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // Landing here after the server ended the session explains itself instead of showing a blank form.
+  const [error, setError] = useState<string | null>(() => {
+    if (!sessionNotice.expired) return null;
+    sessionNotice.expired = false;
+    return t('onboarding.errors.sessionExpired');
+  });
   const valid = login.trim().length >= 3 && password.length > 0 && !busy;
 
   const submit = async () => {

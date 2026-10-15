@@ -156,6 +156,7 @@ export const onboarding: Translation<typeof Uk> = {
     unconfirmed: 'This email isn’t confirmed yet — we sent a new code.',
     exists: 'This email is already registered. Sign in or reset your password.',
     signup: 'Couldn’t create the account. Try again.',
+    sessionExpired: 'Your session ended. Sign in again — your data is still here.',
     signin: 'Couldn’t sign in. Check your connection and try again.',
     password: 'Couldn’t save the password. Try again.',
     passwordShort: 'The password needs at least {count} characters.',
