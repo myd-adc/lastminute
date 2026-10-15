@@ -129,6 +129,7 @@ export function WideFeed() {
                   <Pill label={whenLabel(event.startsAt, now)} tone="accent" />
                   <Pill label={event.venue} tone="surface2" weight="medium" style={glass} />
                   <Pill label={priceLabel(event)} tone="surface2" weight="medium" style={glass} />
+                  {event.authorId && <Pill label={t('feed.own.byPerson')} tone="surface2" weight="medium" style={glass} />}
                 </View>
                 <Text style={[display(30, 34), { color: c.text }]} numberOfLines={3}>
                   {event.title}

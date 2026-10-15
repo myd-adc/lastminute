@@ -62,6 +62,7 @@ export const FeedPage = memo(function FeedPage(p: Props) {
                 <Pill label={p.when} tone="accent" />
                 <Pill label={e.venue} tone="surface2" weight="medium" style={s.glassPill} />
                 <Pill label={priceLabel(e)} tone="surface2" weight="medium" style={s.glassPill} />
+                {e.authorId && <Pill label={t('feed.own.byPerson')} tone="surface2" weight="medium" style={s.glassPill} />}
               </View>
               <Text style={[display(28, 31), s.text]} numberOfLines={3}>
                 {e.title}
