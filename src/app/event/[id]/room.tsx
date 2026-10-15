@@ -1,9 +1,10 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { ChevronLeft } from 'lucide-react-native';
+import { CalendarX, ChevronLeft } from 'lucide-react-native';
 import { useCallback, useRef, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { LeaveEventLink, LeaveEventSheet } from '@/components/feed/LeaveEvent';
 import { useToast } from '@/components/feed/Toast';
 import { CardDeck, type Choice, type DeckHandle } from '@/components/room/CardDeck';
 import { RoomSkeleton } from '@/components/skeletons/ListSkeletons';
@@ -102,6 +103,7 @@ function RoomMobile({ event }: { event: Event }) {
   const r = useRoom(event, footerBottom(insets.bottom) + 150);
   const deck = useRef<DeckHandle>(null);
   const top = r.queue.pending[0];
+  const [leaving, setLeaving] = useState(false);
 
   return (
     <View style={[styles.flex, { backgroundColor: c.bg, paddingTop: insets.top + 6, paddingBottom: footerBottom(insets.bottom) + 13 }]}>
@@ -119,6 +121,11 @@ function RoomMobile({ event }: { event: Event }) {
             </Text>
           </View>
           {r.going && <Pill label={r.counter} />}
+          {r.going && (
+            <Pressable accessibilityRole="button" accessibilityLabel={t('feed.leave.action')} hitSlop={8} onPress={() => setLeaving(true)}>
+              <CalendarX size={21} color={c.muted} strokeWidth={2} />
+            </Pressable>
+          )}
         </View>
         <RoomTabs event={event} now={r.now} />
       </View>
@@ -149,6 +156,7 @@ function RoomMobile({ event }: { event: Event }) {
           </View>
         </>
       )}
+      <LeaveEventSheet event={event} visible={leaving} onClose={() => setLeaving(false)} />
       {r.toast.node}
     </View>
   );
@@ -161,6 +169,7 @@ function RoomWide({ event }: { event: Event }) {
   const { c } = useTheme();
   const { t } = useT();
   const [selected, setSelected] = useState<string | null>(null);
+  const [leaving, setLeaving] = useState(false);
   const r = useRoom(event, 150, setSelected);
   const deck = useRef<DeckHandle>(null);
   const top = r.queue.pending[0];
@@ -207,12 +216,16 @@ function RoomWide({ event }: { event: Event }) {
               <View style={{ marginTop: 20 }}>
                 <RoomFootnote name={top.user.name} />
               </View>
+              <View style={{ marginTop: 16 }}>
+                <LeaveEventLink onPress={() => setLeaving(true)} />
+              </View>
               <KeyboardHints style={{ marginTop: 53 }} />
             </View>
           </>
         )}
       </View>
       <RoomMatchesPanel event={event} now={r.now} selectedId={selected} onSelect={setSelected} />
+      <LeaveEventSheet event={event} visible={leaving} onClose={() => setLeaving(false)} />
       {r.toast.node}
     </View>
   );

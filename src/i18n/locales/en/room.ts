@@ -3,9 +3,9 @@ import type { room as Uk } from '../uk/room';
 
 export const room: Translation<typeof Uk> = {
   title: 'Room',
+  youreGoing: 'you’re going ✓',
   eventGone: 'This event no longer exists.',
   toEvents: 'Back to events',
-  youreGoing: 'you’re going ✓',
   tabs: {
     who: '👋 Who’s going',
     album: '📸 Album',

@@ -1,9 +1,9 @@
 // Strings for the room flow. Add keys here; mirror every key in ../en/room.ts.
 export const room = {
   title: 'Кімната',
+  youreGoing: 'ти йдеш ✓',
   eventGone: 'Цієї події вже немає.',
   toEvents: 'До подій',
-  youreGoing: 'ти йдеш ✓',
   tabs: {
     who: '👋 Хто йде',
     album: '📸 Альбом',
