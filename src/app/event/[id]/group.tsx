@@ -62,7 +62,8 @@ function Group({ event }: { event: Event }) {
           {title}
         </Text>
         <Text style={[onest('regular', wide ? 13 : 12, wide ? 17 : 15), { color: c.muted }]} numberOfLines={wide ? 1 : 2}>
-          {wide
+          {/* Before the group exists there are no members to count, so the line names the event instead. */}
+          {wide || !open
             ? `${shortTitle(event)} · ${whenLabel(event.startsAt, now, ' ').toLowerCase()} · ${venueShort(event.venue)}`
             : `${membersLabel(g.total)} · ${t('room.group.allSolo')}`}
         </Text>
