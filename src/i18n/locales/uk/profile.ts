@@ -33,6 +33,7 @@ export const profile = {
     deleteAccount: 'Видалити акаунт',
     deleteAccountSub: 'Альбоми, чати та історія подій зникнуть назавжди',
     deleteQuestion: 'Видалити акаунт і всі дані?',
+    deleteFailed: 'Не вдалося видалити акаунт. Перевір інтернет і спробуй ще раз.',
     delete: 'Видалити',
   },
   appearance: {

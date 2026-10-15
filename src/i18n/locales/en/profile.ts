@@ -34,6 +34,7 @@ export const profile: Translation<typeof Uk> = {
     deleteAccount: 'Delete account',
     deleteAccountSub: 'Albums, chats and your event history are deleted for good',
     deleteQuestion: 'Delete your account and all data?',
+    deleteFailed: 'Could not delete the account. Check your connection and try again.',
     delete: 'Delete',
   },
   appearance: {
