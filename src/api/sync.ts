@@ -30,12 +30,13 @@ const must = <T>(res: { data: T | null; error: { message: string } | null }): T 
   return res.data as T;
 };
 
-function toEvent(e: Tables<'events'>, going: number, solo: number, met: number): RemoteData['events'][number] {
+// `me` turns the user's own personal events into authorId 'me', as messages do, so ownership checks match the demo.
+function toEvent(e: Tables<'events'>, me: string, going: number, solo: number, met: number): RemoteData['events'][number] {
   const poster = e.poster as Partial<Event['poster']> | null;
   return {
     id: e.id,
     communityId: e.community_id,
-    authorId: e.personal ? (e.created_by ?? undefined) : undefined,
+    authorId: e.personal && e.created_by ? (e.created_by === me ? 'me' : e.created_by) : undefined,
     title: { uk: e.title_uk, en: e.title_en },
     description: { uk: e.description_uk, en: e.description_en },
     poster: {
@@ -88,7 +89,7 @@ export async function fetchSnapshot(me: string): Promise<Snapshot> {
     const myRow = mine.find((a) => a.event_id === e.id);
     const meSolo = myRow?.going_with === 'solo' && meProfile?.show_solo !== false;
     const met = metRows.find((x) => x.event_id === e.id)?.met ?? 0;
-    return toEvent(e, Math.max(0, (s?.going ?? 0) - (myRow ? 1 : 0)), Math.max(0, (s?.solo ?? 0) - (meSolo ? 1 : 0)), met);
+    return toEvent(e, me, Math.max(0, (s?.going ?? 0) - (myRow ? 1 : 0)), Math.max(0, (s?.solo ?? 0) - (meSolo ? 1 : 0)), met);
   });
 
   const blocked: Synced['blocked'] = {};
