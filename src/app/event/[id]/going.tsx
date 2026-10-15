@@ -76,10 +76,12 @@ function GoingView({ event }: { event: Event }) {
     );
   }
 
+  const goingN = goingCount(state, event);
+  const knownN = acquaintances(state, event.id).length;
   const stats = [
-    { n: goingCount(state, event), label: t('feed.going.statGoing'), accent: false },
+    { n: goingN, label: t('feed.going.statGoing', { count: goingN }), accent: false },
     { n: soloCount(state, event), label: t('feed.going.statSolo'), accent: true },
-    { n: acquaintances(state, event.id).length, label: t('feed.going.statKnown'), accent: false },
+    { n: knownN, label: t('feed.going.statKnown', { count: knownN }), accent: false },
   ];
   const top = wide ? 32 : insets.top;
 
