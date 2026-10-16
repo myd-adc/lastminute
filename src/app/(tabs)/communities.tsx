@@ -1,11 +1,10 @@
-import { router } from 'expo-router';
 import { Search, X } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import { CommunityCard } from '@/components/community/CommunityCard';
 import { CommunityCardsSkeleton } from '@/components/skeletons/ListSkeletons';
-import { Button, Screen, ScreenTitle } from '@/components/ui';
+import { Screen, ScreenTitle } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import type { Community } from '@/data/types';
 import { useT } from '@/i18n';
@@ -104,14 +103,6 @@ export default function CommunitiesScreen() {
           )}
         </>
       )}
-
-      {/* The phone creates from the «+» in the glass tab bar; wide web has no such bar, so it keeps the buttons. */}
-      {wide && (
-        <>
-          <Button label={t('feed.own.create')} onPress={() => router.push('/event/new')} style={[styles.create, styles.createWide]} />
-          <Button label={t('community.list.create')} variant="secondary" onPress={() => router.push('/community/new')} style={[styles.second, styles.createWide]} />
-        </>
-      )}
     </Screen>
   );
 }
@@ -125,7 +116,4 @@ const styles = StyleSheet.create({
   mineList: { gap: 8 },
   list: { gap: 12 },
   more: { alignSelf: 'center', paddingVertical: 4 },
-  create: { marginTop: 12 },
-  second: { marginTop: 10 },
-  createWide: { alignSelf: 'flex-start', paddingHorizontal: 32 },
 });

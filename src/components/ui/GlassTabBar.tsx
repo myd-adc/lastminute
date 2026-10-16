@@ -1,6 +1,6 @@
 import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
-import { CalendarPlus, Compass, MessageSquare, Plus, User, Users, UsersRound, type LucideIcon } from 'lucide-react-native';
+import { Compass, MessageSquare, Plus, User, Users, type LucideIcon } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -8,10 +8,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { t, useT, type TKey } from '@/i18n';
 import { tabBarBottom } from '@/lib/layout';
 import { ms, ND } from '@/lib/motion';
-import { onest, useTheme } from '@/theme';
+import { useTheme } from '@/theme';
 
-import { Sheet } from './Sheet';
-import { Text } from './Text';
+import { CreateSheet } from './CreateSheet';
 
 export type TabKey = 'events' | 'communities' | 'chats' | 'me';
 
@@ -119,44 +118,6 @@ export function GlassTabBar({ active, unread }: { active: TabKey; unread?: boole
   );
 }
 
-// What the «+» offers: an event of your own, or a whole community.
-function CreateSheet({ visible, onClose }: { visible: boolean; onClose: () => void }) {
-  const { c } = useTheme();
-  useT();
-  const go = (href: '/event/new' | '/community/new') => {
-    onClose();
-    router.push(href);
-  };
-  const row = (icon: LucideIcon, label: string, sub: string, onPress: () => void, last?: boolean) => {
-    const Icon = icon;
-    return (
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={label}
-        onPress={onPress}
-        style={({ pressed }) => [styles.row, !last && { borderBottomWidth: 1, borderBottomColor: c.line }, pressed && { opacity: 0.7 }]}
-      >
-        <View style={[styles.rowIcon, { backgroundColor: c.accentSoft }]}>
-          <Icon size={20} color={c.accentInk} strokeWidth={2} />
-        </View>
-        <View style={styles.rowText}>
-          <Text style={[onest('semibold', 16, 20), { color: c.text }]}>{label}</Text>
-          <Text style={[onest('regular', 13, 17.5), { color: c.muted }]}>{sub}</Text>
-        </View>
-      </Pressable>
-    );
-  };
-  return (
-    <Sheet visible={visible} onClose={onClose}>
-      <Text style={[onest('bold', 20, 25), { color: c.text }]}>{t('common.add.title')}</Text>
-      <View style={[styles.rows, { backgroundColor: c.bg }]}>
-        {row(CalendarPlus, t('common.add.event'), t('common.add.eventSub'), () => go('/event/new'))}
-        {row(UsersRound, t('common.add.community'), t('common.add.communitySub'), () => go('/community/new'), true)}
-      </View>
-    </Sheet>
-  );
-}
-
 // 318 pt bar, 1 pt border, 6 pt padding: five 58 pt slots share the 304 pt inside.
 const PAD = 6;
 const TAB = 58;
@@ -182,10 +143,6 @@ const styles = StyleSheet.create({
   tab: { width: TAB, height: 52, borderRadius: 26, alignItems: 'center', justifyContent: 'center' },
   addSlot: { position: 'absolute', left: PAD + 2 * (TAB + GAP), top: (64 - 2 - 52) / 2 },
   add: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
-  rows: { borderRadius: 18, overflow: 'hidden' },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 16, paddingVertical: 14 },
-  rowIcon: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
-  rowText: { flex: 1, gap: 2 },
   blob: { position: 'absolute', left: PAD, top: (64 - 2 - 52) / 2, borderWidth: 1 },
   pressed: { transform: [{ scale: 0.88 }] },
   dot: { position: 'absolute', top: 12, right: 13, width: 8, height: 8, borderRadius: 4 },

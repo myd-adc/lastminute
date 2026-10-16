@@ -1,5 +1,6 @@
 import { router, usePathname } from 'expo-router';
-import type { ReactNode } from 'react';
+import { Plus } from 'lucide-react-native';
+import { useState, type ReactNode } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { getInterest } from '@/data/mock';
@@ -8,6 +9,7 @@ import { useT } from '@/i18n';
 import { useNow, useStore } from '@/store/AppStore';
 import { display, onest, useTheme } from '@/theme';
 
+import { CreateSheet } from './CreateSheet';
 import { tabLabel, tabs, type TabKey } from './GlassTabBar';
 import { Text } from './Text';
 
@@ -30,6 +32,7 @@ export function WebShell({ children }: { children: ReactNode }) {
   const active = activeTabFor(pathname);
   const unread = unreadCount(state, now);
   const myInterests = state.interests.map(getInterest).filter((i) => !!i);
+  const [adding, setAdding] = useState(false);
 
   return (
     <View style={[styles.root, { backgroundColor: c.bg }]}>
@@ -37,6 +40,18 @@ export function WebShell({ children }: { children: ReactNode }) {
         <Pressable onPress={() => router.navigate('/')} style={styles.logo}>
           <View style={[styles.logoDot, { backgroundColor: c.accent }]} />
           <Text style={[display(18, 22), { color: c.text }]}>{t('common.appName')}</Text>
+        </Pressable>
+
+        {/* Wide web has no glass tab bar, so the «+» from the phone lives at the top of the nav instead. */}
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('common.add.label')}
+          aria-expanded={adding}
+          onPress={() => setAdding(true)}
+          style={({ hovered }: { hovered?: boolean }) => [styles.create, { backgroundColor: c.accent }, hovered && styles.createHover]}
+        >
+          <Plus size={18} color={c.onAccent} strokeWidth={2.5} />
+          <Text style={[onest('bold', 15), { color: c.onAccent }]}>{t('common.add.label')}</Text>
         </Pressable>
 
         <View style={styles.navList}>
@@ -87,6 +102,7 @@ export function WebShell({ children }: { children: ReactNode }) {
         )}
       </View>
       <View style={styles.main}>{children}</View>
+      <CreateSheet visible={adding} onClose={() => setAdding(false)} />
     </View>
   );
 }
@@ -94,8 +110,10 @@ export function WebShell({ children }: { children: ReactNode }) {
 const styles = StyleSheet.create({
   root: { flex: 1, flexDirection: 'row' },
   sidebar: { width: SIDEBAR_WIDTH, borderRightWidth: 1, paddingHorizontal: 20, paddingVertical: 28, gap: 20 },
-  logo: { flexDirection: 'row', alignItems: 'center', gap: 10, height: 22, marginLeft: 6, marginBottom: 26 },
+  logo: { flexDirection: 'row', alignItems: 'center', gap: 10, height: 22, marginLeft: 6, marginBottom: 22 },
   logoDot: { width: 10, height: 10, borderRadius: 5 },
+  create: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, height: 44, borderRadius: 22 },
+  createHover: { opacity: 0.9 },
   navList: { gap: 6 },
   nav: { flexDirection: 'row', alignItems: 'center', gap: 12, height: 42, paddingHorizontal: 12, borderRadius: 12 },
   badge: { minWidth: 22, height: 22, borderRadius: 11, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
