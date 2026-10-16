@@ -3,7 +3,7 @@ import { Bookmark, ChevronDown, ChevronUp, Lock, Send, X } from 'lucide-react-na
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 
-import { Avatar, AvatarStack, Button, IconButton, Pill } from '@/components/ui';
+import { Avatar, AvatarStack, Button, IconButton, Pill, SIDEBAR_WIDTH } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import type { Event } from '@/data/types';
 import { genderForms } from '@/lib/genderForms';
@@ -24,13 +24,18 @@ import { RailButton } from './RailButton';
 import { useToast } from './Toast';
 import { useFeed } from './useFeed';
 
-const PANEL = 440;
+// W03 numbers: a 440 pt panel beside a 440×720 card. Below ~1400 pt the window cannot hold both at full size,
+// so the panel gives way first and the card follows — otherwise the action rail, which hangs off the card's right
+// edge, slides out of the middle column and lands on top of the panel.
+const PANEL_MAX = 440;
+const PANEL_MIN = 320;
+const RAIL = 78; // 22 pt gap + 56 pt buttons, mirrored on both sides so the card stays centred
 
 // W03 wide-web feed: one centred poster card with arrows + keyboard, and «Who is going» on the right.
 export function WideFeed() {
   const { c, scheme } = useTheme();
   const { t } = useT();
-  const { height: winH } = useWindowDimensions();
+  const { width: winW, height: winH } = useWindowDimensions();
   const toast = useToast(40);
   const { state, now, feed, previews, handlers, setTab } = useFeed(toast.show);
   const { loading } = useStore();
@@ -39,8 +44,11 @@ export function WideFeed() {
   const event: Event | undefined = feed[i];
 
   // W03: 440×720 card 92 pt from the top of a 900 pt window, hints 24 pt under it.
-  const cardH = Math.max(480, Math.min(720, winH - 180));
-  const cardW = Math.round((cardH * 440) / 720);
+  const panelW = Math.round(Math.min(PANEL_MAX, Math.max(PANEL_MIN, (winW - SIDEBAR_WIDTH) * 0.38)));
+  const column = winW - SIDEBAR_WIDTH - panelW;
+  const byHeight = Math.round((Math.max(480, Math.min(720, winH - 180)) * 440) / 720);
+  const cardW = Math.max(240, Math.min(byHeight, column - RAIL * 2 - 24));
+  const cardH = Math.round((cardW * 720) / 440);
   const k = cardH / 720;
 
   const state$ = useRef({ i, feed });
@@ -99,7 +107,7 @@ export function WideFeed() {
     />
   );
 
-  if (loading) return <WideFeedSkeleton tabs={tabs} cardW={cardW} cardH={cardH} panelW={PANEL} />;
+  if (loading) return <WideFeedSkeleton tabs={tabs} cardW={cardW} cardH={cardH} panelW={panelW} />;
 
   if (!event) {
     return (
@@ -176,7 +184,7 @@ export function WideFeed() {
     const list = attendeesFor(state, e.id).slice(0, 3);
     const next = nextForYou(state, now, e.id).slice(0, 3);
     return (
-      <ScrollView style={[styles.panel, { borderLeftColor: c.line }]} contentContainerStyle={styles.panelContent}>
+      <ScrollView style={[styles.panel, { width: panelW, borderLeftColor: c.line }]} contentContainerStyle={styles.panelContent}>
         <View style={styles.panelHead}>
           <Text style={[styles.panelTitle, { color: c.text }]}>{t('feed.wide.who')}</Text>
           <View style={[styles.count, { backgroundColor: c.surface2 }]}>
@@ -273,7 +281,7 @@ const styles = StyleSheet.create({
   hints: { flexDirection: 'row', justifyContent: 'center', gap: 16, marginTop: 24 },
   hint: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   key: { borderWidth: 1, borderRadius: 6, paddingHorizontal: 7, paddingVertical: 2 },
-  panel: { width: PANEL, flexGrow: 0, borderLeftWidth: 1 },
+  panel: { flexGrow: 0, borderLeftWidth: 1 },
   panelContent: { paddingTop: 32, paddingHorizontal: 28, paddingBottom: 28, gap: 16 },
   panelHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   panelTitle: { flex: 1, fontFamily: fonts.displaySemibold, fontSize: 18, lineHeight: 22 },
