@@ -19,6 +19,12 @@ export const onboarding: Translation<typeof Uk> = {
     partner: 'A venue or an organizer? Become a partner →',
     partnerSubject: 'Partnership with LastMinute',
   },
+  oauth: {
+    google: 'Continue with Google',
+    failed: 'Couldn’t sign in with Google. Try again or use your email.',
+    finishing: 'Signing you in…',
+    toLogin: 'Back to sign-in',
+  },
   login: {
     title: 'Sign in',
     wideSubtitle: 'Welcome back. Your username or email — whichever you remember.',

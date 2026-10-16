@@ -4,6 +4,7 @@ import { View } from 'react-native';
 
 import { resendCode, sessionNotice, signIn } from '@/api/auth';
 import { isLive } from '@/api/client';
+import { OAuthButtons } from '@/components/onboarding/OAuth';
 import { AuthError, LoginInput, MobileAuth, PasswordInput, SwitchLine, WideAuth } from '@/components/onboarding/AuthForms';
 import { Field, FieldLabel, TextLink } from '@/components/onboarding/kit';
 import { Button } from '@/components/ui';
@@ -64,6 +65,7 @@ export default function LoginScreen() {
   const forgot = <TextLink label={t('onboarding.login.forgot')} size={14} onPress={() => router.push('/reset')} />;
   const fields = (size: 'md' | 'lg') => (
     <>
+      <OAuthButtons onError={setError} />
       {size === 'lg' ? (
         <>
           <FieldLabel label={t('onboarding.login.loginLabel')} />

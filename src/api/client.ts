@@ -17,6 +17,8 @@ export const supabase = createClient<Database>(url, key, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,
+    // OAuth comes back with a ?code= that /auth-callback trades for a session; the same flow works in the app.
+    flowType: 'pkce',
   },
 });
 

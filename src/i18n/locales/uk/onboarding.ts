@@ -17,6 +17,12 @@ export const onboarding = {
     partner: 'Ти майданчик чи організатор? Стати партнером →',
     partnerSubject: 'Партнерство з LastMinute',
   },
+  oauth: {
+    google: 'Продовжити з Google',
+    failed: 'Не вдалося увійти через Google. Спробуй ще раз або увійди поштою.',
+    finishing: 'Входимо…',
+    toLogin: 'До входу',
+  },
   login: {
     title: 'Вхід',
     wideSubtitle: 'З поверненням. Нік або пошта — як зручніше.',

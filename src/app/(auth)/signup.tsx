@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { PASSWORD_MIN, signUp } from '@/api/auth';
 import { isLive } from '@/api/client';
 import { AuthError, MobileAuth, PasswordInput, SwitchLine, WideAuth } from '@/components/onboarding/AuthForms';
+import { OAuthButtons } from '@/components/onboarding/OAuth';
 import { EmailInput, isEmail, normalizeEmail } from '@/components/onboarding/EmailInput';
 import { Field, FieldLabel } from '@/components/onboarding/kit';
 import { Button } from '@/components/ui';
@@ -55,6 +56,7 @@ export default function SignupScreen() {
   if (wide)
     return (
       <WideAuth title={t('onboarding.signup.title')} subtitle={t('onboarding.signup.wideSubtitle')}>
+        <OAuthButtons onError={setError} />
         <Field label={t('onboarding.login.emailLabel')}>
           <EmailInput value={email} onChange={setEmail} autoFocus size="md" />
         </Field>
@@ -67,6 +69,7 @@ export default function SignupScreen() {
     );
   return (
     <MobileAuth>
+      <OAuthButtons onError={setError} />
       <FieldLabel label={t('onboarding.login.emailLabel')} />
       <EmailInput value={email} onChange={setEmail} />
       <FieldLabel label={t('onboarding.login.passwordLabel')} />
