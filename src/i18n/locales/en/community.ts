@@ -99,6 +99,8 @@ export const community: Translation<typeof Uk> = {
     category: 'Category:',
     publish: 'Publish event',
     badTime: 'Write the time as 18:00',
+    pastTime: 'That time has passed — pick a later one or another day.',
+    pickCategory: 'Pick a category — it sets the picture on the poster.',
     failed: 'Couldn’t publish. Try again.',
   },
 };

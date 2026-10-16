@@ -32,6 +32,10 @@ type Props = {
 };
 
 // M21 "New event": one form for a community's event and for a personal one.
+// An end past midnight names its day, so "23:30 – 01:30" doesn't read as ending before it starts.
+const endLabel = (startsAt: string, endsAt: string, now: number) =>
+  new Date(startsAt).toDateString() === new Date(endsAt).toDateString() ? time(endsAt) : `${dayLabel(endsAt, now).toLowerCase()} ${time(endsAt)}`;
+
 export function EventForm({ title: head, sub, communityId, defaultGradient, note, blocked }: Props) {
   const { c } = useTheme();
   const { t } = useT();
@@ -47,7 +51,8 @@ export function EventForm({ title: head, sub, communityId, defaultGradient, note
   const [hours, setHours] = useState(2);
   const [whenOpen, setWhenOpen] = useState(false);
   const [where, setWhere] = useState('');
-  const [category, setCategory] = useState<InterestId>('boardgames');
+  // No default: the category draws the poster art, and a silent preset put dice on a cinema night.
+  const [category, setCategory] = useState<InterestId | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -60,11 +65,15 @@ export function EventForm({ title: head, sub, communityId, defaultGradient, note
   // "Kabinet anticafe, 24 Sheptytskykh St": the place is everything before the first comma.
   const [venue, ...rest] = where.split(',');
   const address = rest.join(',').trim();
-  const valid = title.trim().length >= 2 && venue.trim().length >= 2 && !!startsAt && Date.parse(startsAt) > now;
+  const past = !!startsAt && Date.parse(startsAt) <= now;
+  const valid = title.trim().length >= 2 && venue.trim().length >= 2 && !!startsAt && !past && !!category;
+  // Say why "Publish" is dim, next to the field that causes it, instead of leaving the person guessing.
+  const timeHint = !!start.trim() && !startsAt ? t('community.event.badTime') : past ? t('community.event.pastTime') : null;
+  const needsCategory = !category && title.trim().length >= 2 && venue.trim().length >= 2 && !!startsAt && !past;
 
   const publish = async () => {
     if (!startsAt || !endsAt) return setError(t('community.event.badTime'));
-    if (!valid) return;
+    if (!valid || !category) return;
     setBusy(true);
     const interest = pickableInterests().find((i) => i.id === category);
     const id = await addEvent({
@@ -152,12 +161,13 @@ export function EventForm({ title: head, sub, communityId, defaultGradient, note
         >
           <InputBox focused={whenOpen}>
             <Text style={[onest('medium', 16, 20), { color: startsAt ? c.text : c.muted, flex: 1 }]} numberOfLines={1}>
-              {startsAt && endsAt ? `${dayLabel(startsAt, now)} · ${time(startsAt)} – ${time(endsAt)}` : t('community.event.badTime')}
+              {startsAt && endsAt ? `${dayLabel(startsAt, now)} · ${time(startsAt)} – ${endLabel(startsAt, endsAt, now)}` : t('community.event.badTime')}
             </Text>
             {whenOpen ? <ChevronUp size={20} color={c.muted} strokeWidth={2} /> : <ChevronDown size={20} color={c.muted} strokeWidth={2} />}
           </InputBox>
         </Pressable>
       </Field>
+      {timeHint && <Text style={[type.footnote, { color: c.danger }]}>{timeHint}</Text>}
       {whenOpen && (
         <View style={{ gap: 12 }}>
           <View style={styles.chips}>
@@ -207,7 +217,8 @@ export function EventForm({ title: head, sub, communityId, defaultGradient, note
         ))}
       </View>
 
-      {(error || (!!start.trim() && !startsAt)) && <Text style={[type.footnote, { color: c.danger }]}>{error ?? t('community.event.badTime')}</Text>}
+      {needsCategory && <Text style={[type.footnote, { color: c.muted }]}>{t('community.event.pickCategory')}</Text>}
+      {error && <Text style={[type.footnote, { color: c.danger }]}>{error}</Text>}
     </Screen>
   );
 }
