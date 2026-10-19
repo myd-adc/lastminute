@@ -16,7 +16,7 @@
     "android": {
       "package": "com.mydadc.lastminute",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#0B0B10",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -42,7 +42,7 @@
         "expo-splash-screen",
         {
           "image": "./assets/splash-logo-light.png",
-          "imageWidth": 220,
+          "imageWidth": 235,
           "backgroundColor": "#F6F5F1",
           "dark": {
             "image": "./assets/splash-logo-dark.png",
