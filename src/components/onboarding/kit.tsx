@@ -2,6 +2,7 @@ import { ChevronDown, Globe, Moon, Sun } from 'lucide-react-native';
 import { forwardRef, useState, type ReactNode } from 'react';
 import { Pressable, StyleSheet, TextInput, View, type StyleProp, type TextInputProps, type ViewStyle } from 'react-native';
 
+import { BrandMark } from '@/components/ui/BrandMark';
 import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
 import { useStore } from '@/store/AppStore';
@@ -15,12 +16,12 @@ export function useAccentInk() {
   return accentInk(c, scheme);
 }
 
-// «• lastminute» wordmark: 10 pt accent dot + Unbounded Bold 18, tracking −3 %.
+// Wordmark: the accent brand mark + Unbounded Bold 18, tracking −3 %.
 export function Logo({ size = 18 }: { size?: number }) {
   const { c } = useTheme();
   return (
     <View style={styles.logo}>
-      <View style={[styles.logoDot, { backgroundColor: c.accent }]} />
+      <BrandMark height={Math.round(size * 0.62)} color={c.accent} />
       <Text style={[display(size, Math.round(size * 1.24)), { letterSpacing: -size * 0.03, color: c.text }]}>lastminute</Text>
     </View>
   );
@@ -173,7 +174,6 @@ export function TextLink({ label, onPress, size = 13 }: { label: string; onPress
 
 const styles = StyleSheet.create({
   logo: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  logoDot: { width: 10, height: 10, borderRadius: 5 },
   lang: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 32, paddingHorizontal: 10, borderRadius: 16, borderWidth: 1 },
   themeBtn: { width: 32, height: 32, borderRadius: 16, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   themePlain: { width: 28, height: 28, alignItems: 'center', justifyContent: 'center' },

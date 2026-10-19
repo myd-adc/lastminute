@@ -9,6 +9,7 @@ import { useT } from '@/i18n';
 import { useNow, useStore } from '@/store/AppStore';
 import { display, onest, useTheme } from '@/theme';
 
+import { BrandMark } from './BrandMark';
 import { CreateSheet } from './CreateSheet';
 import { tabLabel, tabs, type TabKey } from './GlassTabBar';
 import { Text } from './Text';
@@ -38,7 +39,7 @@ export function WebShell({ children }: { children: ReactNode }) {
     <View style={[styles.root, { backgroundColor: c.bg }]}>
       <View style={[styles.sidebar, { borderRightColor: c.line, backgroundColor: c.bg }]}>
         <Pressable onPress={() => router.navigate('/')} style={styles.logo}>
-          <View style={[styles.logoDot, { backgroundColor: c.accent }]} />
+          <BrandMark height={11} color={c.accent} />
           <Text style={[display(18, 22), { color: c.text }]}>{t('common.appName')}</Text>
         </Pressable>
 
@@ -111,7 +112,6 @@ const styles = StyleSheet.create({
   root: { flex: 1, flexDirection: 'row' },
   sidebar: { width: SIDEBAR_WIDTH, borderRightWidth: 1, paddingHorizontal: 20, paddingVertical: 28, gap: 20 },
   logo: { flexDirection: 'row', alignItems: 'center', gap: 10, height: 22, marginLeft: 6, marginBottom: 22 },
-  logoDot: { width: 10, height: 10, borderRadius: 5 },
   create: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, height: 44, borderRadius: 22 },
   createHover: { opacity: 0.9 },
   navList: { gap: 6 },
