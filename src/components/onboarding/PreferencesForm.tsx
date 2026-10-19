@@ -9,7 +9,8 @@ import { useT } from '@/i18n';
 import { useIsWide } from '@/lib/layout';
 import { onest, useTheme } from '@/theme';
 
-export const MIN_INTERESTS = 3;
+// One is enough: not everyone has several hobbies, and three blocked people at the last onboarding step.
+export const MIN_INTERESTS = 1;
 
 // "Indie" has the same 🎸 as "Concerts" and is a genre rather than a format, so the picker leaves it out (as in M04).
 // A function, not a constant: `interests` is a live binding that switches with the language.

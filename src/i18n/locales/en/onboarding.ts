@@ -115,11 +115,11 @@ export const onboarding: Translation<typeof Uk> = {
   },
   interests: {
     title: 'What gets you out of the house?',
-    subtitle: 'Pick at least 3 so the feed is about you, not the whole city.',
+    subtitle: 'Pick what you’re into — one is enough. Then the feed is about you, not the whole city.',
     start: 'Let’s go 🚀',
     vibe: 'What’s your vibe?',
     goesWith: 'You usually go…',
-    tooFew: 'Pick at least {min} — {count} so far.',
+    tooFew: 'Pick at least one — then the feed fits you.',
     picked: {
       one: '{count} picked. The feed will adapt to it.',
       other: '{count} picked. The feed will adapt to them.',
