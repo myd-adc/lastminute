@@ -8,7 +8,7 @@ export const community: Translation<typeof Uk> = {
     howTitle: 'How it works',
     howWhat: 'A community is a club, venue or university that posts its own events.',
     howJoin: 'Join one and its events show up in the feed under “Communities”.',
-    howClosed: 'Closed ones are for insiders: UCU students, for example, join with an @ucu.edu.ua email.',
+    howClosed: 'Closed ones are for insiders: you join by confirming your university or work email. Nobody else sees it.',
     join: 'Join',
     joinWithEmail: 'With email',
     joined: 'You’re in',

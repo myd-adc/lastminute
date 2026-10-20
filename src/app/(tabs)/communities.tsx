@@ -1,10 +1,10 @@
-import { Search, X } from 'lucide-react-native';
+import { CircleHelp, Search, X } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import { CommunityCard } from '@/components/community/CommunityCard';
 import { CommunityCardsSkeleton } from '@/components/skeletons/ListSkeletons';
-import { Chip, Screen, ScreenTitle } from '@/components/ui';
+import { Chip, Screen, ScreenTitle, Sheet } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import type { Community } from '@/data/types';
 import { useT } from '@/i18n';
@@ -28,6 +28,7 @@ export default function CommunitiesScreen() {
   const wide = useIsWide();
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<'all' | 'open' | 'closed'>('all');
+  const [help, setHelp] = useState(false);
   const [expanded, setExpanded] = useState(false);
 
   const mine = useMemo(() => myCommunities(state).filter((cm) => matches(cm, query)), [state, query]);
@@ -43,7 +44,15 @@ export default function CommunitiesScreen() {
 
   return (
     <Screen withTabBar contentStyle={[styles.content, wide && styles.wide]}>
-      <ScreenTitle title={t('community.list.title')} />
+      <ScreenTitle
+        title={t('community.list.title')}
+        right={
+          // People kept asking what a community is for; the answer sits one tap away instead of filling the list.
+          <Pressable accessibilityRole="button" accessibilityLabel={t('community.list.howTitle')} hitSlop={12} onPress={() => setHelp(true)}>
+            <CircleHelp size={24} color={c.text} strokeWidth={2} />
+          </Pressable>
+        }
+      />
       <Text style={[onest('regular', 15, 21), { color: c.muted, marginTop: -6 }]}>{t('community.list.sub')}</Text>
       {/* With dozens of communities, finding one is the main job: the search is always there, plus a filter by access. */}
       <View style={[styles.search, { backgroundColor: c.surface }]}>
@@ -67,21 +76,6 @@ export default function CommunitiesScreen() {
           <Chip key={f} label={t(`community.list.filter.${f}`)} selected={filter === f} onPress={() => setFilter(f)} />
         ))}
       </View>
-      {/* Newcomers kept asking what a community is for; once they are in one, the list explains itself. */}
-      {!loading && !query && myCommunities(state).length === 0 && (
-        <View style={[styles.how, { backgroundColor: c.surface, borderColor: c.line }]}>
-          <Text style={[onest('bold', 15, 19), { color: c.text }]}>{t('community.list.howTitle')}</Text>
-          {(['howWhat', 'howJoin', 'howClosed'] as const).map((k, i) => (
-            <View key={k} style={styles.howRow}>
-              <View style={[styles.howNum, { backgroundColor: c.accent }]}>
-                <Text style={[onest('bold', 12, 15), { color: c.onAccent }]}>{i + 1}</Text>
-              </View>
-              <Text style={[onest('regular', 14, 19), { color: c.muted, flex: 1 }]}>{t(`community.list.${k}`)}</Text>
-            </View>
-          ))}
-        </View>
-      )}
-
       {loading ? (
         <View style={{ marginTop: 8 }}>
           <CommunityCardsSkeleton />
@@ -116,6 +110,17 @@ export default function CommunitiesScreen() {
           )}
         </>
       )}
+      <Sheet visible={help} onClose={() => setHelp(false)}>
+        <Text style={[onest('bold', 18, 23), { color: c.text }]}>{t('community.list.howTitle')}</Text>
+        {(['howWhat', 'howJoin', 'howClosed'] as const).map((k, i) => (
+          <View key={k} style={styles.howRow}>
+            <View style={[styles.howNum, { backgroundColor: c.accent }]}>
+              <Text style={[onest('bold', 12, 15), { color: c.onAccent }]}>{i + 1}</Text>
+            </View>
+            <Text style={[onest('regular', 15, 21), { color: c.muted, flex: 1 }]}>{t(`community.list.${k}`)}</Text>
+          </View>
+        ))}
+      </Sheet>
     </Screen>
   );
 }
@@ -130,7 +135,6 @@ const styles = StyleSheet.create({
   list: { gap: 12 },
   more: { alignSelf: 'center', paddingVertical: 4 },
   filters: { flexDirection: 'row', gap: 8, marginTop: -4 },
-  how: { borderRadius: 18, borderWidth: 1, padding: 16, gap: 10 },
   howRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
   howNum: { width: 22, height: 22, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
 });
