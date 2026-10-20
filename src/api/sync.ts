@@ -49,6 +49,8 @@ function toEvent(e: Tables<'events'>, me: string, going: number, solo: number, m
     venue: e.venue,
     address: e.address,
     walk: e.walk ?? undefined,
+    image: e.image_url ?? undefined,
+    ticketUrl: e.ticket_url ?? undefined,
     price: e.price,
     priceNote: e.price_note ?? undefined,
     category: e.category as InterestId,

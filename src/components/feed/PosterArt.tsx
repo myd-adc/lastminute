@@ -3,6 +3,7 @@ import { memo, useId } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Svg, { Defs, LinearGradient as SvgLinearGradient, Rect, Stop } from 'react-native-svg';
 
+import { RemoteImage } from '@/components/ui/RemoteImage';
 import { Text } from '@/components/ui/Text';
 import type { Event } from '@/data/types';
 import { fonts, gradients, useTheme } from '@/theme';
@@ -78,7 +79,9 @@ export const PosterArt = memo(function PosterArt({ event, width, height, variant
   return (
     <View style={[styles.clip, { width, height }]}>
       <PosterFill colors={gradients[event.poster.gradient]} width={width} height={height} />
-      {spec.ring && (
+      {/* A real poster photo replaces the generated words and emoji; the gradient shows while it loads. */}
+      {event.image ? <RemoteImage uri={event.image} style={StyleSheet.absoluteFill} /> : null}
+      {!event.image && spec.ring && (
         <View
           style={[
             styles.ring,
@@ -86,28 +89,30 @@ export const PosterArt = memo(function PosterArt({ event, width, height, variant
           ]}
         />
       )}
-      <View style={[styles.words, { left: spec.words.x * k, top: spec.words.y * k + shift }]}>
-        {event.poster.lines.map((line, i) => (
-          // No numberOfLines: on web it adds maxWidth: 100% of the 1 pt anchor and clips the word.
-          <Text
-            key={i}
-            style={[
-              styles.word,
-              {
-                color: c.bg,
-                top: i * LINE * size - ((BOX - LINE) / 2) * size,
-                fontSize: size,
-                lineHeight: BOX * size,
-                letterSpacing: -size * 0.06,
-                width: width * 2.4,
-              },
-            ]}
-          >
-            {line}
-          </Text>
-        ))}
-      </View>
-      {spec.emoji && (
+      {!event.image && (
+        <View style={[styles.words, { left: spec.words.x * k, top: spec.words.y * k + shift }]}>
+          {event.poster.lines.map((line, i) => (
+            // No numberOfLines: on web it adds maxWidth: 100% of the 1 pt anchor and clips the word.
+            <Text
+              key={i}
+              style={[
+                styles.word,
+                {
+                  color: c.bg,
+                  top: i * LINE * size - ((BOX - LINE) / 2) * size,
+                  fontSize: size,
+                  lineHeight: BOX * size,
+                  letterSpacing: -size * 0.06,
+                  width: width * 2.4,
+                },
+              ]}
+            >
+              {line}
+            </Text>
+          ))}
+        </View>
+      )}
+      {!event.image && spec.emoji && (
         <Text style={[styles.emoji, { left: spec.emoji.x * k, top: spec.emoji.y * k + shift, fontSize: spec.emoji.size * k }]}>{event.poster.emoji}</Text>
       )}
       {spec.topScrim && (

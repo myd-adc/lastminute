@@ -128,7 +128,7 @@ function Body({ event, d, wide }: { event: Event; d: ReturnType<typeof useDetail
         icon={Ticket}
         title={priceLabel(event)}
         sub={event.priceNote ?? (event.price == null ? t('feed.details.freeNote') : t('feed.details.payNote'))}
-        onPress={() => d.openUrl(organiserUrl(event))}
+        onPress={() => d.openUrl(event.ticketUrl ?? organiserUrl(event))}
         right={wide ? <Text style={link}>{t('feed.details.site')}</Text> : <ExternalLink size={18} color={c.muted} strokeWidth={2} />}
       />
       <InfoRow

@@ -184,6 +184,7 @@ export type Database = {
           description_uk: string;
           ends_at: string;
           id: string;
+          image_url: string | null;
           partner: boolean;
           personal: boolean;
           poster: NonNullable<Json>;
@@ -208,6 +209,7 @@ export type Database = {
           description_uk?: string;
           ends_at: string;
           id?: string;
+          image_url?: string | null;
           partner?: boolean;
           personal?: boolean;
           poster?: NonNullable<Json>;
@@ -231,6 +233,7 @@ export type Database = {
           description_uk?: string;
           ends_at?: string;
           id?: string;
+          image_url?: string | null;
           partner?: boolean;
           personal?: boolean;
           poster?: NonNullable<Json>;
