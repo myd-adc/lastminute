@@ -17,6 +17,9 @@ type Props = {
 // M06/M10/W03 header tabs: "Communities" · "For you" (+ "Saved" on wide, while it is
 // picked), accent underline under the active one. The bookmark on the right opens and closes the saved stack.
 // Phone row is 32 pt high (Figma y = 58…90, i.e. 8 pt under the status bar).
+// Left-to-right order of the tabs, for the slide between them.
+export const FEED_TAB_ORDER = ['communities', 'forYou', 'saved'] as const;
+
 export function FeedTabs({ value, onChange, onPoster, wide, savedCount }: Props) {
   const { c, scheme } = useTheme();
   const { t } = useT();

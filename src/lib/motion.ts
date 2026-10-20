@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { AccessibilityInfo, Animated, Easing, PanResponder, Platform } from 'react-native';
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 
@@ -112,4 +112,24 @@ export function useEscape(onEscape: () => void, enabled = true) {
       if (i >= 0) escapeStack.splice(i, 1);
     };
   }, [enabled]);
+}
+
+// Content that slides in from the side it comes from when `key` changes (feed tabs: left of "For you" comes in from
+// the left). `order` lists the keys left to right. Set before paint, so the new content never flashes in place.
+export function useSlideIn(key: string, order: readonly string[], distance = 56) {
+  const [x] = useState(() => new Animated.Value(0));
+  const [opacity] = useState(() => new Animated.Value(1));
+  const prev = useRef(key);
+  useLayoutEffect(() => {
+    if (prev.current === key) return;
+    const dir = Math.sign(order.indexOf(key) - order.indexOf(prev.current)) || 1;
+    prev.current = key;
+    x.setValue(dir * distance);
+    opacity.setValue(0);
+    Animated.parallel([
+      Animated.timing(x, { toValue: 0, duration: ms(280), easing: easeOut, useNativeDriver: ND }),
+      Animated.timing(opacity, { toValue: 1, duration: ms(220), easing: easeOut, useNativeDriver: ND }),
+    ]).start();
+  }, [key, order, distance, x, opacity]);
+  return { opacity, transform: [{ translateX: x }] };
 }

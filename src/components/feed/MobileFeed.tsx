@@ -1,11 +1,12 @@
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { FlatList, Platform, StyleSheet, View, type LayoutChangeEvent, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
+import { Animated, FlatList, Platform, StyleSheet, View, type LayoutChangeEvent, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { prefetchImages } from '@/components/ui';
 import type { Event } from '@/data/types';
 import { tabBarClearance } from '@/lib/layout';
+import { useSlideIn } from '@/lib/motion';
 import { goingCount, metCount, soloCount } from '@/lib/selectors';
 import { whenLabel } from '@/lib/time';
 import { useTheme } from '@/theme';
@@ -14,7 +15,7 @@ import { useStore } from '@/store/AppStore';
 import { EndOfFeed } from './EndOfFeed';
 import { FeedPage } from './FeedPage';
 import { MobileFeedSkeleton } from './FeedSkeleton';
-import { FeedTabs } from './FeedTabs';
+import { FEED_TAB_ORDER, FeedTabs } from './FeedTabs';
 import { useToast } from './Toast';
 import { useFeed } from './useFeed';
 
@@ -124,34 +125,40 @@ export function MobileFeed() {
     />
   );
 
+  const slide = useSlideIn(state.feedTab, FEED_TAB_ORDER);
+
   if (loading) return <MobileFeedSkeleton header={header(false)} />;
 
   return (
     <View style={[styles.root, { backgroundColor: c.bg }]} onLayout={onLayout}>
       {feed.length === 0 ? (
-        <EndOfFeed header={header(false)} contentStyle={{ paddingTop: insets.top + 8, paddingBottom: clearance }} />
+        <Animated.View style={[styles.root, slide]}>
+          <EndOfFeed header={header(false)} contentStyle={{ paddingTop: insets.top + 8, paddingBottom: clearance }} />
+        </Animated.View>
       ) : (
         size.h > 0 && (
           <>
-            <FlatList
-              ref={listRef}
-              data={feed}
-              keyExtractor={(e) => e.id}
-              renderItem={renderItem}
-              pagingEnabled
-              showsVerticalScrollIndicator={false}
-              decelerationRate="fast"
-              snapToInterval={size.h}
-              getItemLayout={(_, i) => ({ length: size.h, offset: size.h * i, index: i })}
-              onScroll={onScroll}
-              scrollEventThrottle={32}
-              // A quick flick crosses two or three pages before the list renders another batch; a wider window keeps
-              // the pages around the current one mounted so a fast thumb never lands on an empty, black page.
-              windowSize={7}
-              initialNumToRender={3}
-              maxToRenderPerBatch={3}
-              updateCellsBatchingPeriod={30}
-            />
+            <Animated.View style={[styles.root, slide]}>
+              <FlatList
+                ref={listRef}
+                data={feed}
+                keyExtractor={(e) => e.id}
+                renderItem={renderItem}
+                pagingEnabled
+                showsVerticalScrollIndicator={false}
+                decelerationRate="fast"
+                snapToInterval={size.h}
+                getItemLayout={(_, i) => ({ length: size.h, offset: size.h * i, index: i })}
+                onScroll={onScroll}
+                scrollEventThrottle={32}
+                // A quick flick crosses two or three pages before the list renders another batch; a wider window keeps
+                // the pages around the current one mounted so a fast thumb never lands on an empty, black page.
+                windowSize={7}
+                initialNumToRender={3}
+                maxToRenderPerBatch={3}
+                updateCellsBatchingPeriod={30}
+              />
+            </Animated.View>
             <View style={[styles.header, { top: insets.top + 8 }]}>{header(true)}</View>
           </>
         )
