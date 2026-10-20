@@ -67,25 +67,28 @@ export const FeedPage = memo(function FeedPage(p: Props) {
                 {e.title}
               </Text>
             </Pressable>
-            <Pressable onPress={open} style={s.who}>
-              {p.preview.people.length > 0 && <AvatarStack people={p.preview.people} size={36} extra={extra} />}
-              {/* "0 going" reads as a dead event; an empty room is an invitation to be the one others find. */}
-              {p.goingN === 0 ? (
-                <View style={styles.whoText}>
-                  <Text style={[onest('bold', 15, 19), s.text]}>{t('feed.card.firstTitle')}</Text>
-                  <Text style={[onest('medium', 13, 17), s.accent]}>{t('feed.card.firstSub')}</Text>
-                </View>
-              ) : (
-                <View style={styles.whoText}>
-                  <Text style={[onest('bold', 15, 19), s.text]}>{t('feed.card.going', { count: p.goingN })}</Text>
-                  {p.metN > 0 ? (
-                    <Text style={[onest('medium', 13, 17), s.accent]}>{t('feed.card.met', { count: p.metN })}</Text>
-                  ) : (
-                    p.soloN > 0 && <Text style={[onest('medium', 13, 17), s.accent]}>{t('feed.card.soloHint', { count: p.soloN })}</Text>
-                  )}
-                </View>
-              )}
-            </Pressable>
+            {/* With a poster photo the card gives the room to the photo; who is going is one tap away in the details. */}
+            {!e.image && (
+              <Pressable onPress={open} style={s.who}>
+                {p.preview.people.length > 0 && <AvatarStack people={p.preview.people} size={36} extra={extra} />}
+                {/* "0 going" reads as a dead event; an empty room is an invitation to be the one others find. */}
+                {p.goingN === 0 ? (
+                  <View style={styles.whoText}>
+                    <Text style={[onest('bold', 15, 19), s.text]}>{t('feed.card.firstTitle')}</Text>
+                    <Text style={[onest('medium', 13, 17), s.accent]}>{t('feed.card.firstSub')}</Text>
+                  </View>
+                ) : (
+                  <View style={styles.whoText}>
+                    <Text style={[onest('bold', 15, 19), s.text]}>{t('feed.card.going', { count: p.goingN })}</Text>
+                    {p.metN > 0 ? (
+                      <Text style={[onest('medium', 13, 17), s.accent]}>{t('feed.card.met', { count: p.metN })}</Text>
+                    ) : (
+                      p.soloN > 0 && <Text style={[onest('medium', 13, 17), s.accent]}>{t('feed.card.soloHint', { count: p.soloN })}</Text>
+                    )}
+                  </View>
+                )}
+              </Pressable>
+            )}
           </View>
           <View style={styles.rail}>
             <RailButton tone="poster" size={44} icon={Bookmark} active={p.saved} label={p.saved ? t('common.saved') : t('common.save')} onPress={() => p.onSave(e.id)} />

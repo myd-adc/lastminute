@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { memo, useId } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { memo, useEffect, useId, useState } from 'react';
+import { Image, StyleSheet, View } from 'react-native';
 import Svg, { Defs, LinearGradient as SvgLinearGradient, Rect, Stop } from 'react-native-svg';
 
 import { RemoteImage } from '@/components/ui/RemoteImage';
@@ -24,10 +24,10 @@ type Spec = {
 };
 
 const SPECS = {
-  feed: { w: 390, words: { x: 17.97, y: 112, size: 118 }, ring: { x: 120, y: -60, d: 420 }, emoji: { x: 260, y: 330, size: 90 }, scrim: { h: 520, mid: 0.82 }, topScrim: 140, photo: { top: 100, bottomFree: 0.44 } }, // M06
+  feed: { w: 390, words: { x: 17.97, y: 112, size: 118 }, ring: { x: 120, y: -60, d: 420 }, emoji: { x: 260, y: 330, size: 90 }, scrim: { h: 520, mid: 0.82 }, topScrim: 140, photo: { top: 92, bottomFree: 0.36 } }, // M06
   backdrop: { w: 390, words: { x: 17.97, y: 70, size: 118 } }, // M07 behind the sheet
   card: { w: 440, words: { x: 21.93, y: 70, size: 128 }, ring: { x: 150, y: -80, d: 420 }, emoji: { x: 310, y: 300, size: 90 }, scrim: { h: 460, mid: 0.85 }, photo: { top: 16, bottomFree: 0.4 } }, // W03
-  dialog: { w: 380, words: { x: 19.96, y: 120, size: 110 }, ring: { x: 120, y: -80, d: 360 }, emoji: { x: 250, y: 420, size: 80 }, photo: { top: 0, bottomFree: 0 } }, // W04
+  dialog: { w: 380, words: { x: 19.96, y: 120, size: 110 }, ring: { x: 120, y: -80, d: 360 }, emoji: { x: 250, y: 420, size: 80 }, photo: { top: 16, bottomFree: 0.1 } }, // W04
 } satisfies Record<string, Spec>;
 
 export type PosterVariant = keyof typeof SPECS;
@@ -82,20 +82,17 @@ export const PosterArt = memo(function PosterArt({ event, width, height, variant
   return (
     <View style={[styles.clip, { width, height }]}>
       <PosterFill colors={gradients[event.poster.gradient]} width={width} height={height} />
-      {/* A real poster photo replaces the generated words and emoji; the gradient shows while it loads. */}
-      {/* A poster photo is shown whole above the card's text, over a blurred, dimmed copy of itself that fills the
-          frame; the backdrop variant behind a sheet just takes the blurred copy. */}
+      {/* A poster photo replaces the generated words: shown whole, with rounded corners, above the card's text, over a
+          blurred and dimmed copy of itself; the backdrop variant behind a sheet just takes the blurred copy. */}
       {event.image ? (
         <>
           <RemoteImage uri={event.image} style={StyleSheet.absoluteFill} placeholder={false} blurRadius={spec.photo ? 28 : 18} />
-          <View style={[StyleSheet.absoluteFill, { backgroundColor: `rgba(${scrim},${spec.photo ? 0.45 : 0.3})` }]} />
+          <View style={[StyleSheet.absoluteFill, { backgroundColor: `rgba(${scrim},${spec.photo ? 0.5 : 0.3})` }]} />
           {spec.photo && (
-            <RemoteImage
+            <PosterPhoto
               uri={event.image}
-              resizeMode="contain"
-              loader
-              placeholder={false}
-              style={{ position: 'absolute', left: 12 * k, right: 12 * k, top: spec.photo.top * k + shift, height: height * (1 - spec.photo.bottomFree) - spec.photo.top * k - shift }}
+              box={{ x: 16 * k, y: spec.photo.top * k + shift, w: width - 32 * k, h: height * (1 - spec.photo.bottomFree) - spec.photo.top * k - shift }}
+              radius={16 * k}
             />
           )}
         </>
@@ -160,3 +157,38 @@ const styles = StyleSheet.create({
   top: { position: 'absolute', left: 0, right: 0, top: 0 },
   bottom: { position: 'absolute', left: 0, right: 0, bottom: 0 },
 });
+
+// Natural size of each poster photo, so it can be fitted into its box and rounded at its own edges.
+const photoSizes = new Map<string, { w: number; h: number }>();
+
+function PosterPhoto({ uri, box, radius }: { uri: string; box: { x: number; y: number; w: number; h: number }; radius: number }) {
+  const [size, setSize] = useState(() => photoSizes.get(uri) ?? null);
+  useEffect(() => {
+    if (photoSizes.has(uri)) return;
+    let alive = true;
+    Image.getSize(
+      uri,
+      (w, h) => {
+        photoSizes.set(uri, { w, h });
+        if (alive) setSize({ w, h });
+      },
+      () => {},
+    );
+    return () => {
+      alive = false;
+    };
+  }, [uri]);
+  // Until the size is known, a spinner fills the whole box.
+  const scale = size ? Math.min(box.w / size.w, box.h / size.h) : 1;
+  const w = size ? size.w * scale : box.w;
+  const h = size ? size.h * scale : box.h;
+  return (
+    <RemoteImage
+      key={size ? 'fitted' : 'box'}
+      uri={uri}
+      loader
+      placeholder={false}
+      style={{ position: 'absolute', left: box.x + (box.w - w) / 2, top: box.y, width: w, height: h, borderRadius: radius }}
+    />
+  );
+}
