@@ -46,9 +46,9 @@ export function MobileFeed() {
   };
 
   // Posters ahead of the current page start downloading now, so the next swipe lands on a loaded photo.
-  const prefetchFrom = (i: number) => prefetchImages(feedRef.current.slice(i, i + 4).map((e) => e.image));
+  const prefetchFrom = (i: number) => prefetchImages(feedRef.current.slice(i, i + 2).map((e) => e.image));
   useEffect(() => {
-    prefetchImages(feed.slice(0, 4).map((e) => e.image));
+    prefetchImages(feed.slice(0, 3).map((e) => e.image));
   }, [feed]);
 
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {

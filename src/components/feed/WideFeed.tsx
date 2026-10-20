@@ -44,7 +44,7 @@ export function WideFeed() {
   const event: Event | undefined = feed[i];
   // The next posters download while this one is on screen.
   useEffect(() => {
-    prefetchImages(feed.slice(i, i + 4).map((e) => e.image));
+    prefetchImages(feed.slice(i, i + 3).map((e) => e.image));
   }, [feed, i]);
 
   // W03: 440×720 card 92 pt from the top of a 900 pt window, hints 24 pt under it.

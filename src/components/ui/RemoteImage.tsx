@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ActivityIndicator, Animated, Easing, Image, StyleSheet, View, type ImageResizeMode, type StyleProp, type ViewStyle } from 'react-native';
+import { ActivityIndicator, Animated, Easing, Image, Platform, StyleSheet, View, type ImageResizeMode, type StyleProp, type ViewStyle } from 'react-native';
 
 import { easeOut, ms, ND } from '@/lib/motion';
 import { useTheme } from '@/theme';
@@ -8,12 +8,22 @@ import { useTheme } from '@/theme';
 const arrived = new Set<string>();
 
 // Starts downloads before the photos are on screen (the next posters in the feed), so a swipe finds them ready.
+// Web: a detached <img> only warms the HTTP cache. react-native-web's Image.prefetch keeps every decoded bitmap in
+// a request table it never clears, which grew until iOS Safari killed the tab after a few swipes.
+const requested = new Set<string>();
 export function prefetchImages(uris: (string | undefined)[]) {
   for (const uri of uris) {
-    if (!uri || arrived.has(uri)) continue;
+    if (!uri || arrived.has(uri) || requested.has(uri)) continue;
+    requested.add(uri);
+    if (Platform.OS === 'web') {
+      const img = new window.Image();
+      img.decoding = 'async';
+      img.src = uri;
+      continue;
+    }
     Image.prefetch(uri)
       .then((ok) => ok && arrived.add(uri))
-      .catch(() => {});
+      .catch(() => requested.delete(uri));
   }
 }
 
