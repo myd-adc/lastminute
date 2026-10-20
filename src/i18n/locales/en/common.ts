@@ -2,6 +2,12 @@ import type { Translation } from '../types';
 import type { common as Uk } from '../uk/common';
 
 export const common: Translation<typeof Uk> = {
+  crop: {
+    title: 'How your photo will look',
+    hint: 'Drag the photo to choose what goes in the circle, and zoom with the buttons.',
+    zoomIn: 'Zoom in',
+    zoomOut: 'Zoom out',
+  },
   add: {
     label: 'Create',
     title: 'What are we making?',

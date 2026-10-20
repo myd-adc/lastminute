@@ -1,5 +1,11 @@
 // Shared strings: actions, time words, counters. Mirror every key in ../en/common.ts.
 export const common = {
+  crop: {
+    title: 'Як виглядатиме фото',
+    hint: 'Потягни фото, щоб обрати, що буде в кружечку, і наблиз кнопками.',
+    zoomIn: 'Наблизити',
+    zoomOut: 'Віддалити',
+  },
   add: {
     label: 'Створити',
     title: 'Що створюємо?',
