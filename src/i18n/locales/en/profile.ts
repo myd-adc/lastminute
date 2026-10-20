@@ -22,6 +22,7 @@ export const profile: Translation<typeof Uk> = {
     label: 'My events',
     empty: 'You’re not going anywhere yet. Pick an event in the feed and tap “I’m going”.',
     toFeed: 'To the feed',
+    leave: 'Not going',
   },
   safety: {
     label: 'Safety',

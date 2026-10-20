@@ -3,8 +3,10 @@ import { useState, type ReactNode } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { DateTile } from '@/components/feed/DateTile';
+import { LeaveEventSheet } from '@/components/feed/LeaveEvent';
 import { Avatar, Chip, Toggle } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
+import type { Event } from '@/data/types';
 import { useT } from '@/i18n';
 import { genderForms } from '@/lib/genderForms';
 import { useIsWide } from '@/lib/layout';
@@ -37,6 +39,9 @@ export function MyEventsSection() {
   const { state } = useStore();
   const now = useNow();
   const mine = myUpcoming(state, now);
+  // The event stays set while the sheet animates out; `open` drives the animation.
+  const [leaving, setLeaving] = useState<Event | null>(null);
+  const [open, setOpen] = useState(false);
   return (
     <Section label={t('profile.myEvents.label')}>
       <Group>
@@ -49,25 +54,41 @@ export function MyEventsSection() {
           </View>
         ) : (
           mine.map((e, i) => (
-            <Pressable
-              key={e.id}
-              accessibilityRole="button"
-              onPress={() => router.push({ pathname: '/event/[id]/room', params: { id: e.id } })}
-              style={({ pressed }) => [styles.myRow, i < mine.length - 1 && { borderBottomWidth: 1, borderBottomColor: c.line }, pressed && { backgroundColor: c.surface2 }]}
-            >
-              <DateTile iso={e.startsAt} />
-              <View style={{ flex: 1, gap: 2 }}>
-                <Text style={[onest('semibold', 15, 19), { color: c.text }]} numberOfLines={1}>
-                  {e.title}
-                </Text>
-                <Text style={[onest('regular', 12, 15), { color: c.muted }]} numberOfLines={1}>
-                  {`${e.venue} · ${t('feed.card.going', { count: goingCount(state, e) })}`}
-                </Text>
-              </View>
-            </Pressable>
+            // The row is two siblings, not nested buttons: open the room, or change your mind.
+            <View key={e.id} style={[styles.myRow, i < mine.length - 1 && { borderBottomWidth: 1, borderBottomColor: c.line }]}>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => router.push({ pathname: '/event/[id]/room', params: { id: e.id } })}
+                style={({ pressed }) => [styles.myOpen, pressed && { opacity: 0.7 }]}
+              >
+                <DateTile iso={e.startsAt} />
+                <View style={{ flex: 1, gap: 2 }}>
+                  <Text style={[onest('semibold', 15, 19), { color: c.text }]} numberOfLines={1}>
+                    {e.title}
+                  </Text>
+                  <Text style={[onest('regular', 12, 15), { color: c.muted }]} numberOfLines={1}>
+                    {`${e.venue} · ${t('feed.card.going', { count: goingCount(state, e) })}`}
+                  </Text>
+                </View>
+              </Pressable>
+              {/* Changing your mind belongs where your plans are listed, not only deep inside the event. */}
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`${t('profile.myEvents.leave')}: ${e.title}`}
+                hitSlop={8}
+                onPress={() => {
+                  setLeaving(e);
+                  setOpen(true);
+                }}
+                style={({ pressed }) => [styles.leave, { borderColor: c.line }, pressed && { backgroundColor: c.surface2 }]}
+              >
+                <Text style={[onest('semibold', 13, 16), { color: c.muted }]}>{t('profile.myEvents.leave')}</Text>
+              </Pressable>
+            </View>
           ))
         )}
       </Group>
+      {leaving && <LeaveEventSheet event={leaving} visible={open} onClose={() => setOpen(false)} onLeft={() => setOpen(false)} />}
     </Section>
   );
 }
@@ -327,6 +348,8 @@ export function DemoSection({ dense }: { dense?: boolean }) {
 }
 
 const styles = StyleSheet.create({
+  leave: { height: 32, paddingHorizontal: 12, borderRadius: 16, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  myOpen: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12 },
   myRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 12, paddingVertical: 10 },
   myEmpty: { padding: 16, gap: 10, alignItems: 'flex-start' },
   pill: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12 },

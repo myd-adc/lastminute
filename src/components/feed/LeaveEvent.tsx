@@ -23,7 +23,8 @@ export function LeaveEventLink({ onPress, label }: { onPress: () => void; label?
 
 // One-step confirmation for leaving an event. A sheet rather than Alert.alert, which does nothing on web.
 // Matches live on the room decisions, not on the attendance, so they and their chats outlive the exit.
-export function LeaveEventSheet({ event, visible, onClose }: { event: Event; visible: boolean; onClose: () => void }) {
+// `onLeft` replaces the default jump to the feed, for lists that should simply lose the row (the profile).
+export function LeaveEventSheet({ event, visible, onClose, onLeft }: { event: Event; visible: boolean; onClose: () => void; onLeft?: () => void }) {
   const { c } = useTheme();
   const { t } = useT();
   const { state, dispatch } = useStore();
@@ -33,7 +34,8 @@ export function LeaveEventSheet({ event, visible, onClose }: { event: Event; vis
   const leave = () => {
     dispatch({ type: 'leave', eventId: event.id });
     onClose();
-    router.replace('/');
+    if (onLeft) onLeft();
+    else router.replace('/');
   };
 
   const line = [onest('regular', 14, 19), { color: c.muted }];
