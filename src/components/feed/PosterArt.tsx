@@ -18,13 +18,16 @@ type Spec = {
   emoji?: { x: number; y: number; size: number };
   scrim?: { h: number; mid: number };
   topScrim?: number;
+  // Where a poster photo sits whole (contained): top inset and the share of the height kept free at the bottom for
+  // the card's text. Posters are mostly portrait 1:√2, so a cover crop on a tall phone cut off their sides and text.
+  photo?: { top: number; bottomFree: number };
 };
 
 const SPECS = {
-  feed: { w: 390, words: { x: 17.97, y: 112, size: 118 }, ring: { x: 120, y: -60, d: 420 }, emoji: { x: 260, y: 330, size: 90 }, scrim: { h: 520, mid: 0.82 }, topScrim: 140 }, // M06
+  feed: { w: 390, words: { x: 17.97, y: 112, size: 118 }, ring: { x: 120, y: -60, d: 420 }, emoji: { x: 260, y: 330, size: 90 }, scrim: { h: 520, mid: 0.82 }, topScrim: 140, photo: { top: 100, bottomFree: 0.44 } }, // M06
   backdrop: { w: 390, words: { x: 17.97, y: 70, size: 118 } }, // M07 behind the sheet
-  card: { w: 440, words: { x: 21.93, y: 70, size: 128 }, ring: { x: 150, y: -80, d: 420 }, emoji: { x: 310, y: 300, size: 90 }, scrim: { h: 460, mid: 0.85 } }, // W03
-  dialog: { w: 380, words: { x: 19.96, y: 120, size: 110 }, ring: { x: 120, y: -80, d: 360 }, emoji: { x: 250, y: 420, size: 80 } }, // W04
+  card: { w: 440, words: { x: 21.93, y: 70, size: 128 }, ring: { x: 150, y: -80, d: 420 }, emoji: { x: 310, y: 300, size: 90 }, scrim: { h: 460, mid: 0.85 }, photo: { top: 16, bottomFree: 0.4 } }, // W03
+  dialog: { w: 380, words: { x: 19.96, y: 120, size: 110 }, ring: { x: 120, y: -80, d: 360 }, emoji: { x: 250, y: 420, size: 80 }, photo: { top: 0, bottomFree: 0 } }, // W04
 } satisfies Record<string, Spec>;
 
 export type PosterVariant = keyof typeof SPECS;
@@ -80,7 +83,23 @@ export const PosterArt = memo(function PosterArt({ event, width, height, variant
     <View style={[styles.clip, { width, height }]}>
       <PosterFill colors={gradients[event.poster.gradient]} width={width} height={height} />
       {/* A real poster photo replaces the generated words and emoji; the gradient shows while it loads. */}
-      {event.image ? <RemoteImage uri={event.image} style={StyleSheet.absoluteFill} loader placeholder={false} /> : null}
+      {/* A poster photo is shown whole above the card's text, over a blurred, dimmed copy of itself that fills the
+          frame; the backdrop variant behind a sheet just takes the blurred copy. */}
+      {event.image ? (
+        <>
+          <RemoteImage uri={event.image} style={StyleSheet.absoluteFill} placeholder={false} blurRadius={spec.photo ? 28 : 18} />
+          <View style={[StyleSheet.absoluteFill, { backgroundColor: `rgba(${scrim},${spec.photo ? 0.45 : 0.3})` }]} />
+          {spec.photo && (
+            <RemoteImage
+              uri={event.image}
+              resizeMode="contain"
+              loader
+              placeholder={false}
+              style={{ position: 'absolute', left: 12 * k, right: 12 * k, top: spec.photo.top * k + shift, height: height * (1 - spec.photo.bottomFree) - spec.photo.top * k - shift }}
+            />
+          )}
+        </>
+      ) : null}
       {!event.image && spec.ring && (
         <View
           style={[

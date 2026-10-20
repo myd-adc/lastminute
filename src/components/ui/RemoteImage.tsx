@@ -55,12 +55,14 @@ export function RemoteImage({
   resizeMode = 'cover',
   loader,
   placeholder = true,
+  blurRadius,
 }: {
   uri: string;
   style?: StyleProp<ViewStyle>;
   resizeMode?: ImageResizeMode;
   loader?: boolean;
   placeholder?: boolean;
+  blurRadius?: number;
 }) {
   const { c } = useTheme();
   const breathe = sharedPulse();
@@ -78,6 +80,7 @@ export function RemoteImage({
       <Animated.Image
         source={{ uri }}
         resizeMode={resizeMode}
+        blurRadius={blurRadius}
         accessibilityIgnoresInvertColors
         onLoad={() => {
           arrived.add(uri);
