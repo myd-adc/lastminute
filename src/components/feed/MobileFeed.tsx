@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { FlatList, Platform, StyleSheet, View, type LayoutChangeEvent, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { prefetchImages } from '@/components/ui';
 import type { Event } from '@/data/types';
 import { tabBarClearance } from '@/lib/layout';
 import { goingCount, metCount, soloCount } from '@/lib/selectors';
@@ -44,8 +45,17 @@ export function MobileFeed() {
     if (width !== size.w || height !== size.h) setSize({ w: width, h: height });
   };
 
+  // Posters ahead of the current page start downloading now, so the next swipe lands on a loaded photo.
+  const prefetchFrom = (i: number) => prefetchImages(feedRef.current.slice(i, i + 4).map((e) => e.image));
+  useEffect(() => {
+    prefetchImages(feed.slice(0, 4).map((e) => e.image));
+  }, [feed]);
+
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    if (size.h) index.current = Math.round(e.nativeEvent.contentOffset.y / size.h);
+    if (!size.h) return;
+    const i = Math.round(e.nativeEvent.contentOffset.y / size.h);
+    if (i !== index.current) prefetchFrom(i + 1);
+    index.current = i;
   };
 
   const goTo = useCallback((i: number) => {

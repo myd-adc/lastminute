@@ -80,7 +80,7 @@ export const PosterArt = memo(function PosterArt({ event, width, height, variant
     <View style={[styles.clip, { width, height }]}>
       <PosterFill colors={gradients[event.poster.gradient]} width={width} height={height} />
       {/* A real poster photo replaces the generated words and emoji; the gradient shows while it loads. */}
-      {event.image ? <RemoteImage uri={event.image} style={StyleSheet.absoluteFill} /> : null}
+      {event.image ? <RemoteImage uri={event.image} style={StyleSheet.absoluteFill} loader placeholder={false} /> : null}
       {!event.image && spec.ring && (
         <View
           style={[

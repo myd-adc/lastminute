@@ -3,7 +3,7 @@ import { Bookmark, ChevronDown, ChevronUp, Lock, Send, X } from 'lucide-react-na
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 
-import { Avatar, AvatarStack, Button, IconButton, Pill, SIDEBAR_WIDTH } from '@/components/ui';
+import { Avatar, AvatarStack, Button, IconButton, Pill, prefetchImages, SIDEBAR_WIDTH } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import type { Event } from '@/data/types';
 import { genderForms } from '@/lib/genderForms';
@@ -42,6 +42,10 @@ export function WideFeed() {
   const [index, setIndex] = useState(0);
   const i = Math.min(index, Math.max(0, feed.length - 1));
   const event: Event | undefined = feed[i];
+  // The next posters download while this one is on screen.
+  useEffect(() => {
+    prefetchImages(feed.slice(i, i + 4).map((e) => e.image));
+  }, [feed, i]);
 
   // W03: 440×720 card 92 pt from the top of a 900 pt window, hints 24 pt under it.
   const panelW = Math.round(Math.min(PANEL_MAX, Math.max(PANEL_MIN, (winW - SIDEBAR_WIDTH) * 0.38)));

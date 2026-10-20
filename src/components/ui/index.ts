@@ -7,7 +7,7 @@ export { GlassTabBar, tabs, type TabKey } from './GlassTabBar';
 export { Gradient } from './Gradient';
 export { IconButton } from './IconButton';
 export { Placeholder } from './Placeholder';
-export { RemoteImage } from './RemoteImage';
+export { prefetchImages, RemoteImage } from './RemoteImage';
 export { goBack, Header, Screen, ScreenTitle, SectionLabel } from './Screen';
 export { CloseButton, Sheet } from './Sheet';
 export { activeTabFor, SIDEBAR_WIDTH, WebShell } from './WebShell';
