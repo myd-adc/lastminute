@@ -1,4 +1,4 @@
-import { Bookmark, Send, Users } from 'lucide-react-native';
+import { Bookmark, Send } from 'lucide-react-native';
 import { memo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
@@ -6,7 +6,6 @@ import { AvatarStack, Button, Pill } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import type { Event } from '@/data/types';
 import { useT } from '@/i18n';
-import { going as goingLabel } from '@/lib/time';
 import { display, onest, useStyles, type Palette, type GradientId, type Scheme } from '@/theme';
 
 import { priceLabel } from './format';
@@ -83,7 +82,6 @@ export const FeedPage = memo(function FeedPage(p: Props) {
           <View style={styles.rail}>
             <RailButton tone="poster" size={44} icon={Bookmark} active={p.saved} label={p.saved ? t('common.saved') : t('common.save')} onPress={() => p.onSave(e.id)} />
             <RailButton tone="poster" size={44} icon={Send} label={t('feed.share')} onPress={() => p.onShare(e)} />
-            <RailButton tone="poster" size={44} icon={Users} label={String(p.goingN)} accessibilityLabel={goingLabel(p.goingN)} onPress={open} />
           </View>
         </View>
 
@@ -122,7 +120,8 @@ const styles = StyleSheet.create({
   infoTop: { gap: 12 },
   pills: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   whoText: { flex: 1, gap: 2 },
-  rail: { width: 52, alignItems: 'center', justifyContent: 'space-between', gap: 12 },
+  // The going count lives in the "who's going" box, so the rail is just save and share, at the bottom.
+  rail: { width: 52, alignItems: 'center', justifyContent: 'flex-end', gap: 12 },
   actions: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   go: { flex: 1 },
 });

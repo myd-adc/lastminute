@@ -32,6 +32,8 @@ export function FeedTabs({ value, onChange, onPoster, wide, savedCount }: Props)
   ];
   return (
     <View style={[styles.row, !wide && styles.phoneRow]}>
+      {/* Phone: a spacer as wide as the bookmark keeps the two tabs centred on the screen. */}
+      {!wide && <View style={styles.saved} />}
       <View style={[styles.tabs, { gap: wide ? 24 : 18 }]} accessibilityRole="tablist">
         {items.map((item) => {
           const active = item.key === value;
