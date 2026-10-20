@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
   rail: { width: 52, alignItems: 'center', justifyContent: 'space-between', gap: 12 },
   wideRoot: { flex: 1, flexDirection: 'row' },
   centre: { paddingTop: 32, paddingBottom: 24 },
-  tabs: { alignSelf: 'flex-start', marginLeft: 42 },
+  tabs: { alignSelf: 'center', paddingLeft: 12 },
   stage: { alignItems: 'center', marginTop: 29, paddingLeft: 12 },
   card: { borderRadius: 28 },
   panel: { borderLeftWidth: 1, paddingTop: 32, paddingHorizontal: 28, gap: 12 },

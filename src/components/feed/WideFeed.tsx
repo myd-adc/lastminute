@@ -345,7 +345,8 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   endContent: { paddingTop: 8, paddingBottom: 40, paddingHorizontal: 40, maxWidth: 560, width: '100%', alignSelf: 'center' },
   centre: { flex: 1, paddingTop: 32, paddingBottom: 24 },
-  tabs: { alignSelf: 'flex-start', marginLeft: 42 },
+  // Same left padding as the stage, so the tabs sit centred over the card.
+  tabs: { alignSelf: 'center', paddingLeft: 12 },
   // Card is centred in the column (6 pt right of centre in the frame); 29 pt under the tabs.
   stage: { alignItems: 'center', marginTop: 29, paddingLeft: 12 },
   card: { position: 'absolute', borderRadius: 28, overflow: 'hidden' },
