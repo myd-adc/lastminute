@@ -1,17 +1,18 @@
 import { router } from 'expo-router';
-import { ChevronDown, ChevronUp, Palette } from 'lucide-react-native';
+import { ChevronDown, ChevronUp, ImagePlus, Palette } from 'lucide-react-native';
 import { useMemo, useState, type ReactNode } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
 
 import { Field, InputBox, TextField } from '@/components/onboarding/kit';
 import { pickableInterests } from '@/components/onboarding/PreferencesForm';
 import { Glow, glows } from '@/components/profile/Glow';
 import { PageHead } from '@/components/community/PageHead';
-import { Button, Chip, Gradient, Screen } from '@/components/ui';
+import { Button, Chip, Gradient, Screen, Segmented } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import type { InterestId } from '@/data/types';
 import { useT } from '@/i18n';
 import { useIsWide } from '@/lib/layout';
+import { pickPosterImage } from '@/lib/pickSquareImage';
 import { at, DAY, dayLabel, HOUR, time } from '@/lib/time';
 import { useNow, useStore } from '@/store/AppStore';
 import { onest, type, useTheme } from '@/theme';
@@ -46,6 +47,9 @@ export function EventForm({ title: head, sub, communityId, defaultGradient, note
   const [words, setWords] = useState('');
   const [gradient, setGradient] = useState<GradientId>(defaultGradient);
   const [posterOpen, setPosterOpen] = useState(false);
+  // The card can show the event's own poster photo instead of the generated words-on-colour one.
+  const [posterKind, setPosterKind] = useState<'words' | 'photo'>('words');
+  const [image, setImage] = useState<string | null>(null);
   const [day, setDay] = useState(1);
   const [start, setStart] = useState('19:00');
   const [hours, setHours] = useState(2);
@@ -87,6 +91,7 @@ export function EventForm({ title: head, sub, communityId, defaultGradient, note
       price: null,
       category,
       poster: { lines: lines.length ? lines : ['LAST', 'MINUTE'], emoji: interest?.emoji ?? '', gradient },
+      image: posterKind === 'photo' && image ? image : undefined,
     });
     setBusy(false);
     if (!id) return setError(t('community.event.failed'));
@@ -110,9 +115,13 @@ export function EventForm({ title: head, sub, communityId, defaultGradient, note
         style={styles.cover}
       >
         <View>
-          <Gradient id={gradient} style={styles.avatar}>
-            <Text style={[onest('bold', 34), styles.initial]}>{lines[0]?.[0]}</Text>
-          </Gradient>
+          {posterKind === 'photo' && image ? (
+            <Image source={{ uri: image }} style={styles.avatar} />
+          ) : (
+            <Gradient id={gradient} style={styles.avatar}>
+              <Text style={[onest('bold', 34), styles.initial]}>{lines[0]?.[0]}</Text>
+            </Gradient>
+          )}
           <View style={[styles.badge, { backgroundColor: c.accent, borderColor: c.bg }]}>
             <Palette size={14} color={c.onAccent} strokeWidth={2} />
           </View>
@@ -123,6 +132,37 @@ export function EventForm({ title: head, sub, communityId, defaultGradient, note
         </View>
       </Pressable>
       {posterOpen && (
+        <View style={{ gap: 12 }}>
+          <Segmented
+            options={[
+              { key: 'words', label: t('community.event.posterWordsKind') },
+              { key: 'photo', label: t('community.event.posterPhotoKind') },
+            ]}
+            value={posterKind}
+            onChange={setPosterKind}
+          />
+        </View>
+      )}
+      {posterOpen && posterKind === 'photo' && (
+        <View style={styles.photoRow}>
+          {image && <Image source={{ uri: image }} style={styles.photoThumb} resizeMode="cover" />}
+          <View style={{ flex: 1, gap: 8 }}>
+            <Text style={[onest('regular', 13, 17.5), { color: c.muted }]}>{t('community.event.posterPhotoSub')}</Text>
+            <Pressable
+              accessibilityRole="button"
+              onPress={async () => {
+                const uri = await pickPosterImage();
+                if (uri) setImage(uri);
+              }}
+              style={({ pressed }) => [styles.photoBtn, { backgroundColor: c.surface2 }, pressed && { opacity: 0.8 }]}
+            >
+              <ImagePlus size={18} color={c.text} strokeWidth={2} />
+              <Text style={[onest('semibold', 14), { color: c.text }]}>{t(image ? 'community.event.posterPhotoChange' : 'community.event.posterPhotoPick')}</Text>
+            </Pressable>
+          </View>
+        </View>
+      )}
+      {posterOpen && posterKind === 'words' && (
         <View style={{ gap: 12 }}>
           <TextField
             accessibilityLabel={t('community.event.posterWords')}
@@ -241,6 +281,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   swatch: { width: 30, height: 30, borderRadius: 15 },
+  photoRow: { flexDirection: 'row', gap: 14, alignItems: 'center' },
+  photoThumb: { width: 84, height: 118, borderRadius: 12 },
+  photoBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'flex-start', height: 40, paddingHorizontal: 14, borderRadius: 20 },
   input: { minHeight: 54 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, alignItems: 'center' },
   inlineLabel: { marginRight: 2 },

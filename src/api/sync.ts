@@ -250,7 +250,7 @@ async function syncCover(communityId: string, d: Partial<CommunityDraft>, previo
   await removeImage(COVERS, previous);
 }
 
-export type EventDraft = Pick<Event, 'communityId' | 'title' | 'description' | 'startsAt' | 'endsAt' | 'venue' | 'address' | 'price' | 'category' | 'poster'>;
+export type EventDraft = Pick<Event, 'communityId' | 'title' | 'description' | 'startsAt' | 'endsAt' | 'venue' | 'address' | 'price' | 'category' | 'poster' | 'image'>;
 
 // Open communities are joined directly; a domain-only one goes through join_community(), which checks the address.
 export const joinCommunity = (me: string, c: Community) =>
@@ -300,6 +300,8 @@ export const deleteEvent = (eventId: string) => write(supabase.from('events').de
 
 // Events created in the app are single-language: the same text goes into both language columns.
 export async function createEvent(me: string, d: EventDraft): Promise<string> {
+  // A picked poster goes to the public covers bucket under the author's folder (see migration event_posters).
+  const image = d.image && isPicked(d.image) ? publicUrl(COVERS, await uploadImage(COVERS, `events/${me}`, d.image)) : (d.image ?? null);
   const { data, error } = await supabase
     .from('events')
     .insert({
@@ -317,6 +319,7 @@ export async function createEvent(me: string, d: EventDraft): Promise<string> {
       price: d.price,
       category: d.category,
       poster: d.poster,
+      image_url: image,
     })
     .select('id')
     .single();
