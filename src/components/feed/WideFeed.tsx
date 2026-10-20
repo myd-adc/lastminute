@@ -265,11 +265,14 @@ export function WideFeed() {
             </View>
           ))}
         </View>
-        <Pressable onPress={() => handlers.onGo(e.id)} style={[styles.lock, { borderColor: c.accent }]}>
-          <Lock size={22} color={c.accentInk} strokeWidth={2} />
-          <Text style={[onest('semibold', 15, 19), styles.centerText, { color: c.text }]}>{t('feed.wide.lockTitle')}</Text>
-          <Text style={[onest('regular', 13, 17), styles.centerText, { color: c.muted }]}>{t('feed.wide.symmetry')}</Text>
-        </Pressable>
+        {/* Nothing is hidden while nobody is going, so the "tap to see who" lock would promise an empty list. */}
+        {n > 0 && (
+          <Pressable onPress={() => handlers.onGo(e.id)} style={[styles.lock, { borderColor: c.accent }]}>
+            <Lock size={22} color={c.accentInk} strokeWidth={2} />
+            <Text style={[onest('semibold', 15, 19), styles.centerText, { color: c.text }]}>{t('feed.wide.lockTitle')}</Text>
+            <Text style={[onest('regular', 13, 17), styles.centerText, { color: c.muted }]}>{t('feed.wide.symmetry')}</Text>
+          </Pressable>
+        )}
 
         {next.length > 0 && (
           <>
@@ -285,9 +288,10 @@ export function WideFeed() {
                   <Text style={[onest('semibold', 15, 19), { color: c.text }]} numberOfLines={1}>
                     {ne.title}
                   </Text>
-                  <Text style={[onest('regular', 13, 17), { color: c.muted }]}>
-                    {goingLabel(goingCount(state, ne))}
-                    {state.going[ne.id] ? ` · ${t('common.youreGoing')}` : ''}
+                  <Text style={[onest('regular', 13, 17), { color: c.muted }]} numberOfLines={1}>
+                    {[ne.venue, goingCount(state, ne) > 0 ? goingLabel(goingCount(state, ne)) : null, state.going[ne.id] ? t('common.youreGoing') : null]
+                      .filter(Boolean)
+                      .join(' · ')}
                   </Text>
                 </View>
               </Pressable>
