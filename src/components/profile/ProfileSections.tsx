@@ -2,13 +2,14 @@ import { router } from 'expo-router';
 import { useState, type ReactNode } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { DateTile } from '@/components/feed/DateTile';
 import { Avatar, Chip, Toggle } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
 import { genderForms } from '@/lib/genderForms';
 import { useIsWide } from '@/lib/layout';
 import { withHandle } from '@/lib/username';
-import { myCommunities, pendingSurveys, profileStats, verifiedCommunity } from '@/lib/selectors';
+import { goingCount, myCommunities, myUpcoming, pendingSurveys, profileStats, verifiedCommunity } from '@/lib/selectors';
 import { useNow, useStore } from '@/store/AppStore';
 import { display, onest, type, useTheme, type ThemeMode } from '@/theme';
 
@@ -26,6 +27,48 @@ export function Section({ label, children }: { label: string; children: ReactNod
       <GroupLabel>{label}</GroupLabel>
       {children}
     </>
+  );
+}
+
+// "My events": what the user said "I'm going" to, soonest first; a row opens the event room.
+export function MyEventsSection() {
+  const { c } = useTheme();
+  const { t } = useT();
+  const { state } = useStore();
+  const now = useNow();
+  const mine = myUpcoming(state, now);
+  return (
+    <Section label={t('profile.myEvents.label')}>
+      <Group>
+        {mine.length === 0 ? (
+          <View style={styles.myEmpty}>
+            <Text style={[type.subhead, { color: c.muted }]}>{t('profile.myEvents.empty')}</Text>
+            <Pressable accessibilityRole="link" onPress={() => router.navigate('/')} hitSlop={8}>
+              <Text style={[onest('semibold', 14), { color: c.accentInk }]}>{t('profile.myEvents.toFeed')}</Text>
+            </Pressable>
+          </View>
+        ) : (
+          mine.map((e, i) => (
+            <Pressable
+              key={e.id}
+              accessibilityRole="button"
+              onPress={() => router.push({ pathname: '/event/[id]/room', params: { id: e.id } })}
+              style={({ pressed }) => [styles.myRow, i < mine.length - 1 && { borderBottomWidth: 1, borderBottomColor: c.line }, pressed && { backgroundColor: c.surface2 }]}
+            >
+              <DateTile iso={e.startsAt} />
+              <View style={{ flex: 1, gap: 2 }}>
+                <Text style={[onest('semibold', 15, 19), { color: c.text }]} numberOfLines={1}>
+                  {e.title}
+                </Text>
+                <Text style={[onest('regular', 12, 15), { color: c.muted }]} numberOfLines={1}>
+                  {`${e.venue} · ${t('feed.card.going', { count: goingCount(state, e) })}`}
+                </Text>
+              </View>
+            </Pressable>
+          ))
+        )}
+      </Group>
+    </Section>
   );
 }
 
@@ -284,6 +327,8 @@ export function DemoSection({ dense }: { dense?: boolean }) {
 }
 
 const styles = StyleSheet.create({
+  myRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 12, paddingVertical: 10 },
+  myEmpty: { padding: 16, gap: 10, alignItems: 'flex-start' },
   pill: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12 },
   profile: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14, borderRadius: 20 },
   profileText: { flex: 1, gap: 3 },

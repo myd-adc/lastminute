@@ -5,6 +5,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import {
   AccountSection,
+  MyEventsSection,
   ProfileCard,
   SafetySection,
   StatsCard,
@@ -39,6 +40,7 @@ export default function MeScreen() {
       </View>
       <ProfileCard />
       <StatsCard />
+      <MyEventsSection />
       <VisibilitySection />
       <SafetySection />
       <AccountSection confirming={confirmLogout} setConfirming={setConfirmLogout} />

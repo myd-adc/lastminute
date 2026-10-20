@@ -1,24 +1,22 @@
 import { router } from 'expo-router';
-import { Globe, Plus } from 'lucide-react-native';
+import { Globe } from 'lucide-react-native';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { Avatar } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { getInterest, goesWithOptions, vibes } from '@/data/mock';
-import { CommunityAvatar } from '@/components/community/CommunityAvatar';
-import { communityMeta } from '@/components/community/text';
-import { myCommunities, verifiedCommunity } from '@/lib/selectors';
+import { verifiedCommunity } from '@/lib/selectors';
 import { withHandle } from '@/lib/username';
 import { LANGS, useT, type Lang } from '@/i18n';
 import { useStore } from '@/store/AppStore';
 import { display, onest, useTheme } from '@/theme';
 
-import { accentText } from './names';
 import {
   AppearanceSection,
   ConfirmRow,
   DemoSection,
+  MyEventsSection,
   NotificationsSection,
   Section,
   StatsCard,
@@ -43,7 +41,7 @@ export function WideProfile() {
         <View style={[styles.col, styles.colLeft]}>
           <BigProfileCard />
           <StatsCard />
-          <MyCommunities />
+          <MyEventsSection />
           <WideAccount />
         </View>
         <View style={[styles.col, styles.colRight]}>
@@ -144,46 +142,6 @@ function BigProfileCard() {
   );
 }
 
-function MyCommunities() {
-  const { c, scheme } = useTheme();
-  const { t } = useT();
-  const { state } = useStore();
-  const mine = myCommunities(state);
-  return (
-    <Section label={t('profile.wide.myCommunities')}>
-      <Group>
-        {mine.map((cm) => (
-          <Pressable
-            key={cm.id}
-            accessibilityRole="button"
-            onPress={() => router.push({ pathname: '/community/[id]', params: { id: cm.id } })}
-            style={({ pressed }) => [styles.sceneRow, { borderBottomWidth: 1, borderBottomColor: c.line }, pressed && { backgroundColor: c.surface2 }]}
-          >
-            <CommunityAvatar community={cm} size={32} />
-            <View style={{ flex: 1, gap: 2 }}>
-              <Text style={[onest('semibold', 15, 19), { color: c.text }]}>{cm.name}</Text>
-              <Text style={[onest('regular', 12, 15), { color: c.muted }]}>{communityMeta(cm, true)}</Text>
-            </View>
-          </Pressable>
-        ))}
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => router.push('/communities')}
-          style={({ pressed }) => [styles.sceneRow, pressed && { backgroundColor: c.surface2 }]}
-        >
-          <View style={[styles.sceneDot, styles.addDot, { borderColor: accentText(c, scheme) }]}>
-            <Plus size={16} color={accentText(c, scheme)} strokeWidth={2.5} />
-          </View>
-          <View style={{ flex: 1, gap: 2 }}>
-            <Text style={[onest('semibold', 15, 19), { color: accentText(c, scheme) }]}>{t('profile.wide.findCommunity')}</Text>
-            <Text style={[onest('regular', 12, 15), { color: c.muted }]}>{t('profile.wide.findCommunitySub')}</Text>
-          </View>
-        </Pressable>
-      </Group>
-    </Section>
-  );
-}
-
 function WideAccount() {
   const { t } = useT();
   const { c } = useTheme();
@@ -267,7 +225,4 @@ const styles = StyleSheet.create({
   tags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   tag: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12 },
   primary: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12 },
-  sceneRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 12 },
-  sceneDot: { width: 32, height: 32, borderRadius: 16 },
-  addDot: { borderWidth: 1.5, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center' },
 });

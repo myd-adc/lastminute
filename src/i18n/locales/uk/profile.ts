@@ -17,6 +17,11 @@ export const profile = {
     showShared: 'Показувати спільні події',
     showSharedSub: '«Були разом на 2 подіях»',
   },
+  myEvents: {
+    label: 'Мої події',
+    empty: 'Ти поки нікуди не йдеш. Обери подію в стрічці й натисни «Я йду».',
+    toFeed: 'До стрічки',
+  },
   safety: {
     label: 'Безпека',
     blocked: 'Заблоковані',
@@ -63,11 +68,8 @@ export const profile = {
   wide: {
     edit: 'Редагувати',
     talkAbout: 'Говори зі мною про',
-    myCommunities: 'Мої спільноти',
     primary: 'Основна',
     studentVerified: 'Студентську пошту підтверджено',
-    findCommunity: 'Знайти або створити спільноту',
-    findCommunitySub: 'Відкриті — для всіх, закриті — за поштою домену',
     languageSwitch: 'Мова інтерфейсу',
   },
   settings: {

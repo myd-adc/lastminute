@@ -18,6 +18,11 @@ export const profile: Translation<typeof Uk> = {
     showShared: 'Show shared events',
     showSharedSub: '“2 events together”',
   },
+  myEvents: {
+    label: 'My events',
+    empty: 'You’re not going anywhere yet. Pick an event in the feed and tap “I’m going”.',
+    toFeed: 'To the feed',
+  },
   safety: {
     label: 'Safety',
     blocked: 'Blocked',
@@ -64,11 +69,8 @@ export const profile: Translation<typeof Uk> = {
   wide: {
     edit: 'Edit',
     talkAbout: 'Talk to me about',
-    myCommunities: 'My communities',
     primary: 'Primary',
     studentVerified: 'Student email verified',
-    findCommunity: 'Find or start a community',
-    findCommunitySub: 'Open ones are for everyone, closed ones for an email domain',
     languageSwitch: 'Interface language',
   },
   settings: {
