@@ -61,11 +61,6 @@ function GoingView({ event }: { event: Event }) {
       if (r === 'failed') toast.show(t('feed.toast.calendarFailed'));
       else if (r === 'shared' && Platform.OS === 'web') toast.show(t('feed.toast.icsDownloaded'));
     });
-  const leave = () => {
-    dispatch({ type: 'leave', eventId: event.id });
-    router.replace('/');
-  };
-
   if (!g) {
     return (
       <Screen contentStyle={styles.narrow}>
@@ -157,9 +152,6 @@ function GoingView({ event }: { event: Event }) {
             <Pressable accessibilityRole="button" onPress={calendar} hitSlop={8} style={styles.link}>
               <CalendarDays size={16} color={c.text} strokeWidth={2} />
               <Text style={[onest('semibold', 14, 18), { color: c.text }]}>{t('feed.going.calendar')}</Text>
-            </Pressable>
-            <Pressable accessibilityRole="button" onPress={leave} hitSlop={8}>
-              <Text style={[onest('semibold', 14, 18), { color: c.muted }]}>{t('feed.going.cancel')}</Text>
             </Pressable>
           </View>
         </View>

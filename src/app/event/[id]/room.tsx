@@ -4,7 +4,6 @@ import { useCallback, useRef, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { LeaveEventLink, LeaveEventSheet } from '@/components/feed/LeaveEvent';
 import { useToast } from '@/components/feed/Toast';
 import { CardDeck, type Choice, type DeckHandle } from '@/components/room/CardDeck';
 import { RoomSkeleton } from '@/components/skeletons/ListSkeletons';
@@ -102,7 +101,6 @@ function RoomMobile({ event }: { event: Event }) {
   const r = useRoom(event, footerBottom(insets.bottom) + 150);
   const deck = useRef<DeckHandle>(null);
   const top = r.queue.pending[0];
-  const [leaving, setLeaving] = useState(false);
 
   return (
     <View style={[styles.flex, { backgroundColor: c.bg, paddingTop: insets.top + 6, paddingBottom: footerBottom(insets.bottom) + 13 }]}>
@@ -147,13 +145,9 @@ function RoomMobile({ event }: { event: Event }) {
           <View style={styles.mobileFoot}>
             <RoomActions onSkip={() => deck.current?.swipe('skip')} onGo={() => deck.current?.swipe('go')} />
             <RoomFootnote name={top.user.name} />
-            <View style={styles.leaveRow}>
-              <LeaveEventLink onPress={() => setLeaving(true)} />
-            </View>
           </View>
         </>
       )}
-      <LeaveEventSheet event={event} visible={leaving} onClose={() => setLeaving(false)} />
       {r.toast.node}
     </View>
   );
@@ -166,7 +160,6 @@ function RoomWide({ event }: { event: Event }) {
   const { c } = useTheme();
   const { t } = useT();
   const [selected, setSelected] = useState<string | null>(null);
-  const [leaving, setLeaving] = useState(false);
   const r = useRoom(event, 150, setSelected);
   const deck = useRef<DeckHandle>(null);
   const top = r.queue.pending[0];
@@ -213,16 +206,12 @@ function RoomWide({ event }: { event: Event }) {
               <View style={{ marginTop: 20 }}>
                 <RoomFootnote name={top.user.name} />
               </View>
-              <View style={{ marginTop: 16 }}>
-                <LeaveEventLink onPress={() => setLeaving(true)} />
-              </View>
               <KeyboardHints style={{ marginTop: 53 }} />
             </View>
           </>
         )}
       </View>
       <RoomMatchesPanel event={event} now={r.now} selectedId={selected} onSelect={setSelected} />
-      <LeaveEventSheet event={event} visible={leaving} onClose={() => setLeaving(false)} />
       {r.toast.node}
     </View>
   );
@@ -237,7 +226,6 @@ const styles = StyleSheet.create({
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 10, height: 44 },
   mobileDeck: { flex: 1, paddingHorizontal: 20, paddingTop: 20, paddingBottom: 22 },
   mobileFoot: { paddingHorizontal: 20, gap: 14 },
-  leaveRow: { alignItems: 'center' },
   wideMain: { paddingHorizontal: 40, paddingTop: 30, paddingBottom: 44 },
   wideHead: { flexDirection: 'row', alignItems: 'center', gap: 14, height: 52 },
   thumb: { width: 52, height: 52, borderRadius: 14 },

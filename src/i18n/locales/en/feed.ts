@@ -130,6 +130,5 @@ export const feed: Translation<typeof Uk> = {
     addMe: 'Add me',
     seeWho: '👋 See who’s going',
     calendar: 'Add to calendar',
-    cancel: 'Cancel “I’m going”',
   },
 };

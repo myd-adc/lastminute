@@ -5,7 +5,7 @@ import { Animated, Linking, Pressable, ScrollView, StyleSheet, useWindowDimensio
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { InfoRow, PeopleStack } from '@/components/feed/DetailsParts';
-import { CancelEventSheet, LeaveEventLink, LeaveEventSheet } from '@/components/feed/LeaveEvent';
+import { CancelEventSheet, LeaveEventLink } from '@/components/feed/LeaveEvent';
 import { categoryLabel, mapsUrl, priceLabel, shortTitle } from '@/components/feed/format';
 import { PosterArt } from '@/components/feed/PosterArt';
 import { shareEvent } from '@/components/feed/share';
@@ -59,7 +59,6 @@ function useDetails(event: Event) {
   const { t } = useT();
   const now = useNow();
   const toast = useToast(120);
-  const [leaving, setLeaving] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const going = state.going[event.id];
   const saved = !!state.saved[event.id];
@@ -84,7 +83,7 @@ function useDetails(event: Event) {
   };
   const openUrl = (url: string) => Linking.openURL(url).catch(() => toast.show(t('feed.toast.openFailed')));
 
-  return { state, dispatch, now, toast, going, saved, preview, goingN, soloN, knownN, hasGroup, share, toggleSave, openRoom, go, openUrl, leaving, setLeaving, cancelling, setCancelling };
+  return { state, dispatch, now, toast, going, saved, preview, goingN, soloN, knownN, hasGroup, share, toggleSave, openRoom, go, openUrl, cancelling, setCancelling };
 }
 
 // Figma dims: M07 rgba(bg, 0.55) behind the sheet, W04 rgba(bg, 0.73) behind the dialog (same in light).
@@ -146,7 +145,6 @@ function Body({ event, d, wide }: { event: Event; d: ReturnType<typeof useDetail
         </View>
       )}
       <View style={styles.ownRow}>
-        {d.going && !mine && <LeaveEventLink onPress={() => d.setLeaving(true)} />}
         {mine && <LeaveEventLink label={t('feed.own.cancelAction')} onPress={() => d.setCancelling(true)} />}
         {author && !mine && (
           <LeaveEventLink
@@ -194,7 +192,6 @@ function MobileDetails({ event }: { event: Event }) {
           )}
         </View>
       </Animated.View>
-      <LeaveEventSheet event={event} visible={d.leaving} onClose={() => d.setLeaving(false)} />
       <CancelEventSheet event={event} visible={d.cancelling} onClose={() => d.setCancelling(false)} />
       {d.toast.node}
     </>
@@ -277,7 +274,6 @@ function WideDetails({ event }: { event: Event }) {
           <X size={18} color={c.text} strokeWidth={2} />
         </Pressable>
       </Animated.View>
-      <LeaveEventSheet event={event} visible={d.leaving} onClose={() => d.setLeaving(false)} />
       <CancelEventSheet event={event} visible={d.cancelling} onClose={() => d.setCancelling(false)} />
       {d.toast.node}
     </View>

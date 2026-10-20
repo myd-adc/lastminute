@@ -132,6 +132,5 @@ export const feed = {
     addMe: 'Додати мене',
     seeWho: '👋 Подивитись, хто йде',
     calendar: 'У календар',
-    cancel: 'Скасувати «Я йду»',
   },
 };
