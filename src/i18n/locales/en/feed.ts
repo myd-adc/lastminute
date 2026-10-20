@@ -86,6 +86,7 @@ export const feed: Translation<typeof Uk> = {
     hintGo: 'I’m going',
     hintSkip: 'skip',
     who: 'Who is going',
+    hidePanel: 'Hide the “Who’s going” panel',
     soloGoing: { one: '{count} going solo', other: '{count} going solo' },
     known: { one: '{count} was at past events with you', other: '{count} were at past events with you' },
     tagSolo: '🙋 solo',

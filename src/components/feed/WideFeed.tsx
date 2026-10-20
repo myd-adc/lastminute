@@ -1,7 +1,7 @@
 import { router, useFocusEffect } from 'expo-router';
-import { Bookmark, ChevronDown, ChevronUp, Lock, Send } from 'lucide-react-native';
+import { Bookmark, ChevronDown, ChevronUp, Lock, Send, Users, X } from 'lucide-react-native';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Animated, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import { Avatar, AvatarStack, Button, IconButton, Pill, prefetchImages, SIDEBAR_WIDTH } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
@@ -10,13 +10,14 @@ import { genderForms } from '@/lib/genderForms';
 import { useT } from '@/i18n';
 import { acquaintances, attendeesFor, goingCount, nameAge, nextForYou, soloCount } from '@/lib/selectors';
 import { going as goingLabel, whenLabel } from '@/lib/time';
+import { useSlideIn } from '@/lib/motion';
 import { display, fonts, onest, useTheme } from '@/theme';
 import { useStore } from '@/store/AppStore';
 
 import { DateTile } from './DateTile';
 import { EndOfFeed } from './EndOfFeed';
 import { WideFeedSkeleton } from './FeedSkeleton';
-import { FeedTabs } from './FeedTabs';
+import { FEED_TAB_ORDER, FeedTabs } from './FeedTabs';
 import { priceLabel } from './format';
 import { posterPillBg } from './FeedPage';
 import { PosterArt } from './PosterArt';
@@ -29,6 +30,16 @@ import { useFeed } from './useFeed';
 // edge, slides out of the middle column and lands on top of the panel.
 const PANEL_MAX = 440;
 const PANEL_MIN = 320;
+// Whether the "Who's going" panel is shown; remembered on this device, so switching tabs does not bring it back.
+const PANEL_KEY = 'lastminute:whoPanel';
+const readPanel = () => {
+  try {
+    return globalThis.localStorage?.getItem(PANEL_KEY) !== 'closed';
+  } catch {
+    return true;
+  }
+};
+
 const RAIL = 78; // 22 pt gap + 56 pt buttons, mirrored on both sides so the card stays centred
 
 // W03 wide-web feed: one centred poster card with arrows + keyboard, and «Who is going» on the right.
@@ -40,6 +51,13 @@ export function WideFeed() {
   const { state, now, feed, previews, handlers, setTab } = useFeed(toast.show);
   const { loading } = useStore();
   const [index, setIndex] = useState(0);
+  const [panelOpen, setPanelOpen] = useState(readPanel);
+  const togglePanel = (open: boolean) => {
+    setPanelOpen(open);
+    try {
+      globalThis.localStorage?.setItem(PANEL_KEY, open ? 'open' : 'closed');
+    } catch {}
+  };
   const i = Math.min(index, Math.max(0, feed.length - 1));
   const event: Event | undefined = feed[i];
   // The next posters download while this one is on screen.
@@ -48,7 +66,7 @@ export function WideFeed() {
   }, [feed, i]);
 
   // W03: 440×720 card 92 pt from the top of a 900 pt window, hints 24 pt under it.
-  const panelW = Math.round(Math.min(PANEL_MAX, Math.max(PANEL_MIN, (winW - SIDEBAR_WIDTH) * 0.38)));
+  const panelW = panelOpen ? Math.round(Math.min(PANEL_MAX, Math.max(PANEL_MIN, (winW - SIDEBAR_WIDTH) * 0.38))) : 0;
   const column = winW - SIDEBAR_WIDTH - panelW;
   const byHeight = Math.round((Math.max(480, Math.min(720, winH - 180)) * 440) / 720);
   const cardW = Math.max(240, Math.min(byHeight, column - RAIL * 2 - 24));
@@ -111,12 +129,21 @@ export function WideFeed() {
     />
   );
 
+  const slide = useSlideIn(state.feedTab, FEED_TAB_ORDER);
+
   if (loading) return <WideFeedSkeleton tabs={tabs} cardW={cardW} cardH={cardH} panelW={panelW} />;
 
   if (!event) {
     return (
       <View style={[styles.root, { backgroundColor: c.bg }]}>
-        <EndOfFeed header={tabs} contentStyle={styles.endContent} />
+        {/* Same frame as a feed with events: tabs in place and the panel's column kept, so switching tabs never jumps. */}
+        <View style={styles.centre}>
+          <View style={styles.tabs}>{tabs}</View>
+          <Animated.View style={[styles.flex, slide]}>
+            <EndOfFeed contentStyle={styles.endContent} />
+          </Animated.View>
+        </View>
+        {panelOpen && <View style={[styles.panel, { width: panelW, borderLeftColor: c.line }]} />}
         {toast.node}
       </View>
     );
@@ -130,7 +157,7 @@ export function WideFeed() {
     <View style={[styles.root, { backgroundColor: c.bg }]}>
       <View ref={centre} style={styles.centre}>
         <View style={styles.tabs}>{tabs}</View>
-        <View style={styles.stage}>
+        <Animated.View style={[styles.stage, slide]}>
           <View style={{ width: cardW, height: cardH }}>
             <Pressable onPress={() => handlers.onOpen(event.id)} style={[styles.card, { width: cardW, height: cardH }]}>
               <PosterArt event={event} width={cardW} height={cardH} variant="card" />
@@ -165,6 +192,9 @@ export function WideFeed() {
             <View style={[styles.rail, { left: cardW + 22, bottom: Math.round(144 * k) }]}>
               <RailButton tone="surface" icon={Bookmark} active={saved} label={saved ? t('common.saved') : t('common.save')} onPress={() => handlers.onSave(event.id)} />
               <RailButton tone="surface" icon={Send} label={t('feed.share')} onPress={() => handlers.onShare(event)} />
+              {!panelOpen && (
+                <RailButton tone="surface" icon={Users} label={goingN > 0 ? String(goingN) : t('feed.wide.who')} onPress={() => togglePanel(true)} />
+              )}
             </View>
           </View>
 
@@ -173,10 +203,10 @@ export function WideFeed() {
             <Hint keys={t('feed.wide.keyGo')} label={t('feed.wide.hintGo')} />
             <Hint keys={t('feed.wide.keySkip')} label={t('feed.wide.hintSkip')} />
           </View>
-        </View>
+        </Animated.View>
       </View>
 
-      {whoPanel(event, goingN, previews[event.id]?.people ?? [])}
+      {panelOpen && whoPanel(event, goingN, previews[event.id]?.people ?? [])}
       {toast.node}
     </View>
   );
@@ -190,14 +220,29 @@ export function WideFeed() {
       <ScrollView style={[styles.panel, { width: panelW, borderLeftColor: c.line }]} contentContainerStyle={styles.panelContent}>
         <View style={styles.panelHead}>
           <Text style={[styles.panelTitle, { color: c.text }]}>{t('feed.wide.who')}</Text>
-          <View style={[styles.count, { backgroundColor: c.surface2 }]}>
-            <Text style={[onest('bold', 13, 16), { color: c.text }]}>{n}</Text>
-          </View>
+          {n > 0 && (
+            <View style={[styles.count, { backgroundColor: c.surface2 }]}>
+              <Text style={[onest('bold', 13, 16), { color: c.text }]}>{n}</Text>
+            </View>
+          )}
+          <Pressable accessibilityRole="button" accessibilityLabel={t('feed.wide.hidePanel')} hitSlop={10} onPress={() => togglePanel(false)}>
+            <X size={20} color={c.muted} strokeWidth={2} />
+          </Pressable>
         </View>
+        {/* No zeros: an empty room reads as an invitation, and "0 going solo" says nothing when nobody is going. */}
         <View style={[styles.summary, { backgroundColor: c.surface }]}>
-          <AvatarStack people={preview} size={36} extra={Math.max(0, n - preview.length)} />
+          {n > 0 && <AvatarStack people={preview} size={36} extra={Math.max(0, n - preview.length)} />}
           <View style={styles.textCol}>
-            <Text style={[onest('bold', 15, 19), { color: c.text }]}>{t('feed.wide.soloGoing', { count: solo })}</Text>
+            {n === 0 ? (
+              <>
+                <Text style={[onest('bold', 15, 19), { color: c.text }]}>{t('feed.card.firstTitle')}</Text>
+                <Text style={[onest('medium', 13, 17), { color: c.accentInk }]}>{t('feed.card.firstSub')}</Text>
+              </>
+            ) : (
+              <Text style={[onest('bold', 15, 19), { color: c.text }]}>
+                {solo > 0 ? t('feed.wide.soloGoing', { count: solo }) : t('feed.card.going', { count: n })}
+              </Text>
+            )}
             {known > 0 && <Text style={[onest('medium', 13, 17), { color: c.accentInk }]}>{t('feed.wide.known', { count: known })}</Text>}
           </View>
         </View>
@@ -269,7 +314,7 @@ function Hint({ keys, label }: { keys: string; label: string }) {
 const styles = StyleSheet.create({
   root: { flex: 1, flexDirection: 'row' },
   flex: { flex: 1 },
-  endContent: { paddingTop: 32, paddingBottom: 40, paddingHorizontal: 40, maxWidth: 560, width: '100%', alignSelf: 'center' },
+  endContent: { paddingTop: 8, paddingBottom: 40, paddingHorizontal: 40, maxWidth: 560, width: '100%', alignSelf: 'center' },
   centre: { flex: 1, paddingTop: 32, paddingBottom: 24 },
   tabs: { alignSelf: 'flex-start', marginLeft: 42 },
   // Card is centred in the column (6 pt right of centre in the frame); 29 pt under the tabs.

@@ -84,6 +84,7 @@ export const feed = {
     hintGo: 'я йду',
     hintSkip: 'пропустити',
     who: 'Хто йде',
+    hidePanel: 'Сховати панель «Хто йде»',
     soloGoing: { one: '{count} йде без компанії', few: '{count} ідуть без компанії', many: '{count} ідуть без компанії' },
     known: {
       one: '{count} був з тобою на попередніх подіях',
