@@ -68,6 +68,20 @@ export default function CommunitiesScreen() {
       ) : (
         <Text style={[onest('regular', 15, 21), { color: c.muted, marginTop: -6 }]}>{t('community.list.sub')}</Text>
       )}
+      {/* Newcomers kept asking what a community is for; once they are in one, the list explains itself. */}
+      {!loading && !searching && myCommunities(state).length === 0 && (
+        <View style={[styles.how, { backgroundColor: c.surface, borderColor: c.line }]}>
+          <Text style={[onest('bold', 15, 19), { color: c.text }]}>{t('community.list.howTitle')}</Text>
+          {(['howWhat', 'howJoin', 'howClosed'] as const).map((k, i) => (
+            <View key={k} style={styles.howRow}>
+              <View style={[styles.howNum, { backgroundColor: c.accent }]}>
+                <Text style={[onest('bold', 12, 15), { color: c.onAccent }]}>{i + 1}</Text>
+              </View>
+              <Text style={[onest('regular', 14, 19), { color: c.muted, flex: 1 }]}>{t(`community.list.${k}`)}</Text>
+            </View>
+          ))}
+        </View>
+      )}
 
       {loading ? (
         <View style={{ marginTop: 8 }}>
@@ -116,4 +130,7 @@ const styles = StyleSheet.create({
   mineList: { gap: 8 },
   list: { gap: 12 },
   more: { alignSelf: 'center', paddingVertical: 4 },
+  how: { borderRadius: 18, borderWidth: 1, padding: 16, gap: 10 },
+  howRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
+  howNum: { width: 22, height: 22, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
 });

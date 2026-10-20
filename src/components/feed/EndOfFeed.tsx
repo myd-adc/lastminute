@@ -53,7 +53,8 @@ export function EndOfFeed({ header, contentStyle }: Props) {
           : { title: t('feed.end.communitiesEmptyTitle'), sub: t('feed.end.communitiesEmptySub') }
         : { title: t('feed.end.forYouTitle'), sub: t('feed.end.forYouSub', forms) };
   // "For you" and an empty "Communities" lead to communities; the other tabs lead back to "For you".
-  const findCommunities = tab === 'forYou' || (tab === 'communities' && !inCommunities);
+  const noCommunities = tab === 'communities' && !inCommunities;
+  const findCommunities = tab === 'forYou' || noCommunities;
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: c.bg }} contentContainerStyle={[styles.content, contentStyle]}>
@@ -78,13 +79,16 @@ export function EndOfFeed({ header, contentStyle }: Props) {
         ) : (
           <Button label={t('feed.end.backToForYou')} onPress={() => dispatch({ type: 'setFeedTab', tab: 'forYou' })} />
         )}
-        <Button variant="secondary" label={t('feed.own.create')} onPress={() => router.push('/event/new')} />
-        <Button
-          variant="secondary"
-          label={notify ? t('feed.end.notifyOn') : t('feed.end.notifyOff')}
-          onPress={() => dispatch({ type: 'setNotify', key: 'newCommunityEvents', value: !notify })}
-        />
-        {notify && (
+        {/* Not in any community yet: finding one is the only thing to do here, so it stands alone. */}
+        {!noCommunities && <Button variant="secondary" label={t('feed.own.create')} onPress={() => router.push('/event/new')} />}
+        {!noCommunities && (
+          <Button
+            variant="secondary"
+            label={notify ? t('feed.end.notifyOn') : t('feed.end.notifyOff')}
+            onPress={() => dispatch({ type: 'setNotify', key: 'newCommunityEvents', value: !notify })}
+          />
+        )}
+        {notify && !noCommunities && (
           <Text style={[type.footnote, styles.center, { color: c.muted }]}>
             {t('feed.end.notifyNote')}
           </Text>
