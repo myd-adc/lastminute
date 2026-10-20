@@ -1,6 +1,6 @@
 import { router, useFocusEffect } from 'expo-router';
 import { Bookmark, ChevronDown, ChevronUp, Lock, Send, Users, X } from 'lucide-react-native';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Animated, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import { Avatar, AvatarStack, Button, IconButton, Pill, prefetchImages, SIDEBAR_WIDTH } from '@/components/ui';
@@ -10,7 +10,7 @@ import { genderForms } from '@/lib/genderForms';
 import { useT } from '@/i18n';
 import { acquaintances, attendeesFor, goingCount, nameAge, nextForYou, soloCount } from '@/lib/selectors';
 import { going as goingLabel, whenLabel } from '@/lib/time';
-import { useSlideIn } from '@/lib/motion';
+import { easeOut, ms, useSlideIn } from '@/lib/motion';
 import { display, fonts, onest, useTheme } from '@/theme';
 import { useStore } from '@/store/AppStore';
 
@@ -66,7 +66,8 @@ export function WideFeed() {
   }, [feed, i]);
 
   // W03: 440×720 card 92 pt from the top of a 900 pt window, hints 24 pt under it.
-  const panelW = panelOpen ? Math.round(Math.min(PANEL_MAX, Math.max(PANEL_MIN, (winW - SIDEBAR_WIDTH) * 0.38))) : 0;
+  const fullPanelW = Math.round(Math.min(PANEL_MAX, Math.max(PANEL_MIN, (winW - SIDEBAR_WIDTH) * 0.38)));
+  const panelW = panelOpen ? fullPanelW : 0;
   const column = winW - SIDEBAR_WIDTH - panelW;
   const byHeight = Math.round((Math.max(480, Math.min(720, winH - 180)) * 440) / 720);
   const cardW = Math.max(240, Math.min(byHeight, column - RAIL * 2 - 24));
@@ -136,14 +137,15 @@ export function WideFeed() {
   if (!event) {
     return (
       <View style={[styles.root, { backgroundColor: c.bg }]}>
-        {/* Same frame as a feed with events: tabs in place and the panel's column kept, so switching tabs never jumps. */}
+        {/* Same tree as a feed with events (tabs, content, panel in the same places), so switching tabs animates instead of jumping. */}
         <View style={styles.centre}>
           <View style={styles.tabs}>{tabs}</View>
           <Animated.View style={[styles.flex, slide]}>
             <EndOfFeed contentStyle={styles.endContent} />
           </Animated.View>
         </View>
-        {panelOpen && <View style={[styles.panel, { width: panelW, borderLeftColor: c.line }]} />}
+        {/* No event, nobody to show: the panel folds away instead of standing empty. */}
+        <SlidePanel visible={false} width={fullPanelW} />
         {toast.node}
       </View>
     );
@@ -206,7 +208,9 @@ export function WideFeed() {
         </Animated.View>
       </View>
 
-      {panelOpen && whoPanel(event, goingN, previews[event.id]?.people ?? [])}
+      <SlidePanel visible={panelOpen} width={fullPanelW}>
+        {whoPanel(event, goingN, previews[event.id]?.people ?? [])}
+      </SlidePanel>
       {toast.node}
     </View>
   );
@@ -217,7 +221,7 @@ export function WideFeed() {
     const list = attendeesFor(state, e.id).slice(0, 3);
     const next = nextForYou(state, now, e.id).slice(0, 3);
     return (
-      <ScrollView style={[styles.panel, { width: panelW, borderLeftColor: c.line }]} contentContainerStyle={styles.panelContent}>
+      <ScrollView style={[styles.panel, { width: fullPanelW, borderLeftColor: c.line }]} contentContainerStyle={styles.panelContent}>
         <View style={styles.panelHead}>
           <Text style={[styles.panelTitle, { color: c.text }]}>{t('feed.wide.who')}</Text>
           {n > 0 && (
@@ -301,6 +305,27 @@ export function WideFeed() {
       </ScrollView>
     );
   }
+}
+
+// The right-hand panel, opening and folding by width so the feed column glides instead of jumping. While it folds
+// it keeps showing what it last held; the content keeps its full width and is clipped, so it never reflows.
+function SlidePanel({ visible, width, children }: { visible: boolean; width: number; children?: ReactNode }) {
+  const [w] = useState(() => new Animated.Value(visible ? width : 0));
+  const [shown, setShown] = useState(visible);
+  const [last, setLast] = useState<ReactNode>(children);
+  if (visible && children && children !== last) setLast(children);
+  if (visible && !shown) setShown(true);
+  useEffect(() => {
+    Animated.timing(w, { toValue: visible ? width : 0, duration: ms(visible ? 300 : 240), easing: easeOut, useNativeDriver: false }).start(({ finished }) => {
+      if (finished && !visible) setShown(false);
+    });
+  }, [visible, width, w]);
+  if (!shown) return null;
+  return (
+    <Animated.View style={{ width: w, overflow: 'hidden' }}>
+      <View style={{ width, flex: 1 }}>{visible ? children : last}</View>
+    </Animated.View>
+  );
 }
 
 function Hint({ keys, label }: { keys: string; label: string }) {

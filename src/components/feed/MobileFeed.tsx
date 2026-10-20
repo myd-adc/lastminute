@@ -132,9 +132,13 @@ export function MobileFeed() {
   return (
     <View style={[styles.root, { backgroundColor: c.bg }]} onLayout={onLayout}>
       {feed.length === 0 ? (
-        <Animated.View style={[styles.root, slide]}>
-          <EndOfFeed header={header(false)} contentStyle={{ paddingTop: insets.top + 8, paddingBottom: clearance }} />
-        </Animated.View>
+        <>
+          {/* Only the content slides; the tabs stay where they are, as over the posters. */}
+          <Animated.View style={[styles.root, slide]}>
+            <EndOfFeed header={<View style={styles.headerSpace} />} contentStyle={{ paddingTop: insets.top + 8, paddingBottom: clearance }} />
+          </Animated.View>
+          <View style={[styles.header, { top: insets.top + 8 }]}>{header(false)}</View>
+        </>
       ) : (
         size.h > 0 && (
           <>
@@ -171,4 +175,5 @@ export function MobileFeed() {
 const styles = StyleSheet.create({
   root: { flex: 1 },
   header: { position: 'absolute', left: 20, right: 20 },
+  headerSpace: { height: 32 },
 });

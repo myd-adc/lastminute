@@ -115,8 +115,11 @@ export function useEscape(onEscape: () => void, enabled = true) {
 }
 
 // Content that slides in from the side it comes from when `key` changes (feed tabs: left of "For you" comes in from
-// the left). `order` lists the keys left to right. Set before paint, so the new content never flashes in place.
-export function useSlideIn(key: string, order: readonly string[], distance = 56) {
+// the left). `order` lists the keys left to right. A short travel from half-visible with a hard ease-out reads as
+// the page settling into place; a long slide from transparent showed the black background behind it.
+// Set before paint, so the new content never flashes in place.
+const settleEase = Easing.out(Easing.exp);
+export function useSlideIn(key: string, order: readonly string[], distance = 28) {
   const [x] = useState(() => new Animated.Value(0));
   const [opacity] = useState(() => new Animated.Value(1));
   const prev = useRef(key);
@@ -125,10 +128,10 @@ export function useSlideIn(key: string, order: readonly string[], distance = 56)
     const dir = Math.sign(order.indexOf(key) - order.indexOf(prev.current)) || 1;
     prev.current = key;
     x.setValue(dir * distance);
-    opacity.setValue(0);
+    opacity.setValue(0.5);
     Animated.parallel([
-      Animated.timing(x, { toValue: 0, duration: ms(280), easing: easeOut, useNativeDriver: ND }),
-      Animated.timing(opacity, { toValue: 1, duration: ms(220), easing: easeOut, useNativeDriver: ND }),
+      Animated.timing(x, { toValue: 0, duration: ms(320), easing: settleEase, useNativeDriver: ND }),
+      Animated.timing(opacity, { toValue: 1, duration: ms(180), easing: easeOut, useNativeDriver: ND }),
     ]).start();
   }, [key, order, distance, x, opacity]);
   return { opacity, transform: [{ translateX: x }] };
