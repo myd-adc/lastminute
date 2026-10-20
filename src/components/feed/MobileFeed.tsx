@@ -145,9 +145,12 @@ export function MobileFeed() {
               getItemLayout={(_, i) => ({ length: size.h, offset: size.h * i, index: i })}
               onScroll={onScroll}
               scrollEventThrottle={32}
-              windowSize={3}
-              initialNumToRender={2}
-              maxToRenderPerBatch={2}
+              // A quick flick crosses two or three pages before the list renders another batch; a wider window keeps
+              // the pages around the current one mounted so a fast thumb never lands on an empty, black page.
+              windowSize={7}
+              initialNumToRender={3}
+              maxToRenderPerBatch={3}
+              updateCellsBatchingPeriod={30}
             />
             <View style={[styles.header, { top: insets.top + 8 }]}>{header(true)}</View>
           </>
