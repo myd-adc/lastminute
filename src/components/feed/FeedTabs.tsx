@@ -1,8 +1,10 @@
 import { Bookmark } from 'lucide-react-native';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { Animated, Pressable, StyleSheet, View } from 'react-native';
 
 import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
+import { ND } from '@/lib/motion';
 import type { FeedTab } from '@/store/AppStore';
 import { onest, useTheme } from '@/theme';
 
@@ -25,6 +27,8 @@ export function FeedTabs({ value, onChange, onPoster, wide, savedCount }: Props)
   const { t } = useT();
   const size = wide ? 17 : 16;
   const savedOpen = value === 'saved';
+  // Centre of each tab, measured, so the underline can glide to the picked one.
+  const [centres, setCentres] = useState<Partial<Record<FeedTab, number>>>({});
   // Lime reads on posters and dark pages; the light page needs the deep-olive ink.
   const on = scheme === 'light' && !onPoster ? c.accentInk : c.accent;
   const items: { key: FeedTab; label: string }[] = [
@@ -38,6 +42,7 @@ export function FeedTabs({ value, onChange, onPoster, wide, savedCount }: Props)
       {/* Phone: a spacer as wide as the bookmark keeps the two tabs centred on the screen. */}
       {!wide && <View style={styles.saved} />}
       <View style={[styles.tabs, { gap: wide ? 24 : 18 }]} accessibilityRole="tablist">
+        <Underline x={centres[value]} width={wide ? 32 : 28} color={c.accent} />
         {items.map((item) => {
           const active = item.key === value;
           return (
@@ -48,6 +53,10 @@ export function FeedTabs({ value, onChange, onPoster, wide, savedCount }: Props)
               onPress={() => onChange(item.key)}
               hitSlop={8}
               style={[styles.tab, { gap: wide ? 6 : 4 }]}
+              onLayout={(ev) => {
+                const { x, width } = ev.nativeEvent.layout;
+                setCentres((m) => (m[item.key] === x + width / 2 ? m : { ...m, [item.key]: x + width / 2 }));
+              }}
             >
               <Text
                 style={[
@@ -59,7 +68,8 @@ export function FeedTabs({ value, onChange, onPoster, wide, savedCount }: Props)
               >
                 {item.label}
               </Text>
-              {active && <View style={[styles.underline, { width: wide ? 32 : 28, backgroundColor: c.accent }]} />}
+              {/* Keeps the row height; the visible underline is the one that slides between tabs. */}
+              <View style={styles.underline} />
             </Pressable>
           );
         })}
@@ -90,6 +100,24 @@ const styles = StyleSheet.create({
   tab: { alignItems: 'center', flexShrink: 1 },
   dim: { opacity: 0.6 },
   underline: { height: 3, borderRadius: 2 },
+  slider: { position: 'absolute', left: 0, bottom: 0, height: 3, borderRadius: 2 },
   saved: { width: 28, height: 28, alignItems: 'center', justifyContent: 'center' },
   badge: { position: 'absolute', top: -4, right: -6, minWidth: 16, height: 16, borderRadius: 8, paddingHorizontal: 4, alignItems: 'center', justifyContent: 'center' },
 });
+
+// The accent underline sliding to the active tab with a light spring; it jumps into place the first time.
+function Underline({ x, width, color }: { x?: number; width: number; color: string }) {
+  const [pos] = useState(() => new Animated.Value(x === undefined ? 0 : x - width / 2));
+  const placed = useRef(x !== undefined);
+  useEffect(() => {
+    if (x === undefined) return;
+    if (!placed.current) {
+      placed.current = true;
+      pos.setValue(x - width / 2);
+      return;
+    }
+    Animated.spring(pos, { toValue: x - width / 2, useNativeDriver: ND, speed: 16, bounciness: 7 }).start();
+  }, [x, width, pos]);
+  if (x === undefined) return null;
+  return <Animated.View style={[styles.slider, { width, backgroundColor: color, transform: [{ translateX: pos }] }]} />;
+}
