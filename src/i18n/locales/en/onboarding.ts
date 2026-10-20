@@ -99,7 +99,7 @@ export const onboarding: Translation<typeof Uk> = {
     talkPlaceholder: 'anything but deadlines',
     ideas: 'Ideas:',
     idea: {
-      concert: 'the best gig in Lviv',
+      concert: 'the best gig this year',
       reading: 'what I’m reading now',
       boardGame: 'a board game I always win',
     },

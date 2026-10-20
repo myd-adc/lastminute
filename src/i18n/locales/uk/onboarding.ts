@@ -97,7 +97,7 @@ export const onboarding = {
     talkPlaceholder: 'про що завгодно, крім дедлайнів',
     ideas: 'Ідеї:',
     idea: {
-      concert: 'найкращий концерт у Львові',
+      concert: 'найкращий концерт цього року',
       reading: 'що зараз читаю',
       boardGame: 'настолка, в яку всіх обігрую',
     },
