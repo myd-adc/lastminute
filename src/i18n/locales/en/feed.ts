@@ -53,6 +53,8 @@ export const feed: Translation<typeof Uk> = {
   card: {
     going: { one: '{count} going', other: '{count} going' },
     soloHint: '{count} going solo — there’s a Solo group for them',
+    firstTitle: '✨ Start this crowd',
+    firstSub: 'Whoever taps “I’m going” after you will see you in the room.',
     met: { one: 'including {count} you’ve met', other: 'including {count} you’ve met' },
   },
   end: {

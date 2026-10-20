@@ -51,6 +51,8 @@ export const feed = {
   card: {
     going: { one: '{count} йде', few: '{count} йдуть', many: '{count} йдуть' },
     soloHint: '{count} без компанії — для них є група «Самі»',
+    firstTitle: '✨ Почни цю компанію',
+    firstSub: 'Хто натисне «Я йду» після тебе — побачить тебе в кімнаті.',
     met: { one: 'Серед них {count} знайомий', few: 'Серед них {count} знайомі', many: 'Серед них {count} знайомих' },
   },
   end: {
