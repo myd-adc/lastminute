@@ -1,5 +1,5 @@
 import { router, useFocusEffect } from 'expo-router';
-import { Bookmark, ChevronDown, ChevronUp, Lock, Send, X } from 'lucide-react-native';
+import { Bookmark, ChevronDown, ChevronUp, Lock, Send } from 'lucide-react-native';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 
@@ -151,7 +151,6 @@ export function WideFeed() {
                 </Text>
               </Pressable>
               <View style={styles.actions}>
-                <IconButton icon={X} size={56} accessibilityLabel={t('feed.wide.skip')} onPress={() => handlers.onSkip(event.id)} />
                 <Button label={t('common.imGoing')} onPress={() => handlers.onGo(event.id)} style={styles.flex} />
               </View>
             </View>

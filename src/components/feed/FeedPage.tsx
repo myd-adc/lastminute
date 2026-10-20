@@ -1,8 +1,8 @@
-import { Bookmark, Send, Users, X } from 'lucide-react-native';
+import { Bookmark, Send, Users } from 'lucide-react-native';
 import { memo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { AvatarStack, Button, IconButton, Pill } from '@/components/ui';
+import { AvatarStack, Button, Pill } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import type { Event } from '@/data/types';
 import { useT } from '@/i18n';
@@ -88,7 +88,6 @@ export const FeedPage = memo(function FeedPage(p: Props) {
         </View>
 
         <View style={styles.actions}>
-          <IconButton icon={X} size={56} accessibilityLabel={t('common.skip')} onPress={() => p.onSkip(e.id)} />
           <Button label={t('common.imGoing')} onPress={() => p.onGo(e.id)} style={styles.go} />
         </View>
       </View>
