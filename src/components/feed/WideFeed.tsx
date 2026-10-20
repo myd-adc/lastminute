@@ -359,7 +359,8 @@ const styles = StyleSheet.create({
   hints: { flexDirection: 'row', justifyContent: 'center', gap: 16, marginTop: 24 },
   hint: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   key: { borderWidth: 1, borderRadius: 6, paddingHorizontal: 7, paddingVertical: 2 },
-  panel: { flexGrow: 0, borderLeftWidth: 1 },
+  // Fills the SlidePanel's height, so the dividing line runs to the bottom of the window.
+  panel: { flex: 1, borderLeftWidth: 1 },
   panelContent: { paddingTop: 32, paddingHorizontal: 28, paddingBottom: 28, gap: 16 },
   panelHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   panelTitle: { flex: 1, fontFamily: fonts.displaySemibold, fontSize: 18, lineHeight: 22 },
