@@ -86,7 +86,9 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
           setRemoteData(JSON.parse(remote));
           setRemoteReady(true);
         }
-        dispatch({ type: 'hydrate', state: { ...initialState, ...saved } });
+        // The "Met" tab is gone; a state saved while it was open falls back to "For you".
+        const feedTab = (['forYou', 'communities', 'saved'] as const).includes(saved.feedTab) ? saved.feedTab : 'forYou';
+        dispatch({ type: 'hydrate', state: { ...initialState, ...saved, feedTab } });
       })
       .catch(() => {})
       .finally(() => setHydrated(true));

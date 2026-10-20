@@ -47,13 +47,11 @@ export function EndOfFeed({ header, contentStyle }: Props) {
   const copy =
     tab === 'saved'
       ? { title: t('feed.end.savedTitle'), sub: t('feed.end.savedSub') }
-      : tab === 'met'
-        ? { title: t('feed.end.metTitle'), sub: t('feed.end.metSub', forms) }
-        : tab === 'communities'
-          ? inCommunities
-            ? { title: t('feed.end.communitiesTitle'), sub: t('feed.end.communitiesSub') }
-            : { title: t('feed.end.communitiesEmptyTitle'), sub: t('feed.end.communitiesEmptySub') }
-          : { title: t('feed.end.forYouTitle'), sub: t('feed.end.forYouSub', forms) };
+      : tab === 'communities'
+        ? inCommunities
+          ? { title: t('feed.end.communitiesTitle'), sub: t('feed.end.communitiesSub') }
+          : { title: t('feed.end.communitiesEmptyTitle'), sub: t('feed.end.communitiesEmptySub') }
+        : { title: t('feed.end.forYouTitle'), sub: t('feed.end.forYouSub', forms) };
   // "For you" and an empty "Communities" lead to communities; the other tabs lead back to "For you".
   const findCommunities = tab === 'forYou' || (tab === 'communities' && !inCommunities);
 

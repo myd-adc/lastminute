@@ -70,10 +70,6 @@ export function tabEvents(state: State, now: number, tab: State['feedTab']): Eve
   const all = upcoming(state, now).filter((e) => oldEnough(state, e, now));
   if (tab === 'saved') return all.filter((e) => state.saved[e.id]);
   if (tab === 'communities') return all.filter((e) => e.communityId && isMember(state, e.communityId));
-  if (tab === 'met') {
-    const friends = friendIds(state);
-    return all.filter((e) => metCount(state, e, friends) > 0);
-  }
   return [...all].sort(byInterest(state));
 }
 

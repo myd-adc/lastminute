@@ -26,7 +26,7 @@ export type Going = {
 };
 
 // 'saved' is reached from the bookmark next to the tabs and shows as a tab only while open.
-export type FeedTab = 'forYou' | 'communities' | 'met' | 'saved';
+export type FeedTab = 'forYou' | 'communities' | 'saved';
 
 export type Report = { userId: string; eventId?: string; reason: ReportReason; alsoBlock: boolean; at: string };
 

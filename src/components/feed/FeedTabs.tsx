@@ -14,7 +14,7 @@ type Props = {
   savedCount: number;
 };
 
-// M06/M10/W03 header tabs, TikTok order: "Communities" · "Met" · "For you" (+ "Saved" on wide, while it is
+// M06/M10/W03 header tabs: "Communities" · "For you" (+ "Saved" on wide, while it is
 // picked), accent underline under the active one. The bookmark on the right opens and closes the saved stack.
 // Phone row is 32 pt high (Figma y = 58…90, i.e. 8 pt under the status bar).
 export function FeedTabs({ value, onChange, onPoster, wide, savedCount }: Props) {
@@ -26,7 +26,6 @@ export function FeedTabs({ value, onChange, onPoster, wide, savedCount }: Props)
   const on = scheme === 'light' && !onPoster ? c.accentInk : c.accent;
   const items: { key: FeedTab; label: string }[] = [
     { key: 'communities', label: t('feed.tabs.communities') },
-    { key: 'met', label: t('feed.tabs.met') },
     { key: 'forYou', label: t('feed.tabs.forYou') },
     // Four labels do not fit a 390 pt row; on the phone the lit bookmark on the tab bar is what shows this state.
     ...(wide && value === 'saved' ? [{ key: 'saved' as const, label: t('feed.tabs.saved') }] : []),

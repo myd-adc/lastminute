@@ -44,7 +44,6 @@ export const feed = {
   tabs: {
     forYou: 'Для тебе',
     communities: 'Спільноти',
-    met: 'Знайомі',
     saved: 'Збережені',
     showSaved: 'Показати збережені',
     hideSaved: 'Назад до стрічки',
@@ -64,8 +63,6 @@ export const feed = {
     communitiesEmptyTitle: 'Ти ще не в жодній спільноті',
     communitiesEmptySub: 'Вступи у відкриту спільноту або створи власну — тут будуть її події.',
     findCommunities: 'Знайти спільноту',
-    metTitle: 'Поки ніхто зі знайомих не йде',
-    metSub: 'Тут будуть події, куди йдуть люди, з якими ти вже ходи{v}. Хто саме — видно після «Я йду».',
     backToForYou: 'До «Для тебе»',
     notifyOn: '✓ Сповістимо про нові',
     notifyOff: '🔔 Сповістити про нові',

@@ -46,7 +46,6 @@ export const feed: Translation<typeof Uk> = {
   tabs: {
     forYou: 'For you',
     communities: 'Communities',
-    met: 'Met',
     saved: 'Saved',
     showSaved: 'Show saved',
     hideSaved: 'Back to the feed',
@@ -66,8 +65,6 @@ export const feed: Translation<typeof Uk> = {
     communitiesEmptyTitle: 'You’re not in any community yet',
     communitiesEmptySub: 'Join an open community or start your own — its events will show up here.',
     findCommunities: 'Find a community',
-    metTitle: 'Nobody you’ve met is going yet',
-    metSub: 'Events where people you’ve been out with are going show up here. Who exactly — after you tap “I’m going”.',
     backToForYou: 'Back to For you',
     notifyOn: '✓ We’ll tell you',
     notifyOff: '🔔 Notify me about new ones',
