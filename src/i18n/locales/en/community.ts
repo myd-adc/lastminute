@@ -17,6 +17,7 @@ export const community: Translation<typeof Uk> = {
     closeSearch: 'Close search',
     searchPlaceholder: 'Name or domain',
     noMatch: 'Nothing matched',
+    filter: { all: 'All', open: 'Open', closed: 'Closed' },
     showMore: { one: '{count} more community', other: '{count} more communities' },
     discover: 'Discover',
     create: '+ Create a community',

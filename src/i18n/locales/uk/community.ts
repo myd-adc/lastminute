@@ -15,6 +15,7 @@ export const community = {
     closeSearch: 'Закрити пошук',
     searchPlaceholder: 'Назва або домен',
     noMatch: 'Нічого не знайшли',
+    filter: { all: 'Усі', open: 'Відкриті', closed: 'Закриті' },
     showMore: { one: 'Ще {count} спільнота', few: 'Ще {count} спільноти', many: 'Ще {count} спільнот' },
     discover: 'Знайти',
     create: '+ Створити спільноту',
