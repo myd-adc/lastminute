@@ -136,3 +136,29 @@ export function useSlideIn(key: string, order: readonly string[], distance = 28)
   }, [key, order, distance, x, opacity]);
   return { opacity, transform: [{ translateX: x }] };
 }
+
+// Horizontal swipe between neighbours in `order` (the feed tabs). It claims the gesture only when it is clearly
+// sideways, so vertical scrolling stays with the list; the content follows the finger with resistance, then either
+// hands over to the next key or springs back. Swiping left moves to the key on the right.
+export function useSideSwipe(key: string, order: readonly string[], onChange: (next: string) => void) {
+  const [drag] = useState(() => new Animated.Value(0));
+  const i = order.indexOf(key);
+  const springBack = () => Animated.spring(drag, { toValue: 0, useNativeDriver: ND, speed: 18, bounciness: 6 }).start();
+  const responder = PanResponder.create({
+    onMoveShouldSetPanResponderCapture: (_, g) => Math.abs(g.dx) > 14 && Math.abs(g.dx) > Math.abs(g.dy) * 2,
+    onPanResponderMove: (_, g) => {
+      // No neighbour on that side: a stiffer pull says so.
+      const edge = (g.dx > 0 && i <= 0) || (g.dx < 0 && i >= order.length - 1);
+      drag.setValue(g.dx * (edge ? 0.12 : 0.35));
+    },
+    onPanResponderRelease: (_, g) => {
+      const next = g.dx < 0 ? order[i + 1] : order[i - 1];
+      if (next && (Math.abs(g.dx) > 70 || Math.abs(g.vx) > 0.5)) {
+        drag.setValue(0);
+        onChange(next);
+      } else springBack();
+    },
+    onPanResponderTerminate: springBack,
+  });
+  return { drag, panHandlers: responder.panHandlers };
+}

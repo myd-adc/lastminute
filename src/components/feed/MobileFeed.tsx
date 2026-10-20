@@ -6,11 +6,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { prefetchImages } from '@/components/ui';
 import type { Event } from '@/data/types';
 import { tabBarClearance } from '@/lib/layout';
-import { useSlideIn } from '@/lib/motion';
+import { useSideSwipe, useSlideIn } from '@/lib/motion';
 import { goingCount, metCount, soloCount } from '@/lib/selectors';
 import { whenLabel } from '@/lib/time';
 import { useTheme } from '@/theme';
-import { useStore } from '@/store/AppStore';
+import { useStore, type FeedTab } from '@/store/AppStore';
 
 import { EndOfFeed } from './EndOfFeed';
 import { FeedPage } from './FeedPage';
@@ -18,6 +18,8 @@ import { MobileFeedSkeleton } from './FeedSkeleton';
 import { FEED_TAB_ORDER, FeedTabs } from './FeedTabs';
 import { useToast } from './Toast';
 import { useFeed } from './useFeed';
+
+const SWIPE_TABS = ['communities', 'forYou'] as const;
 
 // M06 phone feed: full-height vertical pages (FlatList paging). Web also pages on wheel/trackpad and ↑/↓/←/→ keys.
 export function MobileFeed() {
@@ -126,6 +128,9 @@ export function MobileFeed() {
   );
 
   const slide = useSlideIn(state.feedTab, FEED_TAB_ORDER);
+  // "Saved" is opened from the bookmark, so a swipe moves only between the two tabs on show.
+  const swipe = useSideSwipe(state.feedTab, SWIPE_TABS, (tab) => setTab(tab as FeedTab));
+  const moved = [slide, { transform: [...slide.transform, { translateX: swipe.drag }] }];
 
   if (loading) return <MobileFeedSkeleton header={header(false)} />;
 
@@ -134,7 +139,7 @@ export function MobileFeed() {
       {feed.length === 0 ? (
         <>
           {/* Only the content slides; the tabs stay where they are, as over the posters. */}
-          <Animated.View style={[styles.root, slide]}>
+          <Animated.View style={[styles.root, ...moved]} {...swipe.panHandlers}>
             <EndOfFeed header={<View style={styles.headerSpace} />} contentStyle={{ paddingTop: insets.top + 8, paddingBottom: clearance }} />
           </Animated.View>
           <View style={[styles.header, { top: insets.top + 8 }]}>{header(false)}</View>
@@ -142,7 +147,7 @@ export function MobileFeed() {
       ) : (
         size.h > 0 && (
           <>
-            <Animated.View style={[styles.root, slide]}>
+            <Animated.View style={[styles.root, ...moved]} {...swipe.panHandlers}>
               <FlatList
                 ref={listRef}
                 data={feed}
