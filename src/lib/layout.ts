@@ -8,9 +8,10 @@ export function useIsWide() {
   return Platform.OS === 'web' && width >= WIDE_BREAKPOINT;
 }
 
-// Figma: the 64 pt glass tab bar ends 34 pt above the screen bottom (the home-indicator zone on a 390×844 frame).
+// The 64 pt glass tab bar.
 export const TAB_BAR_HEIGHT = 64;
-export const tabBarBottom = (bottomInset: number) => Math.max(bottomInset, 34);
+// Closer to the bottom than the 34 pt in the frames: on a device the home indicator's inset is enough, minus a little.
+export const tabBarBottom = (bottomInset: number) => Math.max(bottomInset - 12, 14);
 // Scroll content clears the bar plus a 16 pt gap.
 export const tabBarClearance = (bottomInset: number) => TAB_BAR_HEIGHT + tabBarBottom(bottomInset) + 16;
 // Pinned bottom CTAs sit 38 pt above the screen bottom in the frames (34 pt home indicator + 4).
