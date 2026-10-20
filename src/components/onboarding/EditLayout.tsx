@@ -26,10 +26,15 @@ export function EditLayout({
   const { t } = useT();
   const save = <Button label={t('common.save')} onPress={onSave} disabled={!canSave} style={wide && styles.wideSave} />;
   return (
-    <Screen keyboard footer={save}>
+    // Wide: the form and the preview card sit side by side, so the screen needs more than the default 640 pt column;
+    // "Save" goes under the form instead of a footer that would be centred under both.
+    <Screen keyboard footer={wide ? undefined : save} contentStyle={wide && styles.wideColumn}>
       <Header title={title} onBack={() => goBack('/me')} />
       <View style={wide ? styles.wideRow : { gap: 16 }}>
-        <View style={wide ? styles.wideForm : { gap: 16 }}>{children}</View>
+        <View style={wide ? styles.wideForm : { gap: 16 }}>
+          {children}
+          {wide && save}
+        </View>
         {wide && preview && (
           <View style={styles.widePreview}>
             <PreviewCard person={preview} />
@@ -41,8 +46,9 @@ export function EditLayout({
 }
 
 const styles = StyleSheet.create({
+  wideColumn: { maxWidth: 1000 },
   wideRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 48 },
   wideForm: { flex: 1, maxWidth: 600, gap: 16 },
   widePreview: { width: 320 },
-  wideSave: { alignSelf: 'flex-start', minWidth: 240 },
+  wideSave: { alignSelf: 'flex-start', minWidth: 240, marginTop: 8 },
 });
