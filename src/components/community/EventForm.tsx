@@ -131,18 +131,18 @@ export function EventForm({ title: head, sub, communityId, defaultGradient, note
           <Text style={[onest('regular', 13, 17.5), { color: c.muted }]}>{t('community.event.posterSub')}</Text>
         </View>
       </Pressable>
-      {posterOpen && (
-        <View style={{ gap: 12 }}>
-          <Segmented
-            options={[
-              { key: 'words', label: t('community.event.posterWordsKind') },
-              { key: 'photo', label: t('community.event.posterPhotoKind') },
-            ]}
-            value={posterKind}
-            onChange={setPosterKind}
-          />
-        </View>
-      )}
+      {/* Always on show: hidden behind the poster row, people never found that a photo was an option. */}
+      <Segmented
+        options={[
+          { key: 'words', label: t('community.event.posterWordsKind') },
+          { key: 'photo', label: t('community.event.posterPhotoKind') },
+        ]}
+        value={posterKind}
+        onChange={(k) => {
+          setPosterKind(k);
+          setPosterOpen(true);
+        }}
+      />
       {posterOpen && posterKind === 'photo' && (
         <View style={styles.photoRow}>
           {image && <Image source={{ uri: image }} style={styles.photoThumb} resizeMode="cover" />}
