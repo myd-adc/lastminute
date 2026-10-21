@@ -7,6 +7,10 @@ export const feed: Translation<typeof Uk> = {
   shareArrow: '↗ Send',
   shareToFriend: 'Send to a friend',
   shareText: '{title} — {when}, {venue}. Want to go together?',
+  qr: {
+    title: 'Show a friend this code',
+    sub: 'They point their camera at it and the event opens.',
+  },
   own: {
     title: 'Your own event',
     sub: 'Going somewhere and looking for company? Say so — it shows up in "For you".',

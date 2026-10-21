@@ -46,6 +46,13 @@ export const community: Translation<typeof Uk> = {
     addEvent: '+ Add event',
     settings: 'Settings',
     joinFailed: 'Couldn’t join. Try again.',
+    invite: 'Invite',
+  },
+  invite: {
+    title: 'Invite to “{name}”',
+    sub: 'Point a camera at it — the community page opens, and they can join from there.',
+    subDomain: 'Point a camera at it — the community page opens. Only people with an @{domain} address can join.',
+    shareText: 'Join “{name}” on LastMinute',
   },
   email: {
     label: 'Your @{domain} email',

@@ -1,10 +1,11 @@
 import { Linking, Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
+import { QrCode } from '@/components/ui/QrCode';
 import { Text } from '@/components/ui/Text';
 import { useT } from '@/i18n';
+import { siteQrUrl } from '@/lib/links';
 import { onest, useTheme } from '@/theme';
 
-import { QrPlaceholder } from './QrPlaceholder';
 
 const APP_STORE = 'https://apps.apple.com/';
 const GOOGLE_PLAY = 'https://play.google.com/store';
@@ -15,7 +16,7 @@ export function QrCard({ style }: { style?: StyleProp<ViewStyle> }) {
   const { t } = useT();
   return (
     <View style={[styles.card, { backgroundColor: c.bg }, style]}>
-      <QrPlaceholder size={132} />
+      <QrCode value={siteQrUrl} label={t('onboarding.login.qrA11y')} size={132} />
       <View style={{ flex: 1, gap: 8 }}>
         <Text style={[onest('bold', 16), { color: c.text }]}>{t('onboarding.login.phoneBetter')}</Text>
         <Text style={[onest('regular', 13, 18), { color: c.muted }]}>{t('onboarding.login.phoneBetterText')}</Text>

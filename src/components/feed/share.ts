@@ -1,26 +1,30 @@
 import * as Linking from 'expo-linking';
 import { Platform, Share } from 'react-native';
 
-import type { Event } from '@/data/types';
+import type { Community, Event } from '@/data/types';
 import { t } from '@/i18n/translate';
 import { whenLabel } from '@/lib/time';
 
 export type ShareResult = 'shared' | 'copied' | 'cancelled' | 'failed';
 
-const eventUrl = (e: Event) =>
-  Platform.OS === 'web' && typeof window !== 'undefined' ? `${window.location.origin}/event/${e.id}` : Linking.createURL(`/event/${e.id}`);
+const appUrl = (path: string) =>
+  Platform.OS === 'web' && typeof window !== 'undefined' ? `${window.location.origin}${path}` : Linking.createURL(path);
 
-// Share button: native share sheet; on web the Web Share API when present, otherwise copy the link.
-export async function shareEvent(e: Event, now: number): Promise<ShareResult> {
-  const url = eventUrl(e);
-  const text = t('feed.shareText', { title: e.title, when: whenLabel(e.startsAt, now), venue: e.venue });
+export const shareEvent = (e: Event, now: number) =>
+  shareLink(e.title, t('feed.shareText', { title: e.title, when: whenLabel(e.startsAt, now), venue: e.venue }), appUrl(`/event/${e.id}`));
+
+export const shareCommunity = (c: Community) =>
+  shareLink(c.name, t('community.invite.shareText', { name: c.name }), appUrl(`/community/${c.id}`));
+
+// Native share sheet; on web the Web Share API when present, otherwise copy the link.
+async function shareLink(title: string, text: string, url: string): Promise<ShareResult> {
   try {
     if (Platform.OS !== 'web') {
-      const r = await Share.share({ title: e.title, message: `${text}\n${url}`, url });
+      const r = await Share.share({ title, message: `${text}\n${url}`, url });
       return r.action === Share.dismissedAction ? 'cancelled' : 'shared';
     }
     if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
-      await navigator.share({ title: e.title, text, url });
+      await navigator.share({ title, text, url });
       return 'shared';
     }
     if (typeof navigator !== 'undefined' && navigator.clipboard) {

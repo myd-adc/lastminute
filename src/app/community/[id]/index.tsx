@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { ChevronLeft, SlidersHorizontal } from 'lucide-react-native';
+import { ChevronLeft, QrCode, SlidersHorizontal } from 'lucide-react-native';
 import { useState, type ReactNode } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
@@ -8,13 +8,15 @@ import { CommunityAvatar } from '@/components/community/CommunityAvatar';
 import { communityCounts } from '@/components/community/text';
 import { useDomainJoin } from '@/components/community/DomainJoin';
 import { PageHead } from '@/components/community/PageHead';
+import { shareCommunity } from '@/components/feed/share';
 import { Glow, glows } from '@/components/profile/Glow';
-import { Button, goBack, Pill, Screen } from '@/components/ui';
+import { Button, goBack, Pill, QrSheet, Screen } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { getCommunity } from '@/data/mock';
 import type { Community } from '@/data/types';
 import { useT } from '@/i18n';
 import { useIsWide, webHitArea } from '@/lib/layout';
+import { communityQrUrl } from '@/lib/links';
 import { communityEvents, goingCount, isMember } from '@/lib/selectors';
 import { useNow, useStore } from '@/store/AppStore';
 import { display, onest, type, useTheme } from '@/theme';
@@ -57,6 +59,7 @@ function CommunityPage({ community }: { community: Community }) {
   const wide = useIsWide();
   const member = isMember(state, community.id);
   const join = useDomainJoin(community);
+  const [inviting, setInviting] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const list = communityEvents(state, now, community.id);
@@ -91,15 +94,23 @@ function CommunityPage({ community }: { community: Community }) {
         title={community.name}
         sub={community.description || undefined}
         right={
-          community.mine ? (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={t('community.page.settings')}
-              hitSlop={12}
-              onPress={() => router.push({ pathname: '/community/[id]/settings', params: { id: community.id } })}
-            >
-              <SlidersHorizontal size={22} color={c.text} strokeWidth={2} />
-            </Pressable>
+          member || community.mine ? (
+            <View style={styles.actions}>
+              <Pressable accessibilityRole="button" accessibilityLabel={t('community.page.invite')} hitSlop={12} onPress={() => setInviting(true)} style={webHitArea(22)}>
+                <QrCode size={22} color={c.text} strokeWidth={2} />
+              </Pressable>
+              {community.mine && (
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={t('community.page.settings')}
+                  hitSlop={12}
+                  onPress={() => router.push({ pathname: '/community/[id]/settings', params: { id: community.id } })}
+                  style={webHitArea(22)}
+                >
+                  <SlidersHorizontal size={22} color={c.text} strokeWidth={2} />
+                </Pressable>
+              )}
+            </View>
           ) : undefined
         }
       />
@@ -132,11 +143,21 @@ function CommunityPage({ community }: { community: Community }) {
               : t('community.page.noEvents')}
         </Text>
       )}
+      <QrSheet
+        visible={inviting}
+        onClose={() => setInviting(false)}
+        title={t('community.invite.title', { name: community.name })}
+        sub={community.emailDomain ? t('community.invite.subDomain', { domain: community.emailDomain }) : t('community.invite.sub')}
+        subject={community.name}
+        url={communityQrUrl(community.id)}
+        onShare={() => shareCommunity(community)}
+      />
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
+  actions: { flexDirection: 'row', alignItems: 'center', gap: 20 },
   wide: { maxWidth: 720, width: '100%', alignSelf: 'center' },
   top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: 40 },
   head: { flexDirection: 'row', alignItems: 'center', gap: 16 },

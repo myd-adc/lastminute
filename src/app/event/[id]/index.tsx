@@ -10,13 +10,14 @@ import { categoryLabel, mapsUrl, priceLabel, shortTitle } from '@/components/fee
 import { PosterArt } from '@/components/feed/PosterArt';
 import { shareEvent } from '@/components/feed/share';
 import { useToast } from '@/components/feed/Toast';
-import { Avatar, AvatarStack, Button, Chip, CloseButton, goBack, IconButton, Pill, Sheet } from '@/components/ui';
+import { Avatar, AvatarStack, Button, Chip, CloseButton, goBack, IconButton, Pill, QrSheet, Sheet } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { getEvent, soloGroups } from '@/data/mock';
 import type { Event } from '@/data/types';
 import { useT } from '@/i18n';
 import { t as translate } from '@/i18n/translate';
 import { fullWindow, useIsWide } from '@/lib/layout';
+import { eventQrUrl } from '@/lib/links';
 import { pop, slideUp, useEscape, useOverlayMotion, useSheetDrag } from '@/lib/motion';
 import { acquaintances, attendeesFor, eventAuthor, goingCount, isMyEvent, soloCount, soloGroupMembers } from '@/lib/selectors';
 import { dayLabel, whenLabel } from '@/lib/time';
@@ -69,11 +70,20 @@ function useDetails(event: Event) {
   const hasGroup = !!soloGroups[event.id];
   const knownN = acquaintances(state, event.id).length;
 
-  const share = () =>
-    shareEvent(event, now).then((r) => {
-      if (r === 'copied') toast.show(t('feed.toast.linkCopied'));
-      else if (r === 'failed') toast.show(t('feed.toast.shareFailed'));
-    });
+  // "Send to a friend" opens the code first: the friend is usually sitting right there.
+  const [qrOpen, setQrOpen] = useState(false);
+  const share = () => setQrOpen(true);
+  const qr = (
+    <QrSheet
+      visible={qrOpen}
+      onClose={() => setQrOpen(false)}
+      title={t('feed.qr.title')}
+      sub={t('feed.qr.sub')}
+      subject={event.title}
+      url={eventQrUrl(event.id)}
+      onShare={() => shareEvent(event, now)}
+    />
+  );
   const toggleSave = () => dispatch({ type: 'toggleSaved', eventId: event.id });
   const openRoom = () => router.replace({ pathname: '/event/[id]/room', params: { id: event.id } });
   const go = (patch?: Partial<Going>) => {
@@ -83,7 +93,7 @@ function useDetails(event: Event) {
   };
   const openUrl = (url: string) => Linking.openURL(url).catch(() => toast.show(t('feed.toast.openFailed')));
 
-  return { state, dispatch, now, toast, going, saved, preview, goingN, soloN, knownN, hasGroup, share, toggleSave, openRoom, go, openUrl, cancelling, setCancelling };
+  return { state, dispatch, now, toast, going, saved, preview, goingN, soloN, knownN, hasGroup, share, qr, toggleSave, openRoom, go, openUrl, cancelling, setCancelling };
 }
 
 // Figma dims: M07 rgba(bg, 0.55) behind the sheet, W04 rgba(bg, 0.73) behind the dialog (same in light).
@@ -193,6 +203,7 @@ function MobileDetails({ event }: { event: Event }) {
         </View>
       </Animated.View>
       <CancelEventSheet event={event} visible={d.cancelling} onClose={() => d.setCancelling(false)} />
+      {d.qr}
       {d.toast.node}
     </>
   );
@@ -275,6 +286,7 @@ function WideDetails({ event }: { event: Event }) {
         </Pressable>
       </Animated.View>
       <CancelEventSheet event={event} visible={d.cancelling} onClose={() => d.setCancelling(false)} />
+      {d.qr}
       {d.toast.node}
     </View>
   );

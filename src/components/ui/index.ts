@@ -8,6 +8,8 @@ export { Gradient } from './Gradient';
 export { IconButton } from './IconButton';
 export { Placeholder } from './Placeholder';
 export { prefetchImages, RemoteImage } from './RemoteImage';
+export { QrCode } from './QrCode';
+export { QrSheet, type ShareOutcome } from './QrSheet';
 export { goBack, Header, Screen, ScreenTitle, SectionLabel } from './Screen';
 export { CloseButton, Sheet } from './Sheet';
 export { activeTabFor, SIDEBAR_WIDTH, WebShell } from './WebShell';

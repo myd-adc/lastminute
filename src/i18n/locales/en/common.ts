@@ -30,6 +30,12 @@ export const common: Translation<typeof Uk> = {
   saved: 'Saved',
   cancel: 'Cancel',
   close: 'Close',
+  qr: {
+    shareLink: 'Share the link',
+    copied: 'Link copied',
+    failed: 'Couldn’t share. Show the code instead — it scans.',
+    a11y: 'QR code: {title}',
+  },
   back: 'Back',
   next: 'Next',
   done: 'Done',
