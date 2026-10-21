@@ -224,18 +224,14 @@ export function WideFeed() {
       <ScrollView style={[styles.panel, { width: fullPanelW, borderLeftColor: c.line }]} contentContainerStyle={styles.panelContent}>
         <View style={styles.panelHead}>
           <Text style={[styles.panelTitle, { color: c.text }]}>{t('feed.wide.who')}</Text>
-          {n > 0 && (
-            <View style={[styles.count, { backgroundColor: c.surface2 }]}>
-              <Text style={[onest('bold', 13, 16), { color: c.text }]}>{n}</Text>
-            </View>
-          )}
           <Pressable accessibilityRole="button" accessibilityLabel={t('feed.wide.hidePanel')} hitSlop={10} onPress={() => togglePanel(false)}>
             <X size={20} color={c.muted} strokeWidth={2} />
           </Pressable>
         </View>
         {/* No zeros: an empty room reads as an invitation, and "0 going solo" says nothing when nobody is going. */}
         <View style={[styles.summary, { backgroundColor: c.surface }]}>
-          {n > 0 && <AvatarStack people={preview} size={36} extra={Math.max(0, n - preview.length)} />}
+          {/* Faces only: a lone "+1" bubble just repeats the count written next to it. */}
+          {preview.length > 0 && <AvatarStack people={preview} size={36} extra={Math.max(0, n - preview.length)} />}
           <View style={styles.textCol}>
             {n === 0 ? (
               <>
@@ -364,7 +360,6 @@ const styles = StyleSheet.create({
   panelContent: { paddingTop: 32, paddingHorizontal: 28, paddingBottom: 28, gap: 16 },
   panelHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   panelTitle: { flex: 1, fontFamily: fonts.displaySemibold, fontSize: 18, lineHeight: 22 },
-  count: { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 14 },
   summary: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 12, borderRadius: 16 },
   textCol: { flex: 1, gap: 2 },
   locked: { gap: 10 },
