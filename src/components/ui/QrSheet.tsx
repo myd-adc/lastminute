@@ -24,7 +24,8 @@ type Props = {
   onShare: () => Promise<ShareOutcome>;
 };
 
-// "Show a friend": a big code to scan straight off your screen, with the plain link and the usual share under it.
+// "Show a friend": a big code to scan straight off your screen, with the usual share under it. No link printed:
+// the short id means nothing to a reader, and the scanner's camera shows the address anyway.
 // The share result is reported here rather than in a toast, which would sit behind this sheet's scrim.
 export function QrSheet({ visible, onClose, title, sub, subject, url, onShare }: Props) {
   const { c } = useTheme();
@@ -54,9 +55,6 @@ export function QrSheet({ visible, onClose, title, sub, subject, url, onShare }:
       <View style={styles.code}>
         <QrCode value={url} size={wide ? 280 : 240} label={t('common.qr.a11y', { title: subject })} />
       </View>
-      <Text selectable numberOfLines={1} ellipsizeMode="middle" style={[onest('regular', 13, 17), styles.centre, { color: c.muted }]}>
-        {url.replace(/^https:\/\//, '').replace(/\?.*$/, '')}
-      </Text>
     </Sheet>
   );
 }
