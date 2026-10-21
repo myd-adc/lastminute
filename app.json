@@ -54,6 +54,13 @@
     "scheme": "lastminute",
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "52cbaaab-c174-41c2-9a68-037e717ee3a8"
+      }
+    },
+    "owner": "myd-adc"
   }
 }
