@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
-import { useRef, type ReactNode, type RefObject } from 'react';
-import { Image, Linking, Pressable, StyleSheet, View } from 'react-native';
+import { useEffect, useRef, type ReactNode, type RefObject } from 'react';
+import { Linking, Pressable, StyleSheet, View } from 'react-native';
 
 import { partnerMail } from '@/components/onboarding/AuthSplit';
 import { HeroBlobs } from '@/components/onboarding/HeroBlobs';
@@ -56,6 +56,30 @@ const shots = {
   },
 } satisfies Record<Lang, Record<Scheme, Record<string, number>>>;
 
+// On web an image require is { uri, width, height }, not a number.
+const uriOf = (shot: number) => (shot as unknown as { uri: string }).uri;
+
+// Keeps the decoded images alive, so switching language or theme swaps them instantly.
+const preloaded: HTMLImageElement[] = [];
+function preloadShots() {
+  if (preloaded.length) return;
+  for (const byScheme of Object.values(shots)) {
+    for (const set of Object.values(byScheme)) {
+      for (const shot of Object.values(set)) {
+        const img = new window.Image();
+        img.src = uriOf(shot);
+        img.decode().catch(() => {});
+        preloaded.push(img);
+      }
+    }
+  }
+}
+
+// A plain <img>: react-native-web's Image blanks out while a new source loads, even from cache.
+function Shot({ shot, style }: { shot: number; style: object }) {
+  return <img src={uriOf(shot)} alt="" draggable={false} style={{ display: 'block', objectFit: 'cover', ...style }} />;
+}
+
 const STEPS = [
   { key: 'pick', shot: 'event' },
   { key: 'see', shot: 'stepRoom' },
@@ -81,6 +105,10 @@ const NAV_HEIGHT = 98;
 // Figma phone shell: 265 × 574 at radius 30, drop shadow 0 30 60 rgba(0,0,0,.45).
 const phone = { position: 'absolute', borderRadius: 30, boxShadow: '0 30px 60px rgba(0,0,0,0.45)' } as const;
 
+const heroShot = { width: 265, height: 574, borderRadius: 30 };
+const fill = { width: '100%', height: '100%' };
+const commShot = { width: 420, height: 560 };
+
 type Section = 'how' | 'safety' | 'communities' | 'venues';
 
 export function Landing() {
@@ -94,6 +122,7 @@ export function Landing() {
   const communities = useRef<HTMLDivElement>(null);
   const venues = useRef<HTMLDivElement>(null);
   const img = shots[lang][scheme];
+  useEffect(preloadShots, []);
 
   const { scrollY } = useScroll({ container: scroller });
   // Hero parallax: glows sink and fade, the phones rise at two speeds, the copy fades as it leaves.
@@ -158,10 +187,10 @@ export function Landing() {
           </motion.div>
           <View style={styles.stage} accessibilityLabel={t('onboarding.landing.phonesA11y')}>
             <motion.div style={{ ...phone, left: 0, top: 70, y: feedY }}>
-              <Image source={img.feed} style={styles.heroShot} />
+              <Shot shot={img.feed} style={heroShot} />
             </motion.div>
             <motion.div style={{ ...phone, left: 250, top: 0, y: roomY, rotate: roomRotate }}>
-              <Image source={img.room} style={styles.heroShot} />
+              <Shot shot={img.room} style={heroShot} />
             </motion.div>
           </View>
         </View>
@@ -180,7 +209,7 @@ export function Landing() {
                   <Text style={[display(24, 30), { color: c.text }]}>{t(`onboarding.landing.how.${s.key}.title`)}</Text>
                   <Text style={[onest('regular', 16, 24), { color: c.muted }]}>{t(`onboarding.landing.how.${s.key}.body`)}</Text>
                   <View style={styles.stepShot}>
-                    <Image source={img[s.shot]} style={styles.fill} />
+                    <Shot shot={img[s.shot]} style={fill} />
                   </View>
                 </View>
               </Reveal>
@@ -270,7 +299,7 @@ function Communities({ root, shot, reduce }: { root: RefObject<HTMLDivElement | 
           </View>
         </View>
         <motion.div style={{ y }}>
-          <Image source={shot} style={styles.commShot} />
+          <Shot shot={shot} style={commShot} />
         </motion.div>
       </View>
     </div>
@@ -337,19 +366,16 @@ const styles = StyleSheet.create({
   heroRow: { flexDirection: 'row', alignItems: 'center', gap: 64, paddingTop: NAV_HEIGHT + 72, paddingBottom: 112 },
   ctas: { flexDirection: 'row', gap: 12, marginTop: 36 },
   stage: { width: 520, height: 640 },
-  heroShot: { width: 265, height: 574, borderRadius: 30 },
   section: { paddingTop: 96, paddingBottom: 24, gap: 48 },
   steps: { flexDirection: 'row', gap: 24 },
   stepCard: { flex: 1, borderRadius: 28, borderWidth: 1, paddingTop: 28, paddingHorizontal: 28, gap: 14, overflow: 'hidden' },
   badge: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
   // Pinned to the card bottom so the three phones line up whatever the text length above them.
   stepShot: { width: '100%', aspectRatio: 328 / 380, marginTop: 'auto', paddingTop: 6, overflow: 'hidden' },
-  fill: { width: '100%', height: '100%' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 24 },
   cell: { flexBasis: '30%', flexGrow: 1, minWidth: 0 },
   principle: { flex: 1, borderRadius: 24, borderWidth: 1, padding: 28, gap: 12 },
   commRow: { flexDirection: 'row', alignItems: 'center', gap: 80, paddingBottom: 72 },
-  commShot: { width: 420, height: 560 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   chip: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 999 },
   band: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 32, padding: 56, borderRadius: 32 },
