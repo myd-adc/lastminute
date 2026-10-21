@@ -16,13 +16,13 @@ import { useStore } from '@/store/AppStore';
 
 import { DateTile } from './DateTile';
 import { EndOfFeed } from './EndOfFeed';
+import { EventQrSheet } from './EventQrSheet';
 import { WideFeedSkeleton } from './FeedSkeleton';
 import { FEED_TAB_ORDER, FeedTabs } from './FeedTabs';
 import { priceLabel } from './format';
 import { posterPillBg } from './FeedPage';
 import { PosterArt } from './PosterArt';
 import { RailButton } from './RailButton';
-import { useToast } from './Toast';
 import { useFeed } from './useFeed';
 
 // W03 numbers: a 440 pt panel beside a 440×720 card. Below ~1400 pt the window cannot hold both at full size,
@@ -47,8 +47,7 @@ export function WideFeed() {
   const { c, scheme } = useTheme();
   const { t } = useT();
   const { width: winW, height: winH } = useWindowDimensions();
-  const toast = useToast(40);
-  const { state, now, feed, previews, handlers, setTab } = useFeed(toast.show);
+  const { state, now, feed, previews, handlers, setTab, sharing, closeShare } = useFeed();
   const { loading } = useStore();
   const [index, setIndex] = useState(0);
   const [panelOpen, setPanelOpen] = useState(readPanel);
@@ -146,7 +145,7 @@ export function WideFeed() {
         </View>
         {/* No event, nobody to show: the panel folds away instead of standing empty. */}
         <SlidePanel visible={false} width={fullPanelW} />
-        {toast.node}
+        <EventQrSheet event={sharing} onClose={closeShare} />
       </View>
     );
   }
@@ -211,7 +210,7 @@ export function WideFeed() {
       <SlidePanel visible={panelOpen} width={fullPanelW}>
         {whoPanel(event, goingN, previews[event.id]?.people ?? [])}
       </SlidePanel>
-      {toast.node}
+      <EventQrSheet event={sharing} onClose={closeShare} />
     </View>
   );
 

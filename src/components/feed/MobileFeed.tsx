@@ -13,10 +13,10 @@ import { useTheme } from '@/theme';
 import { useStore, type FeedTab } from '@/store/AppStore';
 
 import { EndOfFeed } from './EndOfFeed';
+import { EventQrSheet } from './EventQrSheet';
 import { FeedPage } from './FeedPage';
 import { MobileFeedSkeleton } from './FeedSkeleton';
 import { FEED_TAB_ORDER, FeedTabs } from './FeedTabs';
-import { useToast } from './Toast';
 import { useFeed } from './useFeed';
 
 const SWIPE_TABS = ['communities', 'forYou'] as const;
@@ -26,8 +26,7 @@ export function MobileFeed() {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const clearance = tabBarClearance(insets.bottom);
-  const toast = useToast(clearance + 8);
-  const { state, now, feed, previews, handlers, setTab } = useFeed(toast.show);
+  const { state, now, feed, previews, handlers, setTab, sharing, closeShare } = useFeed();
   const { loading } = useStore();
   const [size, setSize] = useState({ w: 0, h: 0 });
   const listRef = useRef<FlatList<Event>>(null);
@@ -172,7 +171,7 @@ export function MobileFeed() {
           </>
         )
       )}
-      {toast.node}
+      <EventQrSheet event={sharing} onClose={closeShare} />
     </View>
   );
 }

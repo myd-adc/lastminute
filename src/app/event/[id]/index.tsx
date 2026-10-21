@@ -8,16 +8,15 @@ import { InfoRow, PeopleStack } from '@/components/feed/DetailsParts';
 import { CancelEventSheet, LeaveEventLink } from '@/components/feed/LeaveEvent';
 import { categoryLabel, mapsUrl, priceLabel, shortTitle } from '@/components/feed/format';
 import { PosterArt } from '@/components/feed/PosterArt';
-import { shareEvent } from '@/components/feed/share';
+import { EventQrSheet } from '@/components/feed/EventQrSheet';
 import { useToast } from '@/components/feed/Toast';
-import { Avatar, AvatarStack, Button, Chip, CloseButton, goBack, IconButton, Pill, QrSheet, Sheet } from '@/components/ui';
+import { Avatar, AvatarStack, Button, Chip, CloseButton, goBack, IconButton, Pill, Sheet } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
 import { getEvent, soloGroups } from '@/data/mock';
 import type { Event } from '@/data/types';
 import { useT } from '@/i18n';
 import { t as translate } from '@/i18n/translate';
 import { fullWindow, useIsWide } from '@/lib/layout';
-import { eventQrUrl } from '@/lib/links';
 import { pop, slideUp, useEscape, useOverlayMotion, useSheetDrag } from '@/lib/motion';
 import { acquaintances, attendeesFor, eventAuthor, goingCount, isMyEvent, soloCount, soloGroupMembers } from '@/lib/selectors';
 import { dayLabel, whenLabel } from '@/lib/time';
@@ -73,17 +72,7 @@ function useDetails(event: Event) {
   // "Send to a friend" opens the code first: the friend is usually sitting right there.
   const [qrOpen, setQrOpen] = useState(false);
   const share = () => setQrOpen(true);
-  const qr = (
-    <QrSheet
-      visible={qrOpen}
-      onClose={() => setQrOpen(false)}
-      title={t('feed.qr.title')}
-      sub={t('feed.qr.sub')}
-      subject={event.title}
-      url={eventQrUrl(event.id)}
-      onShare={() => shareEvent(event, now)}
-    />
-  );
+  const qr = <EventQrSheet event={qrOpen ? event : null} onClose={() => setQrOpen(false)} />;
   const toggleSave = () => dispatch({ type: 'toggleSaved', eventId: event.id });
   const openRoom = () => router.replace({ pathname: '/event/[id]/room', params: { id: event.id } });
   const go = (patch?: Partial<Going>) => {
