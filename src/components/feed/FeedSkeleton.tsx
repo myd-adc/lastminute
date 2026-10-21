@@ -33,13 +33,9 @@ export function MobileFeedSkeleton({ header }: { header: ReactNode }) {
           <View style={styles.rail}>
             <Bone w={44} h={44} r={22} />
             <Bone w={44} h={44} r={22} />
-            <Bone w={44} h={44} r={22} />
           </View>
         </View>
-        <View style={[styles.row, { marginTop: 18 }]}>
-          <Bone w={56} h={56} r={28} />
-          <Bone h={56} r={28} style={styles.flex} />
-        </View>
+        <Bone h={56} r={28} style={{ marginTop: 18 }} />
       </Skeleton>
       <View style={[styles.header, { top: insets.top + 8 }]}>{header}</View>
     </View>
@@ -68,10 +64,7 @@ export function WideFeedSkeleton({ tabs, cardW, cardH, panelW }: { tabs: ReactNo
               </View>
               <Bone w="82%" h={34} r={8} />
               <Bone w="60%" h={34} r={8} />
-              <View style={[styles.row, { marginTop: 12 }]}>
-                <Bone w={56} h={56} r={28} />
-                <Bone h={56} r={28} style={styles.flex} />
-              </View>
+              <Bone h={56} r={28} style={{ marginTop: 12 }} />
             </View>
           </View>
         </View>
@@ -103,7 +96,7 @@ const styles = StyleSheet.create({
   header: { position: 'absolute', left: 20, right: 20 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   bottom: { flexDirection: 'row', gap: 14 },
-  rail: { width: 52, alignItems: 'center', justifyContent: 'space-between', gap: 12 },
+  rail: { width: 52, alignItems: 'center', justifyContent: 'flex-end', gap: 12 },
   wideRoot: { flex: 1, flexDirection: 'row' },
   centre: { paddingTop: 32, paddingBottom: 24 },
   tabs: { alignSelf: 'center', paddingLeft: 12 },
