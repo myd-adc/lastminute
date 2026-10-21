@@ -1,15 +1,16 @@
 import { router } from 'expo-router';
 import { ChevronDown, ChevronUp, ImagePlus, Palette } from 'lucide-react-native';
 import { useMemo, useState, type ReactNode } from 'react';
-import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Field, InputBox, TextField } from '@/components/onboarding/kit';
 import { pickableInterests } from '@/components/onboarding/PreferencesForm';
 import { Glow, glows } from '@/components/profile/Glow';
 import { PageHead } from '@/components/community/PageHead';
+import { PosterArt } from '@/components/feed/PosterArt';
 import { Button, Chip, Gradient, Screen, Segmented } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
-import type { InterestId } from '@/data/types';
+import type { Event, InterestId } from '@/data/types';
 import { useT } from '@/i18n';
 import { useIsWide } from '@/lib/layout';
 import { pickPosterImage } from '@/lib/pickSquareImage';
@@ -19,6 +20,9 @@ import { onest, type, useTheme } from '@/theme';
 import { type GradientId, gradientIds } from '@/theme/palette';
 
 const DAYS = 7;
+// The poster preview: the feed card's 1:1.45 portrait at thumbnail size.
+const PREVIEW_W = 96;
+const PREVIEW_H = 140;
 const DURATIONS = [1, 2, 3, 4];
 const TIME_RE = /^([01]?\d|2[0-3]):([0-5]\d)$/;
 
@@ -75,6 +79,11 @@ export function EventForm({ title: head, sub, communityId, defaultGradient, note
   const timeHint = !!start.trim() && !startsAt ? t('community.event.badTime') : past ? t('community.event.pastTime') : null;
   const needsCategory = !category && title.trim().length >= 2 && venue.trim().length >= 2 && !!startsAt && !past;
 
+  const previewEvent = {
+    poster: { lines: lines.length ? lines : ['LAST', 'MINUTE'], emoji: pickableInterests().find((i) => i.id === category)?.emoji ?? '', gradient },
+    image: posterKind === 'photo' && image ? image : undefined,
+  } as Event;
+
   const publish = async () => {
     if (!startsAt || !endsAt) return setError(t('community.event.badTime'));
     if (!valid || !category) return;
@@ -115,13 +124,10 @@ export function EventForm({ title: head, sub, communityId, defaultGradient, note
         style={styles.cover}
       >
         <View>
-          {posterKind === 'photo' && image ? (
-            <Image source={{ uri: image }} style={styles.avatar} />
-          ) : (
-            <Gradient id={gradient} style={styles.avatar}>
-              <Text style={[onest('bold', 34), styles.initial]}>{lines[0]?.[0]}</Text>
-            </Gradient>
-          )}
+          {/* A small copy of the feed card's poster, so the choice shows what people will actually see. */}
+          <View style={styles.preview}>
+            <PosterArt event={previewEvent} width={PREVIEW_W} height={PREVIEW_H} variant="dialog" />
+          </View>
           <View style={[styles.badge, { backgroundColor: c.accent, borderColor: c.bg }]}>
             <Palette size={14} color={c.onAccent} strokeWidth={2} />
           </View>
@@ -145,7 +151,6 @@ export function EventForm({ title: head, sub, communityId, defaultGradient, note
       />
       {posterOpen && posterKind === 'photo' && (
         <View style={styles.photoRow}>
-          {image && <Image source={{ uri: image }} style={styles.photoThumb} resizeMode="cover" />}
           <View style={{ flex: 1, gap: 8 }}>
             <Text style={[onest('regular', 13, 17.5), { color: c.muted }]}>{t('community.event.posterPhotoSub')}</Text>
             <Pressable
@@ -267,8 +272,7 @@ export function EventForm({ title: head, sub, communityId, defaultGradient, note
 const styles = StyleSheet.create({
   wide: { maxWidth: 640, width: '100%', alignSelf: 'center' },
   cover: { flexDirection: 'row', alignItems: 'center', gap: 16 },
-  avatar: { width: 88, height: 88, borderRadius: 44, alignItems: 'center', justifyContent: 'center' },
-  initial: { color: '#fff' },
+  preview: { width: PREVIEW_W, height: PREVIEW_H, borderRadius: 14, overflow: 'hidden' },
   badge: {
     position: 'absolute',
     right: -2,
@@ -282,7 +286,6 @@ const styles = StyleSheet.create({
   },
   swatch: { width: 30, height: 30, borderRadius: 15 },
   photoRow: { flexDirection: 'row', gap: 14, alignItems: 'center' },
-  photoThumb: { width: 84, height: 118, borderRadius: 12 },
   photoBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'flex-start', height: 40, paddingHorizontal: 14, borderRadius: 20 },
   input: { minHeight: 54 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, alignItems: 'center' },
