@@ -9,32 +9,52 @@ import { Logo, ThemeToggle } from '@/components/onboarding/kit';
 import { QrCard } from '@/components/onboarding/QrCard';
 import { Button } from '@/components/ui';
 import { Text } from '@/components/ui/Text';
-import { useT } from '@/i18n';
+import { useT, type Lang } from '@/i18n';
 import { useStore } from '@/store/AppStore';
 import { display, onest, useTheme, type Scheme } from '@/theme';
 
 // W00 landing (Figma «W00 landing» / «· Light»): what LastMinute is, before the W01 sign-in.
 // Plain DOM scroll container so Motion can drive the parallax from its scroll position.
 
+// Phone screenshots of the demo app, per language and theme.
 const shots = {
-  dark: {
-    feed: require('../../../assets/landing/dark-hero-feed.webp'),
-    room: require('../../../assets/landing/dark-hero-room.webp'),
-    event: require('../../../assets/landing/dark-step-event.webp'),
-    stepRoom: require('../../../assets/landing/dark-step-room.webp'),
-    match: require('../../../assets/landing/dark-step-match.webp'),
-    communities: require('../../../assets/landing/dark-communities.webp'),
+  uk: {
+    dark: {
+      feed: require('../../../assets/landing/uk-dark-hero-feed.webp'),
+      room: require('../../../assets/landing/uk-dark-hero-room.webp'),
+      event: require('../../../assets/landing/uk-dark-step-event.webp'),
+      stepRoom: require('../../../assets/landing/uk-dark-step-room.webp'),
+      match: require('../../../assets/landing/uk-dark-step-match.webp'),
+      communities: require('../../../assets/landing/uk-dark-communities.webp'),
+    },
+    light: {
+      feed: require('../../../assets/landing/uk-light-hero-feed.webp'),
+      room: require('../../../assets/landing/uk-light-hero-room.webp'),
+      event: require('../../../assets/landing/uk-light-step-event.webp'),
+      stepRoom: require('../../../assets/landing/uk-light-step-room.webp'),
+      match: require('../../../assets/landing/uk-light-step-match.webp'),
+      communities: require('../../../assets/landing/uk-light-communities.webp'),
+    },
   },
-  light: {
-    // The light feed export carries dark chips from the Figma copy; the poster reads the same on the dark one.
-    feed: require('../../../assets/landing/dark-hero-feed.webp'),
-    room: require('../../../assets/landing/light-hero-room.webp'),
-    event: require('../../../assets/landing/light-step-event.webp'),
-    stepRoom: require('../../../assets/landing/light-step-room.webp'),
-    match: require('../../../assets/landing/light-step-match.webp'),
-    communities: require('../../../assets/landing/light-communities.webp'),
+  en: {
+    dark: {
+      feed: require('../../../assets/landing/en-dark-hero-feed.webp'),
+      room: require('../../../assets/landing/en-dark-hero-room.webp'),
+      event: require('../../../assets/landing/en-dark-step-event.webp'),
+      stepRoom: require('../../../assets/landing/en-dark-step-room.webp'),
+      match: require('../../../assets/landing/en-dark-step-match.webp'),
+      communities: require('../../../assets/landing/en-dark-communities.webp'),
+    },
+    light: {
+      feed: require('../../../assets/landing/en-light-hero-feed.webp'),
+      room: require('../../../assets/landing/en-light-hero-room.webp'),
+      event: require('../../../assets/landing/en-light-step-event.webp'),
+      stepRoom: require('../../../assets/landing/en-light-step-room.webp'),
+      match: require('../../../assets/landing/en-light-step-match.webp'),
+      communities: require('../../../assets/landing/en-light-communities.webp'),
+    },
   },
-} satisfies Record<Scheme, Record<string, number>>;
+} satisfies Record<Lang, Record<Scheme, Record<string, number>>>;
 
 const STEPS = [
   { key: 'pick', shot: 'event' },
@@ -73,7 +93,7 @@ export function Landing() {
   const safety = useRef<HTMLDivElement>(null);
   const communities = useRef<HTMLDivElement>(null);
   const venues = useRef<HTMLDivElement>(null);
-  const img = shots[scheme];
+  const img = shots[lang][scheme];
 
   const { scrollY } = useScroll({ container: scroller });
   // Hero parallax: glows sink and fade, the phones rise at two speeds, the copy fades as it leaves.
